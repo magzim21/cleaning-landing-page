@@ -42,8 +42,7 @@
           "Car steam cleaning",
           "Car seat cleaning",
           "Car carpet cleaning"
-        ],
-        "url": "https://cccdetailing.ca"
+        ]
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,10 +81,15 @@
         font-family: "DM Sans", system-ui, sans-serif;
         font-optical-sizing: auto;
         font-size: 1rem;
-        line-height: 1.6;
+        line-height: 1.55;
         color: var(--text);
         background: var(--bg-deep);
         -webkit-font-smoothing: antialiased;
+      }
+
+      p {
+        font-size: 0.94rem;
+        line-height: 1.42;
       }
 
       a {
@@ -344,7 +348,7 @@
       }
 
       .hero-lede {
-        font-size: 1.125rem;
+        font-size: 1.02rem;
         color: var(--text-muted);
         max-width: 36ch;
         margin: 0 0 28px;
@@ -490,7 +494,7 @@
       .section-head p {
         margin: 0;
         color: var(--text-muted);
-        font-size: 1.05rem;
+        font-size: 0.98rem;
       }
 
       /* Services */
@@ -711,7 +715,7 @@
         font-weight: 600;
       }
 
-      @media (max-width: 768px) {
+      @media (max-width: 767px) {
         .site-header .inner {
           flex-wrap: wrap;
           justify-content: center;
@@ -753,8 +757,17 @@
           font-size: clamp(1.95rem, 7.6vw, 2.6rem);
         }
 
+        .eyebrow {
+          display: flex;
+          width: fit-content;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
         .hero-lede {
-          font-size: 1rem;
+          font-size: 0.95rem;
+          max-width: none;
+          width: 100%;
           margin-bottom: 20px;
         }
 
@@ -775,6 +788,66 @@
 
         .cta-band {
           padding: 26px 14px;
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 1280px) {
+        .wrap {
+          padding: 0 20px;
+        }
+
+        .site-header .inner {
+          padding: 14px 20px;
+          gap: 10px;
+        }
+
+        .brand {
+          font-size: 1.05rem;
+        }
+
+        .header-center {
+          display: none;
+        }
+
+        .header-contact {
+          font-size: 0.74rem;
+          line-height: 1.3;
+        }
+
+        .header-contact .line:last-child {
+          display: none;
+        }
+
+        .nav-actions {
+          margin-left: auto;
+          gap: 8px;
+        }
+
+        .nav-actions .btn {
+          padding: 9px 14px;
+          font-size: 0.88rem;
+        }
+
+        .hero {
+          padding: 40px 0 46px;
+        }
+
+        .hero-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+          gap: 22px;
+          align-items: start;
+        }
+
+        .hero-lede {
+          max-width: 44ch;
+        }
+
+        .steps {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .steps .step:last-child {
+          grid-column: 1 / -1;
         }
       }
     </style>
@@ -890,18 +963,18 @@
                 <li>Tire shine + quick trim finish</li>
                 <li>Ideal every 2-3 weeks</li>
               </ul>
-              <p class="price">From $49 <small>/ sedan</small></p>
+              <p class="price">From CA$149 <small>/ sedan</small></p>
             </article>
             <article class="card">
               <span class="card-tag">Most booked</span>
               <h3>Inside + out complete</h3>
-              <p>Best value for weekly drivers, rideshare use, and family cars needing interior cleaning car care.</p>
+              <p>Best value for weekly drivers, rideshare use, and family cars needing reliable interior car cleaning.</p>
               <ul class="package-points">
-                <li>Everything in Express, plus full car cleaning interior vacuum</li>
+                <li>Everything in Express, plus a full interior car cleaning vacuum</li>
                 <li>Dashboard, console, doors, and cupholders cleaned</li>
                 <li>Interior glass and odor-neutral finish</li>
               </ul>
-              <p class="price">From $89 <small>/ sedan</small></p>
+              <p class="price">From CA$199 <small>/ sedan</small></p>
             </article>
             <article class="card">
               <span class="card-tag">Best results</span>
@@ -913,7 +986,7 @@
                 <li>Clay prep + paint-safe decontamination</li>
                 <li>Polymer sealant for lasting gloss</li>
               </ul>
-              <p class="price">From $189 <small>/ sedan</small></p>
+              <p class="price">From CA$299 <small>/ sedan</small></p>
             </article>
           </div>
         </div>
