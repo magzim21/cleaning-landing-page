@@ -1275,7 +1275,7 @@
         const loopDistance = promoTrack.scrollWidth / 2;
         promoTrack.style.setProperty("--promo-loop-distance", `-${loopDistance}px`);
 
-        const durationSeconds = Math.max(24, Math.round(loopDistance / 70));
+        const durationSeconds = Math.max(48, Math.round((loopDistance / 70) * 2));
         promoTrack.style.setProperty("--promo-duration", `${durationSeconds}s`);
       }
 
