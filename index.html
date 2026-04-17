@@ -241,7 +241,12 @@
       .nav-actions {
         display: flex;
         align-items: center;
+        flex-wrap: nowrap;
         gap: 12px;
+      }
+
+      .nav-actions .btn {
+        flex-shrink: 0;
       }
 
       .header-center {
@@ -272,6 +277,7 @@
         justify-content: center;
         gap: 8px;
         padding: 10px 18px;
+        white-space: nowrap;
         border-radius: 999px;
         font-family: inherit;
         font-weight: 600;
@@ -795,6 +801,140 @@
         color: var(--text-muted);
       }
 
+      /* Booking modal */
+      .booking-modal[hidden] {
+        display: none;
+      }
+
+      .booking-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 120;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+      }
+
+      .booking-modal__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(2, 6, 12, 0.72);
+        backdrop-filter: blur(4px);
+      }
+
+      .booking-modal__panel {
+        position: relative;
+        width: min(680px, 100%);
+        max-height: 90vh;
+        overflow: auto;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: linear-gradient(165deg, rgba(15, 22, 36, 0.98), rgba(11, 18, 31, 0.98));
+        box-shadow: 0 26px 80px rgba(0, 0, 0, 0.55);
+        padding: 24px;
+      }
+
+      .booking-modal__close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.5);
+        color: var(--text);
+        font-size: 1.1rem;
+        cursor: pointer;
+      }
+
+      .booking-modal__close:hover {
+        background: rgba(30, 41, 59, 0.65);
+      }
+
+      .booking-modal h2 {
+        margin: 0 0 8px;
+        font-family: "Outfit", sans-serif;
+        font-size: 1.5rem;
+      }
+
+      .booking-modal__intro {
+        margin: 0 0 18px;
+        color: var(--text-muted);
+      }
+
+      .booking-form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .booking-form__row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .booking-field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .booking-field label {
+        font-size: 0.86rem;
+        color: var(--text-muted);
+      }
+
+      .booking-field input,
+      .booking-field select,
+      .booking-field textarea {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.65);
+        color: var(--text);
+        font: inherit;
+        padding: 10px 12px;
+      }
+
+      .booking-field textarea {
+        min-height: 92px;
+        resize: vertical;
+      }
+
+      .booking-field input:focus-visible,
+      .booking-field select:focus-visible,
+      .booking-field textarea:focus-visible {
+        outline: 2px solid rgba(56, 189, 248, 0.75);
+        outline-offset: 1px;
+      }
+
+      .booking-help {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .booking-form__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      @media (max-width: 767px) {
+        .booking-modal {
+          padding: 12px;
+        }
+
+        .booking-modal__panel {
+          padding: 18px;
+        }
+
+        .booking-form__row {
+          grid-template-columns: 1fr;
+        }
+      }
+
       /* Footer */
       .site-footer {
         padding: 40px 24px 48px;
@@ -845,20 +985,40 @@
 
       @media (max-width: 767px) {
         .site-header .inner {
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 10px;
-          padding: 12px 12px;
+          flex-wrap: nowrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 12px;
         }
 
         .header-center {
-          order: 3;
-          flex-basis: 100%;
+          display: none;
         }
 
-        .header-contact {
-          font-size: 0.78rem;
-          text-align: center;
+        .brand {
+          font-size: 1rem;
+          gap: 8px;
+        }
+
+        .brand-mark {
+          width: 32px;
+          height: 32px;
+          border-radius: 9px;
+        }
+
+        .nav-actions {
+          margin-left: auto;
+          gap: 8px;
+        }
+
+        .nav-actions .btn {
+          padding: 8px 14px;
+          font-size: 0.9rem;
+        }
+
+        .nav-actions .btn.btn-primary {
+          padding-inline: 16px;
         }
 
         .wrap {
@@ -995,7 +1155,7 @@
         </div>
         <nav class="nav-actions" aria-label="Primary">
           <a class="btn btn-ghost" href="tel:+17789840698">Call</a>
-          <a class="btn btn-primary" href="#book">Book a wash</a>
+          <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Header CTA">Book a wash</a>
         </nav>
       </div>
     </header>
@@ -1019,7 +1179,7 @@
               No lines, no waiting rooms, no hidden fees. CCC stands for Comox Valley, Campbell River, Courtenay, and Cumberland.
             </p>
             <div class="hero-cta">
-              <a class="btn btn-primary" href="#book">Get your quote</a>
+              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Hero CTA">Get your quote</a>
               <a class="btn btn-ghost" href="#services">View packages</a>
             </div>
             <p class="hero-note">Local new-client offer: save 20% on your first clean this month in our North Island service area.</p>
@@ -1206,7 +1366,7 @@
             <h2>Get your CCC Detailing quote in under 10 minutes</h2>
             <p>Tell us your vehicle and address and we will reply with exact pricing, nearest available slot in Comox Valley, Campbell River, Courtenay, or Cumberland, and your 20% first-clean code.</p>
             <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
-              <a class="btn btn-primary" href="mailto:book@maxim.run?subject=CCC%20Detailing%20quote%20request">Claim my 20% offer</a>
+              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Offer CTA">Claim my 20% offer</a>
               <a class="btn btn-ghost" href="tel:+17789840698">Call now: (778) 984-0698</a>
             </div>
           </div>
@@ -1235,6 +1395,55 @@
         </div>
       </section>
     </main>
+
+    <div class="booking-modal" id="booking-modal" hidden>
+      <div class="booking-modal__backdrop" data-close-booking></div>
+      <div class="booking-modal__panel" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+        <button class="booking-modal__close" type="button" data-close-booking aria-label="Close booking form">×</button>
+        <h2 id="booking-modal-title">Book your detailing</h2>
+        <p class="booking-modal__intro">Share the details below and we will reply with your confirmed slot and exact quote.</p>
+        <form class="booking-form" id="booking-form">
+          <input type="hidden" id="booking-source" name="booking_source" value="Website">
+          <div class="booking-field">
+            <label for="client-address">Client's address</label>
+            <textarea id="client-address" name="client_address" required placeholder="Street, city, postal code"></textarea>
+          </div>
+          <div class="booking-form__row">
+            <div class="booking-field">
+              <label for="preferred-start">Preferred date/time from</label>
+              <input id="preferred-start" name="preferred_start" type="datetime-local" required>
+            </div>
+            <div class="booking-field">
+              <label for="preferred-end">Preferred date/time to</label>
+              <input id="preferred-end" name="preferred_end" type="datetime-local" required>
+            </div>
+          </div>
+          <div class="booking-field">
+            <label for="car-model">Car model</label>
+            <input id="car-model" name="car_model" type="text" required placeholder="Example: 2020 Toyota RAV4">
+          </div>
+          <div class="booking-field">
+            <label for="package-type">Package type</label>
+            <select id="package-type" name="package_type" required>
+              <option value="">Select a package</option>
+              <option value="Express outside reset">Express outside reset</option>
+              <option value="Inside + out complete">Inside + out complete</option>
+              <option value="Deep detail + protect">Deep detail + protect</option>
+              <option value="Not sure yet">Not sure yet</option>
+            </select>
+          </div>
+          <div class="booking-field">
+            <label for="stain-photos">Pictures upload (hard stains if any)</label>
+            <input id="stain-photos" name="stain_photos" type="file" accept="image/*" multiple>
+            <p class="booking-help">Optional. You can attach stain photos so we can estimate time and treatment.</p>
+          </div>
+          <div class="booking-form__actions">
+            <button class="btn btn-primary" type="submit">Send booking request</button>
+            <button class="btn btn-ghost" type="button" data-close-booking>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <footer class="site-footer">
       <div class="inner">
@@ -1292,6 +1501,93 @@
       });
       setupInfinitePromoLoop();
       syncPromoTickerVisibility();
+
+      const bookingModal = document.getElementById("booking-modal");
+      const bookingForm = document.getElementById("booking-form");
+      const bookingSourceInput = document.getElementById("booking-source");
+      const bookingOpenButtons = document.querySelectorAll(".js-open-booking");
+      const bookingCloseButtons = document.querySelectorAll("[data-close-booking]");
+      const preferredStartInput = document.getElementById("preferred-start");
+      const preferredEndInput = document.getElementById("preferred-end");
+      const stainPhotosInput = document.getElementById("stain-photos");
+      let lastBookingTrigger = null;
+
+      function openBookingModal(triggerLabel, triggerElement) {
+        if (!bookingModal) return;
+        bookingModal.hidden = false;
+        document.body.style.overflow = "hidden";
+        if (bookingSourceInput) bookingSourceInput.value = triggerLabel || "Website";
+        lastBookingTrigger = triggerElement || null;
+        const firstInput = bookingModal.querySelector("textarea, input, select");
+        if (firstInput) firstInput.focus();
+      }
+
+      function closeBookingModal() {
+        if (!bookingModal) return;
+        bookingModal.hidden = true;
+        document.body.style.overflow = "";
+        if (lastBookingTrigger) lastBookingTrigger.focus();
+      }
+
+      function validatePreferredRange() {
+        if (!preferredStartInput || !preferredEndInput) return true;
+        if (!preferredStartInput.value || !preferredEndInput.value) return true;
+        const start = new Date(preferredStartInput.value);
+        const end = new Date(preferredEndInput.value);
+        const valid = end >= start;
+        preferredEndInput.setCustomValidity(valid ? "" : "End date/time must be after start date/time.");
+        return valid;
+      }
+
+      bookingOpenButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          openBookingModal(button.dataset.bookingSource || "Website", button);
+        });
+      });
+
+      bookingCloseButtons.forEach((button) => {
+        button.addEventListener("click", () => closeBookingModal());
+      });
+
+      if (preferredStartInput && preferredEndInput) {
+        preferredStartInput.addEventListener("change", validatePreferredRange);
+        preferredEndInput.addEventListener("change", validatePreferredRange);
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && bookingModal && !bookingModal.hidden) {
+          closeBookingModal();
+        }
+      });
+
+      if (bookingForm) {
+        bookingForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (!validatePreferredRange()) {
+            preferredEndInput.reportValidity();
+            return;
+          }
+
+          const formData = new FormData(bookingForm);
+          const photoCount = stainPhotosInput && stainPhotosInput.files ? stainPhotosInput.files.length : 0;
+          const packageType = String(formData.get("package_type") || "Not specified");
+          const emailSubject = `Booking request - ${packageType}`;
+          const emailBody = [
+            `Booking source: ${String(formData.get("booking_source") || "Website")}`,
+            `Client address: ${String(formData.get("client_address") || "").trim()}`,
+            `Preferred from: ${String(formData.get("preferred_start") || "")}`,
+            `Preferred to: ${String(formData.get("preferred_end") || "")}`,
+            `Car model: ${String(formData.get("car_model") || "").trim()}`,
+            `Package type: ${packageType}`,
+            `Stain photos selected: ${photoCount} file(s)`
+          ].join("\n");
+
+          window.location.href = `mailto:book@maxim.run?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+          bookingForm.reset();
+          closeBookingModal();
+        });
+      }
     </script>
   </body>
 </html>
