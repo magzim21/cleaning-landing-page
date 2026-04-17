@@ -32,6 +32,8 @@
 
       html {
         scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
       }
 
       body {
@@ -60,11 +62,58 @@
         padding: 0 24px;
       }
 
-      /* Header */
-      .site-header {
+      /* Sticky promo ticker */
+      .promo-ticker {
         position: sticky;
         top: 0;
-        z-index: 50;
+        z-index: 70;
+        background: rgba(6, 18, 12, 0.95);
+        color: #bbf7d0;
+        border-bottom: 1px solid rgba(34, 197, 94, 0.25);
+        overflow: hidden;
+      }
+
+      .promo-track {
+        display: flex;
+        width: max-content;
+        animation: ticker-scroll 40s linear infinite;
+      }
+
+      .promo-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 20px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        opacity: 0.9;
+      }
+
+      .promo-item .bolt {
+        color: #22c55e;
+      }
+
+      @keyframes ticker-scroll {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .promo-track {
+          animation: none;
+        }
+      }
+
+      /* Header */
+      .site-header {
+        position: relative;
+        z-index: 40;
         backdrop-filter: blur(12px);
         background: rgba(7, 11, 18, 0.85);
         border-bottom: 1px solid var(--border);
@@ -112,6 +161,28 @@
         display: flex;
         align-items: center;
         gap: 12px;
+      }
+
+      .header-center {
+        flex: 1;
+        text-align: center;
+        min-width: 0;
+      }
+
+      .header-contact {
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.35;
+      }
+
+      .header-contact .line {
+        display: block;
+      }
+
+      .header-contact a {
+        color: var(--text);
+        font-weight: 600;
       }
 
       .btn {
@@ -577,15 +648,106 @@
       .footer-links a:hover {
         color: var(--accent);
       }
+
+      .footer-address {
+        margin: 6px 0 0;
+        line-height: 1.5;
+      }
+
+      .footer-address a {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      @media (max-width: 768px) {
+        .site-header .inner {
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px 12px;
+        }
+
+        .header-center {
+          order: 3;
+          flex-basis: 100%;
+        }
+
+        .header-contact {
+          font-size: 0.78rem;
+          text-align: center;
+        }
+
+        .wrap {
+          padding: 0 12px;
+        }
+
+        .hero {
+          padding: 30px 0 36px;
+        }
+
+        .hero-grid {
+          gap: 22px;
+        }
+
+        section {
+          padding: 32px 0;
+        }
+
+        .section-head {
+          margin-bottom: 22px;
+        }
+
+        .hero h1 {
+          font-size: clamp(1.95rem, 7.6vw, 2.6rem);
+        }
+
+        .hero-lede {
+          font-size: 1rem;
+          margin-bottom: 20px;
+        }
+
+        .proof-card,
+        .card,
+        .step,
+        .signal-card,
+        .hero-card {
+          padding: 18px;
+        }
+
+        .cards,
+        .steps,
+        .signal-grid,
+        .proof-grid {
+          gap: 14px;
+        }
+
+        .cta-band {
+          padding: 26px 14px;
+        }
+      }
     </style>
   </head>
   <body>
+    <div class="promo-ticker" aria-label="Promotional offers">
+      <div class="promo-track">
+        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
+        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
+        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
+        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
+      </div>
+    </div>
     <header class="site-header">
       <div class="inner">
         <a class="brand" href="#top">
           <span class="brand-mark" aria-hidden="true">◆</span>
           CCC Detailing
         </a>
+        <div class="header-center" aria-label="Business address and mobile number">
+          <p class="header-contact">
+            <span class="line">8873 Driftwood, Black Creek, BC V9J 1A9 · <a href="tel:+17789840698">(778) 984-0698</a></span>
+            <span class="line"><a href="mailto:book@maxim.run">book@maxim.run</a></span>
+          </p>
+        </div>
         <nav class="nav-actions" aria-label="Primary">
           <a class="btn btn-ghost" href="tel:+17789840698">Call</a>
           <a class="btn btn-primary" href="#book">Book a wash</a>
@@ -777,7 +939,10 @@
 
     <footer class="site-footer">
       <div class="inner">
-        <p>© <span id="y"></span> CCC Detailing (Comox Valley · Campbell River · Courtenay · Cumberland). Owner-operated mobile detailing.</p>
+        <div>
+          <p>© <span id="y"></span> CCC Detailing (Comox Valley · Campbell River · Courtenay · Cumberland). Owner-operated mobile detailing.</p>
+          <p class="footer-address">8873 Driftwood<br>Black Creek, British Columbia V9J 1A9<br>Canada<br><a href="mailto:book@maxim.run">book@maxim.run</a></p>
+        </div>
         <div class="footer-links">
           <a href="#services">Services</a>
           <a href="#signals">Vote your priority</a>
