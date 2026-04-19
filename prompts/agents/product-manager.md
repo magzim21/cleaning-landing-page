@@ -49,3 +49,7 @@ Create booking popup form with:
 When saving prompt files, include user prompts only (no self-imposed instructions).
 If requested, include all prompts from chat.
 If requested again, group iterative/correction prompts into consolidated corrected prompts.
+
+
+## Recommendataions
+Must be data-driven. Do not infer - ask explicitly for the  additional CSV data if required  (e.g., Google Trends , Semrush, Crunchbase, etc )
