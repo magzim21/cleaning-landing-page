@@ -53,6 +53,8 @@
         --bg-deep: #070b12;
         --bg-card: #0f1624;
         --bg-elevated: #141d2e;
+        --bg-pulse-blue: rgba(56, 189, 248, 0.2);
+        --bg-pulse-red: rgba(239, 68, 68, 0.16);
         --text: #e8edf5;
         --text-muted: #94a3b8;
         --accent: #38bdf8;
@@ -78,6 +80,8 @@
 
       body {
         margin: 0;
+        position: relative;
+        min-height: 100vh;
         font-family: "DM Sans", system-ui, sans-serif;
         font-optical-sizing: auto;
         font-size: 1rem;
@@ -85,6 +89,57 @@
         color: var(--text);
         background: var(--bg-deep);
         -webkit-font-smoothing: antialiased;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -24vmax;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 26%, var(--bg-pulse-blue), transparent 52%),
+          radial-gradient(circle at 82% 36%, rgba(14, 165, 233, 0.14), transparent 50%),
+          radial-gradient(circle at 56% 82%, rgba(59, 130, 246, 0.12), transparent 56%);
+        transform: scale(1);
+        animation: bg-pulsation 14s ease-in-out infinite alternate;
+        will-change: transform, opacity, filter;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0;
+        background:
+          linear-gradient(102deg, rgba(59, 130, 246, 0.34) 0%, transparent 40%),
+          linear-gradient(
+            258deg,
+            rgba(239, 68, 68, 0.34) 0%,
+            rgba(239, 68, 68, 0.2) 18%,
+            rgba(239, 68, 68, 0.08) 34%,
+            rgba(239, 68, 68, 0) 56%
+          ),
+          radial-gradient(circle at 8% 52%, rgba(59, 130, 246, 0.65), transparent 45%),
+          radial-gradient(
+            circle at 92% 48%,
+            rgba(239, 68, 68, 0.72) 0%,
+            rgba(239, 68, 68, 0.42) 18%,
+            rgba(239, 68, 68, 0.18) 34%,
+            rgba(239, 68, 68, 0) 60%
+          ),
+          radial-gradient(circle at 10% 50%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 31%),
+          radial-gradient(circle at 90% 50%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 29%);
+        background-position: -24% 0, 124% 0, -22% 50%, 122% 50%, -24% 50%, 124% 50%;
+        background-repeat: no-repeat;
+        animation: none;
+        will-change: opacity, filter, background-position;
+      }
+
+      body.has-booked-flash::after {
+        animation: police-flash-intro 0.95s linear 1, police-flash 2.9s linear 0.95s infinite;
       }
 
       p {
@@ -107,70 +162,107 @@
         padding: 0 24px;
       }
 
-      /* Sticky promo ticker */
-      .promo-ticker {
-        position: sticky;
-        top: 0;
-        z-index: 70;
-        background: rgba(6, 18, 12, 0.95);
-        color: #bbf7d0;
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-        pointer-events: none;
-        border-bottom: 1px solid transparent;
-        transition: max-height 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
-      }
-
-      .promo-ticker.is-visible {
-        max-height: 36px;
-        opacity: 1;
-        pointer-events: auto;
-        border-bottom-color: rgba(34, 197, 94, 0.25);
-      }
-
-      .promo-track {
-        display: flex;
-        width: max-content;
-        --promo-loop-distance: -50%;
-        --promo-duration: 40s;
-        animation: ticker-scroll var(--promo-duration) linear infinite;
-        will-change: transform;
-      }
-
-      .promo-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 20px;
-        font-weight: 600;
-        font-size: 0.82rem;
-        letter-spacing: 0.01em;
-        white-space: nowrap;
-        opacity: 0.9;
-      }
-
-      @media (min-width: 1025px) {
-        .promo-item {
-          padding-inline: 34px;
+      @keyframes bg-pulsation {
+        0% {
+          transform: scale(1);
+          opacity: 0.58;
+          filter: saturate(1);
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 0.72;
+          filter: saturate(1.12);
+        }
+        100% {
+          transform: scale(1.02);
+          opacity: 0.62;
+          filter: saturate(1.04);
         }
       }
 
-      .promo-item .bolt {
-        color: #22c55e;
+      @keyframes police-flash {
+        0%,
+        16%,
+        36%,
+        56%,
+        100% {
+          opacity: 0;
+          filter: saturate(1);
+        }
+        18% {
+          opacity: 0.42;
+          filter: saturate(1.28) brightness(1.2);
+          background-position: 6% 0, 124% 0, 6% 50%, 122% 50%, 6% 50%, 124% 50%;
+        }
+        21% {
+          opacity: 0.14;
+          background-position: 12% 0, 124% 0, 12% 50%, 122% 50%, 12% 50%, 124% 50%;
+        }
+        24% {
+          opacity: 0.36;
+          background-position: 16% 0, 124% 0, 16% 50%, 122% 50%, 16% 50%, 124% 50%;
+        }
+        40% {
+          opacity: 0.34;
+          filter: saturate(1.24) brightness(1.16);
+          background-position: -24% 0, 94% 0, -22% 50%, 94% 50%, -24% 50%, 94% 50%;
+        }
+        43% {
+          opacity: 0.12;
+          background-position: -24% 0, 88% 0, -22% 50%, 88% 50%, -24% 50%, 88% 50%;
+        }
+        46% {
+          opacity: 0.32;
+          background-position: -24% 0, 82% 0, -22% 50%, 82% 50%, -24% 50%, 82% 50%;
+        }
+        60% {
+          opacity: 0.24;
+          filter: saturate(1.16) brightness(1.1);
+          background-position: 2% 0, 102% 0, 2% 50%, 102% 50%, 2% 50%, 102% 50%;
+        }
+        62% {
+          opacity: 0.1;
+          background-position: -2% 0, 106% 0, -2% 50%, 106% 50%, -2% 50%, 106% 50%;
+        }
       }
 
-      @keyframes ticker-scroll {
-        from {
-          transform: translateX(0);
+      @keyframes police-flash-intro {
+        0%,
+        100% {
+          opacity: 0;
+          filter: saturate(1);
+          background-position: -24% 0, 124% 0, -22% 50%, 122% 50%, -24% 50%, 124% 50%;
         }
-        to {
-          transform: translateX(var(--promo-loop-distance));
+        28% {
+          opacity: 0.9;
+          filter: saturate(1.7) brightness(1.38);
+          background-position: 10% 0, 116% 0, 10% 50%, 116% 50%, 10% 50%, 116% 50%;
+        }
+        34% {
+          opacity: 0.28;
+          background-position: 16% 0, 112% 0, 16% 50%, 112% 50%, 16% 50%, 112% 50%;
+        }
+        42% {
+          opacity: 0.82;
+          filter: saturate(1.6) brightness(1.3);
+          background-position: 18% 0, 110% 0, 18% 50%, 110% 50%, 18% 50%, 110% 50%;
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .promo-track {
+        body::before {
+          animation: none;
+          opacity: 0.54;
+          transform: none;
+        }
+
+        body::after {
+          animation: none;
+          opacity: 0;
+        }
+
+        .booking-thanks-overlay.is-visible,
+        .booking-thanks-overlay__text {
           animation: none;
         }
 
@@ -227,15 +319,11 @@
         color: var(--accent);
       }
 
-      .brand-mark {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--accent) 0%, #0ea5e9 100%);
-        display: grid;
-        place-items: center;
-        color: var(--bg-deep);
-        font-size: 1.1rem;
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        flex-shrink: 0;
       }
 
       .nav-actions {
@@ -921,6 +1009,69 @@
         margin-top: 6px;
       }
 
+      .booking-thanks-overlay[hidden] {
+        display: none;
+      }
+
+      .booking-thanks-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 160;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        text-align: center;
+        pointer-events: auto;
+        cursor: pointer;
+        opacity: 0;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(2, 6, 23, 0.44), rgba(2, 6, 23, 0.72)),
+          rgba(2, 6, 23, 0.36);
+      }
+
+      .booking-thanks-overlay.is-visible {
+        animation: booking-thanks-fade-in 0.35s ease forwards;
+      }
+
+      .booking-thanks-overlay__text {
+        margin: 0;
+        max-width: 980px;
+        color: #f8fbff;
+        font-family: "Outfit", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 7.8vw, 5.2rem);
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+        text-shadow:
+          0 0 28px rgba(56, 189, 248, 0.45),
+          0 10px 28px rgba(2, 6, 23, 0.85);
+        animation: booking-thanks-text 0.8s cubic-bezier(0.2, 0.75, 0.2, 1) forwards;
+      }
+
+      @keyframes booking-thanks-fade-in {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes booking-thanks-text {
+        0% {
+          transform: translateX(-22vw) scale(0.9);
+          filter: blur(8px);
+        }
+        72% {
+          transform: translateX(2vw) scale(1.01);
+          filter: blur(0.6px);
+        }
+        100% {
+          transform: translateX(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
       @media (max-width: 767px) {
         .booking-modal {
           padding: 12px;
@@ -1144,7 +1295,7 @@
     <header class="site-header">
       <div class="inner">
         <a class="brand" href="#top">
-          <span class="brand-mark" aria-hidden="true">◆</span>
+          <img class="brand-logo" src="cleaning-logo.svg" alt="Island Drift Detailing logo">
           Island Drift Detailing
         </a>
         <div class="header-center" aria-label="Business address and mobile number">
@@ -1159,15 +1310,6 @@
         </nav>
       </div>
     </header>
-    <div class="promo-ticker" aria-label="Promotional offers">
-      <div class="promo-track">
-        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
-        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
-        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
-        <span class="promo-item">Spring Sale 20% Off <span class="bolt" aria-hidden="true">⚡</span> Priority Bookings</span>
-      </div>
-    </div>
-
     <main id="top">
       <section class="hero">
         <div class="wrap hero-grid">
@@ -1449,6 +1591,9 @@
         </form>
       </div>
     </div>
+    <div class="booking-thanks-overlay" id="booking-thanks-overlay" hidden aria-live="polite">
+      <p class="booking-thanks-overlay__text">Thank you for booking... We are rushing to you</p>
+    </div>
 
     <footer class="site-footer">
       <div class="inner">
@@ -1467,47 +1612,8 @@
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
 
-      const promoTicker = document.querySelector(".promo-ticker");
-      const promoTrack = document.querySelector(".promo-track");
-      const siteHeader = document.querySelector(".site-header");
-      const promoBaseItems = promoTrack ? Array.from(promoTrack.children).map((item) => item.outerHTML) : [];
-
-      function setupInfinitePromoLoop() {
-        if (!promoTrack || promoBaseItems.length === 0) return;
-
-        const baseMarkup = promoBaseItems.join("");
-        promoTrack.innerHTML = baseMarkup;
-
-        const minLoopWidth = Math.max(window.innerWidth * 1.5, 900);
-        while (promoTrack.scrollWidth < minLoopWidth) {
-          promoTrack.insertAdjacentHTML("beforeend", baseMarkup);
-        }
-
-        const firstPassMarkup = promoTrack.innerHTML;
-        promoTrack.insertAdjacentHTML("beforeend", firstPassMarkup);
-
-        const loopDistance = promoTrack.scrollWidth / 2;
-        promoTrack.style.setProperty("--promo-loop-distance", `-${loopDistance}px`);
-
-        const durationSeconds = Math.max(48, Math.round((loopDistance / 70) * 2));
-        promoTrack.style.setProperty("--promo-duration", `${durationSeconds}s`);
-      }
-
-      function syncPromoTickerVisibility() {
-        if (!promoTicker || !siteHeader) return;
-        const revealAfter = siteHeader.offsetHeight * 0.75;
-        promoTicker.classList.toggle("is-visible", window.scrollY > revealAfter);
-      }
-
-      window.addEventListener("scroll", syncPromoTickerVisibility, { passive: true });
-      window.addEventListener("resize", () => {
-        setupInfinitePromoLoop();
-        syncPromoTickerVisibility();
-      });
-      setupInfinitePromoLoop();
-      syncPromoTickerVisibility();
-
       const bookingModal = document.getElementById("booking-modal");
+      const bookingThanksOverlay = document.getElementById("booking-thanks-overlay");
       const bookingForm = document.getElementById("booking-form");
       const bookingSourceInput = document.getElementById("booking-source");
       const bookingOpenButtons = document.querySelectorAll(".js-open-booking");
@@ -1515,12 +1621,133 @@
       const preferredStartInput = document.getElementById("preferred-start");
       const preferredEndInput = document.getElementById("preferred-end");
       const stainPhotosInput = document.getElementById("stain-photos");
+      const bookedFlashStorageKey = "idd-booking-submitted";
       let lastBookingTrigger = null;
+      let pendingBookingMailtoUrl = "";
+
+      function activateBookedFlash() {
+        document.body.classList.add("has-booked-flash");
+      }
+
+      function startBookedFlashNow() {
+        document.body.classList.remove("has-booked-flash");
+        void document.body.offsetWidth;
+        activateBookedFlash();
+      }
+
+      function clearBookedFlash() {
+        document.body.classList.remove("has-booked-flash");
+        try {
+          window.localStorage.removeItem(bookedFlashStorageKey);
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+      }
+
+      function persistBookedFlash(untilTimestamp) {
+        if (!Number.isFinite(untilTimestamp) || untilTimestamp <= Date.now()) {
+          clearBookedFlash();
+          return false;
+        }
+
+        try {
+          window.localStorage.setItem(
+            bookedFlashStorageKey,
+            JSON.stringify({ until: untilTimestamp })
+          );
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+        return true;
+      }
+
+      function restoreBookedFlash() {
+        try {
+          const savedValue = window.localStorage.getItem(bookedFlashStorageKey);
+          if (!savedValue) return;
+
+          const savedConfig = JSON.parse(savedValue);
+          const untilTimestamp = Number(savedConfig && savedConfig.until);
+          if (Number.isFinite(untilTimestamp) && Date.now() <= untilTimestamp) {
+            activateBookedFlash();
+            return;
+          }
+
+          clearBookedFlash();
+        } catch (_) {
+          clearBookedFlash();
+        }
+      }
+
+      restoreBookedFlash();
+
+      function showBookingThanksOverlay() {
+        if (!bookingThanksOverlay) return;
+        document.body.style.overflow = "hidden";
+        bookingThanksOverlay.hidden = false;
+        bookingThanksOverlay.classList.remove("is-visible");
+        void bookingThanksOverlay.offsetWidth;
+        bookingThanksOverlay.classList.add("is-visible");
+      }
+
+      function dismissBookingThanksOverlay() {
+        if (!bookingThanksOverlay || bookingThanksOverlay.hidden) return;
+        bookingThanksOverlay.classList.remove("is-visible");
+        bookingThanksOverlay.hidden = true;
+        document.body.style.overflow = "";
+
+        if (pendingBookingMailtoUrl) {
+          window.location.href = pendingBookingMailtoUrl;
+          pendingBookingMailtoUrl = "";
+        }
+      }
+
+      function isScrollAttemptEvent(event) {
+        if (!event) return false;
+        if (event.type === "wheel" || event.type === "touchmove") return true;
+        if (event.type !== "keydown") return false;
+
+        return [
+          "ArrowDown",
+          "ArrowUp",
+          "PageDown",
+          "PageUp",
+          "Home",
+          "End",
+          " ",
+          "Spacebar"
+        ].includes(event.key);
+      }
+
+      function isBookingThanksVisible() {
+        return Boolean(bookingThanksOverlay && !bookingThanksOverlay.hidden);
+      }
+
+      function formatDateTimeLocalValue(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      }
+
+      function applyDefaultBookingDateRange() {
+        if (!preferredStartInput || !preferredEndInput) return;
+        const now = new Date();
+        const tomorrowAt19 = new Date(now);
+        tomorrowAt19.setDate(tomorrowAt19.getDate() + 1);
+        tomorrowAt19.setHours(19, 0, 0, 0);
+
+        preferredStartInput.value = formatDateTimeLocalValue(now);
+        preferredEndInput.value = formatDateTimeLocalValue(tomorrowAt19);
+      }
 
       function openBookingModal(triggerLabel, triggerElement) {
         if (!bookingModal) return;
         bookingModal.hidden = false;
         document.body.style.overflow = "hidden";
+        applyDefaultBookingDateRange();
         if (bookingSourceInput) bookingSourceInput.value = triggerLabel || "Website";
         lastBookingTrigger = triggerElement || null;
         const firstInput = bookingModal.querySelector("textarea, input, select");
@@ -1561,10 +1788,31 @@
       }
 
       document.addEventListener("keydown", (event) => {
+        if (isBookingThanksVisible() && isScrollAttemptEvent(event)) {
+          dismissBookingThanksOverlay();
+          return;
+        }
+
         if (event.key === "Escape" && bookingModal && !bookingModal.hidden) {
           closeBookingModal();
         }
       });
+
+      if (bookingThanksOverlay) {
+        bookingThanksOverlay.addEventListener("click", () => dismissBookingThanksOverlay());
+      }
+
+      window.addEventListener("wheel", (event) => {
+        if (isBookingThanksVisible() && isScrollAttemptEvent(event)) {
+          dismissBookingThanksOverlay();
+        }
+      }, { passive: true });
+
+      window.addEventListener("touchmove", (event) => {
+        if (isBookingThanksVisible() && isScrollAttemptEvent(event)) {
+          dismissBookingThanksOverlay();
+        }
+      }, { passive: true });
 
       if (bookingForm) {
         bookingForm.addEventListener("submit", (event) => {
@@ -1588,9 +1836,21 @@
             `Stain photos selected: ${photoCount} file(s)`
           ].join("\n");
 
-          window.location.href = `mailto:book@maxim.run?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+          const preferredEndTimestamp = Date.parse(String(formData.get("preferred_end") || ""));
+          const flashUntilTimestamp = preferredEndTimestamp;
+
+          const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
+          pendingBookingMailtoUrl = `mailto:book@maxim.run?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
           bookingForm.reset();
           closeBookingModal();
+          if (shouldEnableFlash) {
+            requestAnimationFrame(() => {
+              startBookedFlashNow();
+              showBookingThanksOverlay();
+            });
+          } else {
+            showBookingThanksOverlay();
+          }
         });
       }
     </script>
