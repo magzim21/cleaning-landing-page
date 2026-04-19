@@ -27,6 +27,7 @@ Fix eyebrow alignment so it is centered where requested.
 Make hero/body paragraph width use full intended area where requested.
 Make paragraph lines more compact and font slightly smaller while still readable.
 Prevent CTA text wrapping (for example, keep `Book a wash` on one line).
+Section 1: a nice vehicle in the middle, someone cleans it.Section 2: Cards - 3 package cards - what is in included, price, CTA "book now".Section 3: Coming to "your city"
 
 ## CTA + Pricing Corrections
 Review whether `Book a wash` is the strongest CTA and suggest stronger alternatives.
