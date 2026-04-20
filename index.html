@@ -1553,6 +1553,30 @@
         <p class="booking-modal__intro">Share the details below and we will reply with your confirmed slot and exact quote.</p>
         <form class="booking-form" id="booking-form">
           <input type="hidden" id="booking-source" name="booking_source" value="Website">
+          <div class="booking-form__row">
+            <div class="booking-field">
+              <label for="client-email">Email</label>
+              <input
+                id="client-email"
+                name="client_email"
+                type="email"
+                autocomplete="email"
+                required
+                placeholder="name@example.com"
+              >
+            </div>
+            <div class="booking-field">
+              <label for="client-mobile">Mobile number</label>
+              <input
+                id="client-mobile"
+                name="client_mobile"
+                type="tel"
+                autocomplete="tel"
+                required
+                placeholder="(778) 123-4567"
+              >
+            </div>
+          </div>
           <div class="booking-field">
             <label for="client-address">Client's address</label>
             <textarea id="client-address" name="client_address" required placeholder="Street, city, postal code"></textarea>
@@ -1830,6 +1854,8 @@
           const emailSubject = `Booking request - ${packageType}`;
           const emailBody = [
             `Booking source: ${String(formData.get("booking_source") || "Website")}`,
+            `Email: ${String(formData.get("client_email") || "").trim()}`,
+            `Mobile number: ${String(formData.get("client_mobile") || "").trim()}`,
             `Client address: ${String(formData.get("client_address") || "").trim()}`,
             `Preferred from: ${String(formData.get("preferred_start") || "")}`,
             `Preferred to: ${String(formData.get("preferred_end") || "")}`,
