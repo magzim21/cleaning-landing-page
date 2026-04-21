@@ -1648,7 +1648,6 @@
       const preferredEndInput = document.getElementById("preferred-end");
       const bookedFlashStorageKey = "idd-booking-submitted";
       let lastBookingTrigger = null;
-      let pendingBookingMailtoUrl = "";
 
       function activateBookedFlash() {
         document.body.classList.add("has-booked-flash");
@@ -1720,11 +1719,6 @@
         bookingThanksOverlay.classList.remove("is-visible");
         bookingThanksOverlay.hidden = true;
         document.body.style.overflow = "";
-
-        if (pendingBookingMailtoUrl) {
-          window.location.href = pendingBookingMailtoUrl;
-          pendingBookingMailtoUrl = "";
-        }
       }
 
       function isScrollAttemptEvent(event) {
@@ -1840,43 +1834,59 @@
       }, { passive: true });
 
       if (bookingForm) {
-        bookingForm.addEventListener("submit", (event) => {
+        bookingForm.addEventListener("submit", async (event) => {
           event.preventDefault();
           if (!validatePreferredRange()) {
             preferredEndInput.reportValidity();
             return;
           }
 
+          const submitButton = bookingForm.querySelector('button[type="submit"]');
           const formData = new FormData(bookingForm);
-          const photoCount = stainPhotosInput && stainPhotosInput.files ? stainPhotosInput.files.length : 0;
-          const packageType = String(formData.get("package_type") || "Not specified");
-          const emailSubject = `Booking request - ${packageType}`;
-          const emailBody = [
-            `Booking source: ${String(formData.get("booking_source") || "Website")}`,
-            `Email: ${String(formData.get("client_email") || "").trim()}`,
-            `Mobile number: ${String(formData.get("client_mobile") || "").trim()}`,
-            `Client address: ${String(formData.get("client_address") || "").trim()}`,
-            `Preferred from: ${String(formData.get("preferred_start") || "")}`,
-            `Preferred to: ${String(formData.get("preferred_end") || "")}`,
-            `Car model: ${String(formData.get("car_model") || "").trim()}`,
-            `Package type: ${packageType}`,
-            `Stain photos selected: ${photoCount} file(s)`
-          ].join("\n");
-
           const preferredEndTimestamp = Date.parse(String(formData.get("preferred_end") || ""));
           const flashUntilTimestamp = preferredEndTimestamp;
-
           const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
-          pendingBookingMailtoUrl = `mailto:book@maxim.run?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-          bookingForm.reset();
-          closeBookingModal();
-          if (shouldEnableFlash) {
-            requestAnimationFrame(() => {
-              startBookedFlashNow();
-              showBookingThanksOverlay();
+
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.setAttribute("aria-busy", "true");
+          }
+
+          try {
+            const response = await fetch("/api/booking", {
+              method: "POST",
+              body: formData,
             });
-          } else {
-            showBookingThanksOverlay();
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+              const message =
+                typeof payload.error === "string" && payload.error
+                  ? payload.error
+                  : "We could not send your booking. Please try again or email book@maxim.run.";
+              window.alert(message);
+              return;
+            }
+
+            bookingForm.reset();
+            closeBookingModal();
+            if (shouldEnableFlash) {
+              requestAnimationFrame(() => {
+                startBookedFlashNow();
+                showBookingThanksOverlay();
+              });
+            } else {
+              showBookingThanksOverlay();
+            }
+          } catch (_) {
+            window.alert(
+              "We could not reach the server. Check your connection or email book@maxim.run directly."
+            );
+          } finally {
+            if (submitButton) {
+              submitButton.disabled = false;
+              submitButton.removeAttribute("aria-busy");
+            }
           }
         });
       }
