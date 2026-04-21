@@ -1630,6 +1630,7 @@
         <div>
           <p>© <span id="y"></span> Island Drift Detailing (Comox Valley · Campbell River · Courtenay · Cumberland). Owner-operated mobile detailing.</p>
           <p class="footer-address">8873 Driftwood<br>Black Creek, British Columbia V9J 1A9<br>Canada<br><a href="mailto:book@maxim.run">book@maxim.run</a></p>
+          <p class="footer-build">Build commit: <span id="build-commit-sha">...</span></p>
         </div>
         <div class="footer-links">
           <a href="#services">Services</a>
@@ -1641,6 +1642,26 @@
     </footer>
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
+      const buildCommitSha = document.getElementById("build-commit-sha");
+
+      async function setBuildCommitSha() {
+        if (!buildCommitSha) return;
+        try {
+          const response = await fetch("/api/version", { cache: "no-store" });
+          if (!response.ok) {
+            buildCommitSha.textContent = "unknown";
+            return;
+          }
+
+          const payload = await response.json().catch(() => null);
+          const shortSha = payload && typeof payload.shortSha === "string" ? payload.shortSha : "";
+          buildCommitSha.textContent = shortSha || "local-dev";
+        } catch (_) {
+          buildCommitSha.textContent = "unknown";
+        }
+      }
+
+      setBuildCommitSha();
 
       const bookingModal = document.getElementById("booking-modal");
       const bookingThanksOverlay = document.getElementById("booking-thanks-overlay");
