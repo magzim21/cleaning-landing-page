@@ -1,18 +1,29 @@
 #!/bin/sh
 set -e
 # On exit, print a message if the hook failed (non-zero exit) and preserve the exit code
-trap 'ret=$?; if [ $ret -ne 0 ]; then echo "pre-commit hook failed (exit code $ret)"; fi; exit $ret' EXIT
+trap 'ret=$?; if [ $ret -ne 0 ]; then echo "commit-msg hook failed (exit code $ret)"; fi; exit $ret' EXIT
 
 
 # export NODE_PATH=/opt/homebrew/lib/node_modules/ # make sure that this matches to your global node_modules path
-
-# Installing npm packages globally if not present
-(npm list -g @commitlint/config-conventional && echo "@commitlint/config-conventiona is already installed ") ||( npm install -g @commitlint/config-conventional && echo "Installed @commitlint/config-conventional ")
-(npm list -g @commitlint/cli && echo "@commitlint/config-conventiona is already installed ") ||( npm install -g @commitlint/cli && echo "Installed @commitlint/cli ")
-
-
 CONFIG_PATH="$(git rev-parse --show-toplevel)/.githooks/.commitlintrc.yml"
-npm list -g @commitlint/config-conventional || npm install -g @commitlint/config-conventional commitlint
+npm list -g @commitlint/config-conventional >/dev/null 2>&1 || npm install -g @commitlint/config-conventional @commitlint/cli >/dev/null 2>&1
+
+# Cursor's generated message can be "Build commit: ...", which fails conventional-commit validation.
+# Normalize it into a valid header before running commitlint.
+if [ -n "$1" ] && [ -f "$1" ]; then
+  first_line="$(sed -n '1p' "$1")"
+  normalized_line="$(printf '%s' "$first_line" | sed -E 's/^[Bb]uild commit:[[:space:]]*/build: /')"
+  if [ "$normalized_line" != "$first_line" ]; then
+    tmp_file="$(mktemp)"
+    {
+      printf '%s\n' "$normalized_line"
+      sed '1d' "$1"
+    } > "$tmp_file"
+    mv "$tmp_file" "$1"
+    echo "Normalized commit message header to: $normalized_line"
+  fi
+fi
+
 npx commitlint --config "$CONFIG_PATH" --edit "$1"
 
 

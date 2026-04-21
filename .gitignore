@@ -154,3 +154,5 @@ __pycache__/
 .DS_Store
 
 helm/charts/*
+.vercel
+.env*.local

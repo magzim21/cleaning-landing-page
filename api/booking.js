@@ -3,7 +3,11 @@ export const config = {
   runtime: "edge",
 };
 
-const TO_EMAIL = "book@maxim.run";
+const TO_EMAIL = process.env.BOOKING_EMAIL_TO || "book@maxim.run";
+const RESEND_TIMEOUT_MS = 15000;
+const MAX_PHOTO_COUNT = 5;
+const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_TOTAL_PHOTO_SIZE_BYTES = 18 * 1024 * 1024;
 
 function str(value) {
   if (value == null) return "";
@@ -53,7 +57,7 @@ export default async function handler(request) {
   }
 
   const fromEmail =
-    process.env.BOOKING_EMAIL_FROM || "Island Drift Detailing <onboarding@resend.dev>";
+    process.env.BOOKING_EMAIL_FROM || "Island Drift Detailing <hello@booking.maxim.run>;";
 
   let formData;
   try {
@@ -105,10 +109,37 @@ export default async function handler(request) {
   const stainItems = formData.getAll("stain_photos");
   const attachments = [];
   let photoCount = 0;
+  let totalPhotoBytes = 0;
+  let skippedPhotos = Math.max(stainItems.length - MAX_PHOTO_COUNT, 0);
 
-  for (const item of stainItems) {
+  if (stainItems.length > MAX_PHOTO_COUNT) {
+    console.warn(`[${requestId}] Too many stain photos provided`, {
+      provided: stainItems.length,
+      max: MAX_PHOTO_COUNT,
+    });
+  }
+
+  for (const item of stainItems.slice(0, MAX_PHOTO_COUNT)) {
     if (!(item instanceof File) || item.size <= 0) continue;
+    if (item.size > MAX_PHOTO_SIZE_BYTES) {
+      console.warn(`[${requestId}] Skipping photo larger than limit`, {
+        filename: item.name,
+        size: item.size,
+      });
+      skippedPhotos += 1;
+      continue;
+    }
+    if (totalPhotoBytes + item.size > MAX_TOTAL_PHOTO_SIZE_BYTES) {
+      console.warn(`[${requestId}] Skipping photo due to total attachment limit`, {
+        filename: item.name,
+        size: item.size,
+        totalPhotoBytes,
+      });
+      skippedPhotos += 1;
+      continue;
+    }
     photoCount += 1;
+    totalPhotoBytes += item.size;
     const buf = await item.arrayBuffer();
     attachments.push({
       filename: item.name || "photo",
@@ -126,6 +157,7 @@ export default async function handler(request) {
     `Car model: ${carModel}`,
     `Package type: ${packageType}`,
     `Stain photos attached: ${photoCount} file(s)`,
+    `Stain photos skipped: ${skippedPhotos} file(s)`,
   ].join("\n");
 
   const payload = {
@@ -144,9 +176,13 @@ export default async function handler(request) {
     bookingSource,
     packageType,
     attachments: attachments.length,
+    totalPhotoBytes,
+    skippedPhotos,
   });
 
   let sendRes;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort("Resend request timeout"), RESEND_TIMEOUT_MS);
   try {
     sendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -154,14 +190,32 @@ export default async function handler(request) {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify(payload),
     });
   } catch (error) {
+    if (error && error.name === "AbortError") {
+      console.error(`[${requestId}] Resend request timed out`, {
+        timeoutMs: RESEND_TIMEOUT_MS,
+      });
+      return new Response(
+        JSON.stringify({
+          error:
+            "Email service took too long to respond. Please try again in a moment.",
+        }),
+        {
+          status: 504,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
     console.error(`[${requestId}] Could not reach Resend`, error);
     return new Response(JSON.stringify({ error: "Could not reach email service." }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   if (!sendRes.ok) {

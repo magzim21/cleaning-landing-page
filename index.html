@@ -1938,8 +1938,6 @@
           const submitButton = bookingForm.querySelector('button[type="submit"]');
           const formData = new FormData(bookingForm);
           const preferredEndTimestamp = Date.parse(String(formData.get("preferred_end") || ""));
-          const flashUntilTimestamp = preferredEndTimestamp;
-          const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
 
           if (submitButton) {
             submitButton.disabled = true;
@@ -1970,6 +1968,8 @@
             }
 
             setBookingStatus("Booking request sent. Thank you!", "success");
+            const flashUntilTimestamp = preferredEndTimestamp;
+            const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
             bookingForm.reset();
             closeBookingModal();
             if (shouldEnableFlash) {
