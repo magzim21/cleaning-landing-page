@@ -55,8 +55,18 @@ export default async function handler(request) {
   }
 
   const bookingSource = str(formData.get("booking_source")) || "Website";
-  const clientEmail = readFirst(formData, ["email", "client_email"]);
-  const clientMobile = readFirst(formData, ["tel", "client_mobile"]);
+  const clientEmail = readFirst(formData, [
+    "contact_email",
+    "email",
+    "client_email",
+  ]);
+  const clientMobile = readFirst(formData, [
+    "contact_phone",
+    "tel",
+    "phone",
+    "mobile",
+    "client_mobile",
+  ]);
   const clientAddress = str(formData.get("client_address"));
   const preferredStart = str(formData.get("preferred_start"));
   const preferredEnd = str(formData.get("preferred_end"));
