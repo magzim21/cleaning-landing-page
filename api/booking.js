@@ -1,4 +1,7 @@
 export const runtime = "edge";
+export const config = {
+  runtime: "edge",
+};
 
 const TO_EMAIL = "book@maxim.run";
 
@@ -26,7 +29,14 @@ function arrayBufferToBase64(buffer) {
 }
 
 export default async function handler(request) {
+  const requestId = `booking-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  console.log(`[${requestId}] Incoming booking request`, {
+    method: request.method,
+    url: request.url,
+  });
+
   if (request.method !== "POST") {
+    console.warn(`[${requestId}] Rejected non-POST request`);
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers: { "Content-Type": "application/json" },
@@ -35,6 +45,7 @@ export default async function handler(request) {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
+    console.error(`[${requestId}] RESEND_API_KEY is missing`);
     return new Response(JSON.stringify({ error: "Email delivery is not configured." }), {
       status: 503,
       headers: { "Content-Type": "application/json" },
@@ -47,7 +58,8 @@ export default async function handler(request) {
   let formData;
   try {
     formData = await request.formData();
-  } catch {
+  } catch (error) {
+    console.error(`[${requestId}] Failed to parse form data`, error);
     return new Response(JSON.stringify({ error: "Invalid form data." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -74,6 +86,15 @@ export default async function handler(request) {
   const packageType = str(formData.get("package_type")) || "Not specified";
 
   if (!clientEmail || !clientMobile || !clientAddress || !preferredStart || !preferredEnd || !carModel || !packageType) {
+    console.warn(`[${requestId}] Missing required fields`, {
+      hasEmail: Boolean(clientEmail),
+      hasMobile: Boolean(clientMobile),
+      hasAddress: Boolean(clientAddress),
+      hasPreferredStart: Boolean(preferredStart),
+      hasPreferredEnd: Boolean(preferredEnd),
+      hasCarModel: Boolean(carModel),
+      hasPackageType: Boolean(packageType),
+    });
     return new Response(JSON.stringify({ error: "Missing required fields." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -119,6 +140,12 @@ export default async function handler(request) {
     payload.attachments = attachments;
   }
 
+  console.log(`[${requestId}] Sending booking email`, {
+    bookingSource,
+    packageType,
+    attachments: attachments.length,
+  });
+
   let sendRes;
   try {
     sendRes = await fetch("https://api.resend.com/emails", {
@@ -129,7 +156,8 @@ export default async function handler(request) {
       },
       body: JSON.stringify(payload),
     });
-  } catch {
+  } catch (error) {
+    console.error(`[${requestId}] Could not reach Resend`, error);
     return new Response(JSON.stringify({ error: "Could not reach email service." }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
@@ -144,13 +172,17 @@ export default async function handler(request) {
     } catch {
       detail = await sendRes.text();
     }
-    console.error("Resend error:", sendRes.status, detail);
+    console.error(`[${requestId}] Resend error`, {
+      status: sendRes.status,
+      detail,
+    });
     return new Response(JSON.stringify({ error: "Failed to send booking email." }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
   }
 
+  console.log(`[${requestId}] Booking email sent successfully`);
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
     headers: { "Content-Type": "application/json" },

@@ -1012,6 +1012,20 @@
         margin-top: 6px;
       }
 
+      .booking-form__status {
+        margin: 2px 0 0;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+      }
+
+      .booking-form__status--error {
+        color: #fca5a5;
+      }
+
+      .booking-form__status--success {
+        color: #86efac;
+      }
+
       .booking-thanks-overlay[hidden] {
         display: none;
       }
@@ -1135,6 +1149,23 @@
       .footer-address a {
         color: var(--text);
         font-weight: 600;
+      }
+
+      .build-revision {
+        position: fixed;
+        right: 6px;
+        bottom: 4px;
+        z-index: 12;
+        margin: 0;
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 10px;
+        letter-spacing: 0.03em;
+        color: rgba(223, 225, 240, 0.52);
+        background: rgba(12, 16, 28, 0.45);
+        border: 1px solid rgba(223, 225, 240, 0.12);
+        pointer-events: none;
+        user-select: none;
       }
 
       @media (max-width: 767px) {
@@ -1551,7 +1582,7 @@
         <button class="booking-modal__close" type="button" data-close-booking aria-label="Close booking form">×</button>
         <h2 id="booking-modal-title">Book your detailing</h2>
         <p class="booking-modal__intro">Share the details below and we will reply with your confirmed slot and exact quote.</p>
-        <form class="booking-form" id="booking-form">
+        <form class="booking-form" id="booking-form" novalidate>
           <input type="hidden" id="booking-source" name="booking_source" value="Website">
           <div class="booking-form__row">
             <div class="booking-field">
@@ -1618,6 +1649,7 @@
             <button class="btn btn-primary" type="submit">Send booking request</button>
             <button class="btn btn-ghost" type="button" data-close-booking>Cancel</button>
           </div>
+          <p class="booking-form__status" id="booking-form-status" aria-live="polite"></p>
         </form>
       </div>
     </div>
@@ -1630,7 +1662,6 @@
         <div>
           <p>© <span id="y"></span> Island Drift Detailing (Comox Valley · Campbell River · Courtenay · Cumberland). Owner-operated mobile detailing.</p>
           <p class="footer-address">8873 Driftwood<br>Black Creek, British Columbia V9J 1A9<br>Canada<br><a href="mailto:book@maxim.run">book@maxim.run</a></p>
-          <p class="footer-build">Build commit: <span id="build-commit-sha">...</span></p>
         </div>
         <div class="footer-links">
           <a href="#services">Services</a>
@@ -1640,6 +1671,7 @@
         </div>
       </div>
     </footer>
+    <p class="build-revision" aria-hidden="true">rev <span id="build-commit-sha">...</span></p>
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
       const buildCommitSha = document.getElementById("build-commit-sha");
@@ -1647,15 +1679,32 @@
       async function setBuildCommitSha() {
         if (!buildCommitSha) return;
         try {
-          const response = await fetch("/api/version", { cache: "no-store" });
-          if (!response.ok) {
+          const staticRes = await fetch("/build-info.json", { cache: "no-store" });
+          if (staticRes.ok) {
+            const staticPayload = await staticRes.json().catch(() => null);
+            const staticSha =
+              staticPayload && typeof staticPayload.shortSha === "string"
+                ? staticPayload.shortSha
+                : "";
+            if (staticSha) {
+              buildCommitSha.textContent = staticSha;
+              return;
+            }
+          }
+        } catch (_) {
+          /* Ignore static metadata fetch errors and try API fallback. */
+        }
+
+        try {
+          const apiRes = await fetch("/api/version", { cache: "no-store" });
+          if (!apiRes.ok) {
             buildCommitSha.textContent = "unknown";
             return;
           }
-
-          const payload = await response.json().catch(() => null);
-          const shortSha = payload && typeof payload.shortSha === "string" ? payload.shortSha : "";
-          buildCommitSha.textContent = shortSha || "local-dev";
+          const apiPayload = await apiRes.json().catch(() => null);
+          const apiSha =
+            apiPayload && typeof apiPayload.shortSha === "string" ? apiPayload.shortSha : "";
+          buildCommitSha.textContent = apiSha || "local-dev";
         } catch (_) {
           buildCommitSha.textContent = "unknown";
         }
@@ -1671,6 +1720,7 @@
       const bookingCloseButtons = document.querySelectorAll("[data-close-booking]");
       const preferredStartInput = document.getElementById("preferred-start");
       const preferredEndInput = document.getElementById("preferred-end");
+      const bookingFormStatus = document.getElementById("booking-form-status");
       const bookedFlashStorageKey = "idd-booking-submitted";
       let lastBookingTrigger = null;
 
@@ -1791,6 +1841,7 @@
         if (!bookingModal) return;
         bookingModal.hidden = false;
         document.body.style.overflow = "hidden";
+        setBookingStatus("", "");
         applyDefaultBookingDateRange();
         if (bookingSourceInput) bookingSourceInput.value = triggerLabel || "Website";
         lastBookingTrigger = triggerElement || null;
@@ -1803,6 +1854,14 @@
         bookingModal.hidden = true;
         document.body.style.overflow = "";
         if (lastBookingTrigger) lastBookingTrigger.focus();
+      }
+
+      function setBookingStatus(message, type) {
+        if (!bookingFormStatus) return;
+        bookingFormStatus.textContent = message || "";
+        bookingFormStatus.classList.remove("booking-form__status--error", "booking-form__status--success");
+        if (type === "error") bookingFormStatus.classList.add("booking-form__status--error");
+        if (type === "success") bookingFormStatus.classList.add("booking-form__status--success");
       }
 
       function validatePreferredRange() {
@@ -1861,7 +1920,17 @@
       if (bookingForm) {
         bookingForm.addEventListener("submit", async (event) => {
           event.preventDefault();
+          console.log("[Booking] Submit requested");
+          setBookingStatus("", "");
+          if (!bookingForm.checkValidity()) {
+            console.warn("[Booking] Form validation failed");
+            setBookingStatus("Please fill in all required fields before submitting.", "error");
+            bookingForm.reportValidity();
+            return;
+          }
           if (!validatePreferredRange()) {
+            console.warn("[Booking] Preferred date range validation failed");
+            setBookingStatus("Preferred end date/time must be after the start date/time.", "error");
             preferredEndInput.reportValidity();
             return;
           }
@@ -1876,23 +1945,31 @@
             submitButton.disabled = true;
             submitButton.setAttribute("aria-busy", "true");
           }
+          setBookingStatus("Sending your booking request...", "");
 
           try {
+            console.log("[Booking] Sending request to /api/booking");
             const response = await fetch("/api/booking", {
               method: "POST",
               body: formData,
             });
             const payload = await response.json().catch(() => ({}));
+            console.log("[Booking] Received response", {
+              ok: response.ok,
+              status: response.status,
+              payload,
+            });
 
             if (!response.ok) {
               const message =
                 typeof payload.error === "string" && payload.error
                   ? payload.error
                   : "We could not send your booking. Please try again or email book@maxim.run.";
-              window.alert(message);
+              setBookingStatus(message, "error");
               return;
             }
 
+            setBookingStatus("Booking request sent. Thank you!", "success");
             bookingForm.reset();
             closeBookingModal();
             if (shouldEnableFlash) {
@@ -1903,9 +1980,11 @@
             } else {
               showBookingThanksOverlay();
             }
-          } catch (_) {
-            window.alert(
-              "We could not reach the server. Check your connection or email book@maxim.run directly."
+          } catch (error) {
+            console.error("[Booking] Request failed", error);
+            setBookingStatus(
+              "Something went wrong while sending your booking request. Please try again or email book@maxim.run.",
+              "error"
             );
           } finally {
             if (submitButton) {

@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 export default function handler(request) {
   if (request.method !== "GET") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {

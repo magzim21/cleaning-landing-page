@@ -8,6 +8,7 @@ Requirements:
   - must be infinite;
   - add more spacing between repeated messages on desktop;
   - make ticker 2x slower.
+- Add git commit sha (generated) to the very button of the footer. Barely visible.
 Delivery expectations:
 - Implement directly in `index.html`.
 - Preserve existing content/branding unless needed for layout/function fixes.
