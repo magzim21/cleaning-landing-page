@@ -1558,9 +1558,12 @@
               <label for="client-email">Email</label>
               <input
                 id="client-email"
-                name="client_email"
+                name="email"
                 type="email"
                 autocomplete="email"
+                inputmode="email"
+                autocapitalize="off"
+                spellcheck="false"
                 required
                 placeholder="name@example.com"
               >
@@ -1569,9 +1572,10 @@
               <label for="client-mobile">Mobile number</label>
               <input
                 id="client-mobile"
-                name="client_mobile"
+                name="tel"
                 type="tel"
                 autocomplete="tel"
+                inputmode="tel"
                 required
                 placeholder="(778) 123-4567"
               >

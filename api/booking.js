@@ -7,6 +7,14 @@ function str(value) {
   return String(value).trim();
 }
 
+function readFirst(formData, keys) {
+  for (const key of keys) {
+    const value = str(formData.get(key));
+    if (value) return value;
+  }
+  return "";
+}
+
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   const chunk = 0x8000;
@@ -47,8 +55,8 @@ export default async function handler(request) {
   }
 
   const bookingSource = str(formData.get("booking_source")) || "Website";
-  const clientEmail = str(formData.get("client_email"));
-  const clientMobile = str(formData.get("client_mobile"));
+  const clientEmail = readFirst(formData, ["email", "client_email"]);
+  const clientMobile = readFirst(formData, ["tel", "client_mobile"]);
   const clientAddress = str(formData.get("client_address"));
   const preferredStart = str(formData.get("preferred_start"));
   const preferredEnd = str(formData.get("preferred_end"));
