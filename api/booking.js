@@ -5,7 +5,7 @@ export const config = {
 
 const TO_EMAIL = process.env.BOOKING_EMAIL_TO || "book@maxim.run";
 const RESEND_TIMEOUT_MS = 15000;
-const SLACK_TIMEOUT_MS = 8000;
+const SLACK_TIMEOUT_MS = 15000;
 const MAX_PHOTO_COUNT = 5;
 const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_TOTAL_PHOTO_SIZE_BYTES = 18 * 1024 * 1024;
@@ -48,7 +48,8 @@ async function sendSlackBookingNotification({
   photoCount,
   skippedPhotos,
 }) {
-  if (!webhookUrl) {
+  const normalizedWebhookUrl = str(webhookUrl).replace(/^['"]|['"]$/g, "");
+  if (!normalizedWebhookUrl) {
     console.warn(`[${requestId}] SLACK_WEBHOOK_URL is missing, skipping Slack notification`);
     return;
   }
@@ -71,16 +72,19 @@ async function sendSlackBookingNotification({
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort("Slack request timeout"), SLACK_TIMEOUT_MS);
 
-  try {
-    const slackResponse = await fetch(webhookUrl, {
+  const payload = JSON.stringify({
+    text: slackText,
+    mrkdwn: true,
+  });
+
+  async function postToSlack() {
+    const slackResponse = await fetch(normalizedWebhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       signal: controller.signal,
-      body: JSON.stringify({
-        text: slackText,
-      }),
+      body: payload,
     });
 
     if (!slackResponse.ok) {
@@ -91,11 +95,17 @@ async function sendSlackBookingNotification({
         }`
       );
     }
+  }
+
+  try {
+    await postToSlack();
   } catch (error) {
     if (error && error.name === "AbortError") {
       throw new Error(`Slack webhook timed out after ${SLACK_TIMEOUT_MS}ms`);
     }
-    throw error;
+
+    console.warn(`[${requestId}] Slack notification first attempt failed, retrying once`, error);
+    await postToSlack();
   } finally {
     clearTimeout(timeoutId);
   }
@@ -333,16 +343,6 @@ export default async function handler(request) {
     console.log(`[${requestId}] Slack notification sent`);
   } catch (error) {
     console.error(`[${requestId}] Failed to send Slack notification`, error);
-    return new Response(
-      JSON.stringify({
-        error:
-          "Booking email was sent, but Slack notification failed. Please check server logs.",
-      }),
-      {
-        status: 502,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
   }
 
   console.log(`[${requestId}] Booking email sent successfully`);
