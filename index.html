@@ -27,7 +27,7 @@
         "@type": "AutoDetailing",
         "name": "Island Drift Detailing",
         "description": "Owner-operated mobile car interior cleaning, car detailing, and car steam cleaning service in the Comox Valley and Campbell River area.",
-        "telephone": "+1-778-984-0698",
+        "telephone": "+1 (604) 834-0635",
         "email": "book@maxim.run",
         "address": {
           "@type": "PostalAddress",
@@ -1329,16 +1329,17 @@
     <header class="site-header">
       <div class="inner">
         <a class="brand" href="#top">
+          <img class="brand-logo" src="cleaning-logo.svg" alt="Island Drift Detailing logo">
           Island Drift Detailing
         </a>
         <div class="header-center" aria-label="Business address and mobile number">
           <p class="header-contact">
-            <span class="line">8873 Driftwood, Black Creek, BC V9J 1A9 · <a href="tel:+17789840698">(778) 984-0698</a></span>
+            <span class="line">8873 Driftwood, Black Creek, BC V9J 1A9 · <a href="tel:+16048340635">+1 (604) 834-0635</a></span>
             <span class="line"><a href="mailto:book@maxim.run">book@maxim.run</a></span>
           </p>
         </div>
         <nav class="nav-actions" aria-label="Primary">
-          <a class="btn btn-ghost" href="tel:+17789840698">Call</a>
+          <a class="btn btn-ghost" href="tel:+16048340635">Call</a>
           <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Header CTA">Book a wash</a>
         </nav>
       </div>
@@ -1543,7 +1544,7 @@
             <p>Tell us your vehicle and address and we will reply with exact pricing, nearest available slot in Comox Valley, Campbell River, Courtenay, or Cumberland, and your 20% first-clean code.</p>
             <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
               <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Offer CTA">Claim my 20% offer</a>
-              <a class="btn btn-ghost" href="tel:+17789840698">Call now: (778) 984-0698</a>
+              <a class="btn btn-ghost" href="tel:+16048340635">Call now: +1 (604) 834-0635</a>
             </div>
           </div>
         </div>
@@ -1586,6 +1587,17 @@
           <input type="hidden" id="booking-source" name="booking_source" value="Website">
           <div class="booking-form__row">
             <div class="booking-field">
+              <label for="client-name">Name</label>
+              <input
+                id="client-name"
+                name="client_name"
+                type="text"
+                autocomplete="section-booking name"
+                required
+                placeholder="Your full name"
+              >
+            </div>
+            <div class="booking-field">
               <label for="client-email">Contact email</label>
               <input
                 id="client-email"
@@ -1599,18 +1611,18 @@
                 placeholder="name@example.com"
               >
             </div>
-            <div class="booking-field">
-              <label for="client-mobile">Mobile number</label>
-              <input
-                id="client-mobile"
-                name="contact_phone"
-                type="tel"
-                autocomplete="section-booking tel-national"
-                inputmode="tel"
-                required
-                placeholder="(778) 123-4567"
-              >
-            </div>
+          </div>
+          <div class="booking-field">
+            <label for="client-mobile">Mobile number</label>
+            <input
+              id="client-mobile"
+              name="contact_phone"
+              type="tel"
+              autocomplete="section-booking tel-national"
+              inputmode="tel"
+              required
+              placeholder="+1 (604) 834-0635"
+            >
           </div>
           <div class="booking-field">
             <label for="client-address">Client's address</label>
