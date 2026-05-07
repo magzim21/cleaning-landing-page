@@ -666,6 +666,166 @@
         min-height: auto;
       }
 
+      .services-car-size {
+        display: grid;
+        gap: 8px;
+        margin: 0 0 20px;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.45);
+      }
+
+      .services-car-size__label {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .services-car-size__value {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .services-car-size__rail {
+        position: relative;
+        height: 30px;
+      }
+
+      .services-car-size__rail::before,
+      .services-car-size__rail::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 28px;
+        height: 14px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .services-car-size__rail::before {
+        left: 0;
+        background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0));
+      }
+
+      .services-car-size__rail::after {
+        right: 0;
+        background: linear-gradient(270deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0));
+      }
+
+      .services-car-size__track {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.22);
+        transform: translateY(-50%);
+      }
+
+      .services-car-size__head {
+        position: absolute;
+        top: 50%;
+        left: 12.5%;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.22);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+        box-shadow: 0 8px 20px rgba(56, 189, 248, 0.32);
+        transform: translate(-50%, -50%);
+        transition: left 220ms cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+      }
+
+      .services-car-size__head.is-dragging {
+        transition: none;
+      }
+
+      .services-car-size__head.is-bouncing {
+        animation: services-car-size-head-bounce 320ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      @keyframes services-car-size-head-bounce {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        35% {
+          transform: translate(-50%, -50%) scale(1.2);
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      .services-car-size__input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        margin: 0;
+        opacity: 0;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      .services-car-size__input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 24px;
+        height: 24px;
+      }
+
+      .services-car-size__input::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border: 0;
+      }
+
+      .services-car-size__input:focus-visible + .services-car-size__head {
+        box-shadow:
+          0 0 0 3px rgba(56, 189, 248, 0.4),
+          0 8px 20px rgba(56, 189, 248, 0.32);
+      }
+
+      .services-car-size__ticks {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      .services-car-size__ticks button,
+      .booking-car-size__ticks button {
+        padding: 2px 4px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .services-car-size__ticks button:hover,
+      .booking-car-size__ticks button:hover {
+        color: var(--text);
+        background: rgba(148, 163, 184, 0.12);
+      }
+
+      .services-car-size__ticks button:focus-visible,
+      .booking-car-size__ticks button:focus-visible {
+        outline: 2px solid rgba(56, 189, 248, 0.75);
+        outline-offset: 2px;
+      }
+
       @media (min-width: 640px) {
         .cards {
           grid-template-columns: repeat(2, 1fr);
@@ -1282,6 +1442,34 @@
         resize: vertical;
       }
 
+      .booking-field--car-size label {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .booking-car-size__value {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .booking-field--car-size input[type="range"] {
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        accent-color: var(--accent);
+      }
+
+      .booking-car-size__ticks {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
       .booking-field input:focus-visible,
       .booking-field select:focus-visible,
       .booking-field textarea:focus-visible {
@@ -1706,6 +1894,32 @@
             <h2>Price calculator</h2>
             <p>Select one or both detailing blocks to estimate your total service price.</p>
           </div>
+          <div class="services-car-size" aria-label="Vehicle size selector">
+            <div class="services-car-size__label">
+              <span>Vehicle size</span>
+              <span class="services-car-size__value" id="services-car-size-value">Compact / Sedan</span>
+            </div>
+            <div class="services-car-size__rail" id="services-car-size-rail">
+              <div class="services-car-size__track" aria-hidden="true"></div>
+              <input
+                id="services-car-size-slider"
+                class="services-car-size__input"
+                type="range"
+                min="1"
+                max="4"
+                step="1"
+                value="1"
+                aria-describedby="services-car-size-ticks"
+              >
+              <div class="services-car-size__head" id="services-car-size-head" aria-hidden="true"></div>
+            </div>
+            <div class="services-car-size__ticks" id="services-car-size-ticks">
+              <button type="button" data-services-car-size-step="1">Compact / Sedan</button>
+              <button type="button" data-services-car-size-step="2">SUV / Wagon</button>
+              <button type="button" data-services-car-size-step="3">Full-size SUV / Truck</button>
+              <button type="button" data-services-car-size-step="4">Large Truck / Van</button>
+            </div>
+          </div>
           <div class="cards" id="price-calculator-grid">
             <article class="card">
               <div class="service-block-select">
@@ -1717,7 +1931,7 @@
                 <li>Dashboard, console, and high-touch surfaces cleaned</li>
                 <li>Interior glass finish + light exterior glass wash</li>
               </ul>
-              <p class="price">From CA$149 <small>/ sedan</small></p>
+              <p class="price">CA$149</p>
               <div class="package-addons" id="addons-panel-interior" aria-hidden="true">
                 <p class="addons-column-title">Interior add-ons</p>
                 <article class="addon-card">
@@ -1802,7 +2016,7 @@
                 <li>Wheel and tire cleaning</li>
                 <li>Light exterior glass wash</li>
               </ul>
-              <p class="price">From CA$199 <small>/ sedan</small></p>
+              <p class="price">CA$199</p>
               <div class="package-addons" id="addons-panel-exterior" aria-hidden="true">
                 <p class="addons-column-title">Exterior add-ons</p>
                 <article class="addon-card">
@@ -2063,6 +2277,20 @@
             <label for="car-model">Car model</label>
             <input id="car-model" name="car_model" type="text" required placeholder="Example: 2020 Toyota RAV4">
           </div>
+          <div class="booking-field booking-field--car-size">
+            <label for="car-size-slider">
+              Vehicle size
+              <span class="booking-car-size__value" id="car-size-value">Compact / Sedan</span>
+            </label>
+            <input id="car-size-slider" type="range" min="1" max="4" step="1" value="1" aria-describedby="car-size-ticks">
+            <input id="car-size" name="car_size" type="hidden" value="Compact / Sedan">
+            <div class="booking-car-size__ticks" id="car-size-ticks">
+              <button type="button" data-booking-car-size-step="1">Compact / Sedan</button>
+              <button type="button" data-booking-car-size-step="2">SUV / Wagon</button>
+              <button type="button" data-booking-car-size-step="3">Full-size SUV / Truck</button>
+              <button type="button" data-booking-car-size-step="4">Large Truck / Van</button>
+            </div>
+          </div>
           <div class="booking-field">
             <label for="package-type">Package type</label>
             <select id="package-type" name="package_type" required>
@@ -2153,6 +2381,15 @@
       const bookingCloseButtons = document.querySelectorAll("[data-close-booking]");
       const preferredStartInput = document.getElementById("preferred-start");
       const preferredEndInput = document.getElementById("preferred-end");
+      const servicesCarSizeRail = document.getElementById("services-car-size-rail");
+      const servicesCarSizeSlider = document.getElementById("services-car-size-slider");
+      const servicesCarSizeValueLabel = document.getElementById("services-car-size-value");
+      const servicesCarSizeHead = document.getElementById("services-car-size-head");
+      const servicesCarSizeTickButtons = document.querySelectorAll("[data-services-car-size-step]");
+      const carSizeSlider = document.getElementById("car-size-slider");
+      const carSizeValueLabel = document.getElementById("car-size-value");
+      const carSizeHiddenInput = document.getElementById("car-size");
+      const bookingCarSizeTickButtons = document.querySelectorAll("[data-booking-car-size-step]");
       const bookingFormStatus = document.getElementById("booking-form-status");
       const servicePriceCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-service-price]");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
@@ -2162,10 +2399,28 @@
       const packageAddonsContainers = document.querySelectorAll("#services .package-addons");
       const clickableBasicBlocks = document.querySelectorAll("#price-calculator-grid > .card");
       const clickableAddonBlocks = document.querySelectorAll("#services .package-addons .addon-card");
+      const priceCalculatorSummary = document.querySelector(".price-calculator-summary");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
       const bookedFlashStorageKey = "idd-booking-submitted";
       const serviceSelectionsStorageKey = "idd-service-selections";
+      const carSizeOptions = [
+        "Compact / Sedan",
+        "SUV / Wagon",
+        "Full-size SUV / Truck",
+        "Large Truck / Van",
+      ];
+      const waterSplashThreshold = 700;
+      const waterSplashCooldownMs = 800;
       let lastBookingTrigger = null;
+      let lastWaterSplashAt = 0;
+      let servicesCarSizeDragRatio = 0;
+      let isDraggingServicesCarSize = false;
+
+      function normalizeCarSizeStep(stepValue) {
+        const parsedStep = Number.parseInt(String(stepValue), 10);
+        if (!Number.isFinite(parsedStep)) return 1;
+        return Math.min(Math.max(parsedStep, 1), carSizeOptions.length);
+      }
 
       function isPackageSelectedForAddonGroup(addonGroup) {
         if (addonGroup === "interior") {
@@ -2179,6 +2434,16 @@
           );
         }
         return true;
+      }
+
+      function triggerPriceWaterSplash() {
+        if (!priceCalculatorSummary || !priceCalculatorTotal) return;
+        priceCalculatorSummary.classList.remove("is-water-splash");
+        priceCalculatorTotal.classList.remove("is-water-wet");
+        void priceCalculatorSummary.offsetWidth;
+        priceCalculatorSummary.classList.add("is-water-splash");
+        priceCalculatorTotal.classList.add("is-water-wet");
+        lastWaterSplashAt = Date.now();
       }
 
       function updatePriceCalculatorTotal() {
@@ -2204,6 +2469,19 @@
           priceCalculatorTotal.classList.remove("is-increasing", "is-decreasing");
           void priceCalculatorTotal.offsetWidth;
           priceCalculatorTotal.classList.add(total > previousTotalValue ? "is-increasing" : "is-decreasing");
+        }
+        const crossedUpThreshold =
+          Number.isFinite(previousTotalValue)
+          && previousTotalValue < waterSplashThreshold
+          && total >= waterSplashThreshold;
+        const firstLoadAboveThreshold =
+          !Number.isFinite(previousTotalValue)
+          && total >= waterSplashThreshold;
+        const shouldSplash =
+          (crossedUpThreshold || firstLoadAboveThreshold)
+          && (Date.now() - lastWaterSplashAt > waterSplashCooldownMs);
+        if (shouldSplash) {
+          triggerPriceWaterSplash();
         }
         priceCalculatorTotal.style.setProperty("--price-scale", String(priceScale));
         priceCalculatorTotal.textContent = totalLabel;
@@ -2416,6 +2694,93 @@
         return valid;
       }
 
+      function syncCarSizeSelection() {
+        if (!(carSizeSlider instanceof HTMLInputElement)) return;
+        const normalizedStep = normalizeCarSizeStep(carSizeSlider.value);
+        const selectedCarSize = carSizeOptions[normalizedStep - 1] || carSizeOptions[0];
+        carSizeSlider.value = String(normalizedStep);
+        if (carSizeValueLabel) carSizeValueLabel.textContent = selectedCarSize;
+        if (carSizeHiddenInput instanceof HTMLInputElement) carSizeHiddenInput.value = selectedCarSize;
+      }
+
+      function setBookingCarSizeStep(stepValue) {
+        if (!(carSizeSlider instanceof HTMLInputElement)) return;
+        carSizeSlider.value = String(normalizeCarSizeStep(stepValue));
+        syncCarSizeSelection();
+      }
+
+      function syncServicesCarSizeSelection() {
+        if (!(servicesCarSizeSlider instanceof HTMLInputElement) || !servicesCarSizeValueLabel) return;
+        const normalizedStep = normalizeCarSizeStep(servicesCarSizeSlider.value);
+        const selectedCarSize = carSizeOptions[normalizedStep - 1] || carSizeOptions[0];
+        servicesCarSizeSlider.value = String(normalizedStep);
+        servicesCarSizeValueLabel.textContent = selectedCarSize;
+        if (servicesCarSizeHead) {
+          const positionPercent = ((normalizedStep - 0.5) / carSizeOptions.length) * 100;
+          servicesCarSizeHead.style.left = `${positionPercent}%`;
+        }
+        servicesCarSizeDragRatio = (normalizedStep - 1) / (carSizeOptions.length - 1);
+      }
+
+      function setServicesCarSizeStep(stepValue, shouldBounce = false) {
+        if (!(servicesCarSizeSlider instanceof HTMLInputElement)) return;
+        const normalizedStep = normalizeCarSizeStep(stepValue);
+        servicesCarSizeSlider.value = String(normalizedStep);
+        syncServicesCarSizeSelection();
+        if (shouldBounce && servicesCarSizeHead) {
+          servicesCarSizeHead.classList.remove("is-bouncing");
+          void servicesCarSizeHead.offsetWidth;
+          servicesCarSizeHead.classList.add("is-bouncing");
+        }
+      }
+
+      function updateServicesCarSizeDrag(clientX) {
+        if (!(servicesCarSizeRail instanceof HTMLElement)) return;
+        const railRect = servicesCarSizeRail.getBoundingClientRect();
+        if (railRect.width <= 0) return;
+        const ratio = Math.min(Math.max((clientX - railRect.left) / railRect.width, 0), 1);
+        servicesCarSizeDragRatio = ratio;
+        if (servicesCarSizeHead) {
+          servicesCarSizeHead.style.left = `${ratio * 100}%`;
+        }
+        const nearestStep = Math.round(ratio * (carSizeOptions.length - 1)) + 1;
+        const selectedCarSize = carSizeOptions[nearestStep - 1] || carSizeOptions[0];
+        if (servicesCarSizeValueLabel) servicesCarSizeValueLabel.textContent = selectedCarSize;
+      }
+
+      function finishServicesCarSizeDrag() {
+        if (!isDraggingServicesCarSize) return;
+        isDraggingServicesCarSize = false;
+        const nearestStep = Math.round(servicesCarSizeDragRatio * (carSizeOptions.length - 1)) + 1;
+        if (servicesCarSizeHead) {
+          servicesCarSizeHead.classList.remove("is-dragging");
+        }
+        setServicesCarSizeStep(nearestStep, true);
+      }
+
+      function startServicesCarSizeDrag(event) {
+        if (!(event instanceof PointerEvent)) return;
+        if (event.button !== 0) return;
+        isDraggingServicesCarSize = true;
+        if (servicesCarSizeHead) servicesCarSizeHead.classList.add("is-dragging");
+        updateServicesCarSizeDrag(event.clientX);
+        window.addEventListener("pointermove", onServicesCarSizePointerMove);
+        window.addEventListener("pointerup", onServicesCarSizePointerUp);
+        window.addEventListener("pointercancel", onServicesCarSizePointerUp);
+      }
+
+      function onServicesCarSizePointerMove(event) {
+        if (!(event instanceof PointerEvent) || !isDraggingServicesCarSize) return;
+        updateServicesCarSizeDrag(event.clientX);
+      }
+
+      function onServicesCarSizePointerUp() {
+        window.removeEventListener("pointermove", onServicesCarSizePointerMove);
+        window.removeEventListener("pointerup", onServicesCarSizePointerUp);
+        window.removeEventListener("pointercancel", onServicesCarSizePointerUp);
+        finishServicesCarSizeDrag();
+      }
+
       function flashAddonCard(block) {
         block.classList.remove("is-click-flash");
         void block.offsetWidth;
@@ -2488,6 +2853,38 @@
         preferredStartInput.addEventListener("change", validatePreferredRange);
         preferredEndInput.addEventListener("change", validatePreferredRange);
       }
+
+      if (carSizeSlider instanceof HTMLInputElement) {
+        carSizeSlider.addEventListener("input", syncCarSizeSelection);
+        carSizeSlider.addEventListener("change", syncCarSizeSelection);
+      }
+      syncCarSizeSelection();
+      if (servicesCarSizeSlider instanceof HTMLInputElement) {
+        servicesCarSizeSlider.addEventListener("input", syncServicesCarSizeSelection);
+        servicesCarSizeSlider.addEventListener("change", syncServicesCarSizeSelection);
+      }
+      servicesCarSizeTickButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setServicesCarSizeStep(button.getAttribute("data-services-car-size-step"), true);
+        });
+      });
+      bookingCarSizeTickButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setBookingCarSizeStep(button.getAttribute("data-booking-car-size-step"));
+        });
+      });
+      if (servicesCarSizeRail instanceof HTMLElement) {
+        servicesCarSizeRail.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          startServicesCarSizeDrag(event);
+        });
+      }
+      if (servicesCarSizeHead instanceof HTMLElement) {
+        servicesCarSizeHead.addEventListener("animationend", () => {
+          servicesCarSizeHead.classList.remove("is-bouncing");
+        });
+      }
+      syncServicesCarSizeSelection();
 
       servicePriceCheckboxes.forEach((checkbox) => {
         checkbox.addEventListener("change", () => {
@@ -2581,6 +2978,7 @@
             const flashUntilTimestamp = preferredEndTimestamp;
             const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
             bookingForm.reset();
+            syncCarSizeSelection();
             closeBookingModal();
             if (shouldEnableFlash) {
               requestAnimationFrame(() => {
