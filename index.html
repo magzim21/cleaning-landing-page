@@ -2351,6 +2351,45 @@
               <button type="button" data-services-car-size-step="4">Large Truck / Van</button>
             </div>
           </div>
+          <div class="discounts-block" id="discounts-panel">
+            <p class="discounts-title">Discounts</p>
+            <article class="addon-card discount-card">
+              <label class="addon-label discount-label" for="discount-clean-car">
+                <input type="checkbox" id="discount-clean-car" data-discount-percent="20">
+                <span class="addon-name discount-name">My car is already fairly clean—just looking for a quick touch-up (discount applies to the basic package only)</span>
+          
+                <span class="addon-price discount-price">-20%</span>
+              </label>
+            </article>
+            <article class="addon-card discount-card" aria-label="Interior+Exterior discount (applies automatically)">
+              <label class="addon-label discount-label" for="discount-interior-exterior">
+                <input type="checkbox" id="discount-interior-exterior" disabled>
+                <span class="addon-name discount-name">Select Interior and Exterior packages discount to activate 10% discount</span>
+                <span class="addon-price discount-price">-10%</span>
+              </label>
+            </article>
+            <!-- <article class="addon-card discount-card">
+              <label class="addon-label discount-label" for="discount-seniors-single-moms">
+                <input type="checkbox" id="discount-seniors-single-moms" data-discount-percent="20">
+                <span class="addon-name discount-name">For seniors and single moms</span>
+                <span class="addon-price discount-price">-20%</span>
+              </label>
+            </article> -->
+            <div class="volume-discount" aria-label="Volume discount">
+              <div class="volume-discount__meta">
+                <span>Volume discount</span>
+                <span class="volume-discount__value" id="volume-discount-value">0%</span>
+              </div>
+              <div class="volume-discount__rail">
+                <div class="volume-discount__fill" id="volume-discount-fill"></div>
+                <div class="volume-discount__head" id="volume-discount-head" aria-hidden="true"></div>
+              </div>
+              <div class="volume-discount__ticks">
+                <span>CA$200</span>
+                <span>CA$1000</span>
+              </div>
+            </div>
+          </div>
           <p class="services-bundle-note">
             Select <strong>Basic Interior</strong> + <strong>Basic Exterior</strong> to unlock an automatic <strong>10% Interior+Exterior discount</strong>.
           </p>
@@ -2519,38 +2558,6 @@
                 </article> -->
               </div>
             </article>
-          </div>
-          <div class="discounts-block" id="discounts-panel">
-            <p class="discounts-title">Discounts</p>
-            <article class="addon-card discount-card">
-              <label class="addon-label discount-label" for="discount-clean-car">
-                <input type="checkbox" id="discount-clean-car" data-discount-percent="20">
-                <span class="addon-name discount-name">My car is already fairly clean—just looking for a quick touch-up (discount applies to the basic package only)</span>
-          
-                <span class="addon-price discount-price">-20%</span>
-              </label>
-            </article>
-            <!-- <article class="addon-card discount-card">
-              <label class="addon-label discount-label" for="discount-seniors-single-moms">
-                <input type="checkbox" id="discount-seniors-single-moms" data-discount-percent="20">
-                <span class="addon-name discount-name">For seniors and single moms</span>
-                <span class="addon-price discount-price">-20%</span>
-              </label>
-            </article> -->
-            <div class="volume-discount" aria-label="Volume discount">
-              <div class="volume-discount__meta">
-                <span>Volume discount</span>
-                <span class="volume-discount__value" id="volume-discount-value">0%</span>
-              </div>
-              <div class="volume-discount__rail">
-                <div class="volume-discount__fill" id="volume-discount-fill"></div>
-                <div class="volume-discount__head" id="volume-discount-head" aria-hidden="true"></div>
-              </div>
-              <div class="volume-discount__ticks">
-                <span>CA$200</span>
-                <span>CA$1000</span>
-              </div>
-            </div>
           </div>
           <div class="price-calculator-summary" id="price-calculator-summary" aria-live="polite">
             <button class="price-calculator-summary__close" id="price-calculator-close" type="button" aria-label="Close calculator summary">×</button>
@@ -2925,6 +2932,7 @@
       const volumeDiscountValue = document.getElementById("volume-discount-value");
       const volumeDiscountFill = document.getElementById("volume-discount-fill");
       const volumeDiscountHead = document.getElementById("volume-discount-head");
+      const interiorExteriorDiscountIndicator = document.getElementById("discount-interior-exterior");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
       const interiorAddonsPanel = document.getElementById("addons-panel-interior");
@@ -3274,6 +3282,11 @@
         };
       }
 
+      function syncInteriorExteriorDiscountIndicator(hasSelectedBasicBundle) {
+        if (!(interiorExteriorDiscountIndicator instanceof HTMLInputElement)) return;
+        interiorExteriorDiscountIndicator.checked = Boolean(hasSelectedBasicBundle);
+      }
+
       function triggerPriceWaterSplash() {
         if (!priceCalculatorSummary || !priceCalculatorTotal) return;
         priceCalculatorSummary.classList.remove("is-water-splash");
@@ -3496,6 +3509,7 @@
       function updatePriceCalculatorTotal() {
         if (!priceCalculatorTotal || !servicePriceCheckboxes.length) return;
         const breakdown = calculatePriceBreakdown();
+        syncInteriorExteriorDiscountIndicator(breakdown.bundleDiscountAmount > 0);
         const total = breakdown.finalTotal;
         const shouldShowSummary = total > 0;
         if (priceCalculatorSummary) {
