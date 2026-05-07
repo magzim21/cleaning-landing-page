@@ -1121,6 +1121,45 @@
         text-align: right;
       }
 
+      .price-calculator-tax-note {
+        margin: 4px 0 0;
+        font-size: 0.66rem;
+        color: rgba(148, 163, 184, 0.95);
+        text-align: right;
+      }
+
+      .price-calculator-cta-row {
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .price-calculator-cta-row .btn {
+        padding: 9px 12px;
+        font-size: 0.9rem;
+        flex: 0 0 auto;
+      }
+
+      .price-calculator-cta-row .btn:first-child {
+        flex: 1 1 0;
+      }
+
+      .price-calculator-cta-row .btn:last-child {
+        flex: 2 1 0;
+      }
+
+      @media (max-width: 767px) {
+        .price-calculator-cta-row {
+          justify-content: stretch;
+        }
+
+        .price-calculator-cta-row .btn {
+          min-width: 0;
+        }
+      }
+
       .price-calculator-total.is-increasing {
         animation: total-price-pulse-in 420ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
       }
@@ -2474,6 +2513,11 @@
               <p class="price-calculator-total" id="price-calculator-total">CA$0</p>
             </div>
             <p class="price-calculator-min-note" id="price-calculator-min-note" hidden>*Minimum service total is CA$120.</p>
+            <p class="price-calculator-tax-note">Tax included</p>
+            <div class="price-calculator-cta-row" aria-label="Quote actions">
+              <a class="btn btn-ghost" href="tel:+16048340635">Call</a>
+              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Quote Summary CTA">Book now</a>
+            </div>
           </div>
         </div>
       </section>
