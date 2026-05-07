@@ -702,6 +702,11 @@
         box-shadow: 0 16px 34px rgba(2, 8, 23, 0.45);
       }
 
+      #services .card,
+      #services .addon-card {
+        cursor: pointer;
+      }
+
       .card-tag {
         font-size: 0.75rem;
         font-weight: 600;
@@ -1593,7 +1598,7 @@
               <ul class="package-points">
                 <li>Quick interior vacuum of seats, carpets, and mats</li>
                 <li>Dashboard, console, and high-touch surfaces cleaned</li>
-                <li>Interior glass finish + optional light exterior rinse</li>
+                <li>Interior glass finish + light exterior glass wash</li>
               </ul>
               <p class="price">From CA$149 <small>/ sedan</small></p>
             </article>
@@ -1603,9 +1608,9 @@
                 <label for="service-basic-exterior">Basic Exterior Detailing</label>
               </div>
               <ul class="package-points">
-                <li>Everything in Express, plus a full interior car cleaning vacuum</li>
-                <li>Dashboard, console, doors, and cupholders cleaned</li>
-                <li>Interior glass and odor-neutral finish</li>
+                <li>Pressure wash, dense foam, and hand-dry with a fresh microfiber towel</li>
+                <li>Wheel and tire cleaning</li>
+                <li>Light exterior glass wash</li>
               </ul>
               <p class="price">From CA$199 <small>/ sedan</small></p>
             </article>
@@ -2045,6 +2050,7 @@
       const addonsPanel = document.getElementById("addons-panel");
       const interiorAddonsColumn = document.getElementById("addons-column-interior");
       const exteriorAddonsColumn = document.getElementById("addons-column-exterior");
+      const clickablePriceBlocks = document.querySelectorAll("#services .card, #services .addon-card");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
       const bookedFlashStorageKey = "idd-booking-submitted";
       let lastBookingTrigger = null;
@@ -2242,6 +2248,19 @@
         preferredEndInput.setCustomValidity(valid ? "" : "End date/time must be after start date/time.");
         return valid;
       }
+
+      clickablePriceBlocks.forEach((block) => {
+        block.addEventListener("click", (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          if (target.closest("input, label, button, a")) return;
+
+          const blockCheckbox = block.querySelector("input[type='checkbox'][data-service-price]");
+          if (!(blockCheckbox instanceof HTMLInputElement)) return;
+          blockCheckbox.checked = !blockCheckbox.checked;
+          blockCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      });
 
       bookingOpenButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
