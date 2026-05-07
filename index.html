@@ -2415,7 +2415,8 @@
             <article class="addon-card discount-card">
               <label class="addon-label discount-label" for="discount-clean-car">
                 <input type="checkbox" id="discount-clean-car" data-discount-percent="20">
-                <span class="addon-name discount-name">My car is pretty clean already, I just need... (applies to basic package price only)</span>
+                <span class="addon-name discount-name">My car is already fairly clean—just looking for a quick touch-up (discount applies to the basic package only)</span>
+          
                 <span class="addon-price discount-price">-20%</span>
               </label>
             </article>
@@ -2994,7 +2995,8 @@
           && Boolean(addonLabel.querySelector(".vehicle-size-sensitive"));
         const basePackageHasSensitiveMarker = serviceCard instanceof Element
           && Boolean(serviceCard.querySelector(".price.vehicle-size-sensitive"));
-        return addonHasSensitiveMarker || basePackageHasSensitiveMarker;
+        const isAddon = Boolean(checkbox.dataset.addonGroup);
+        return isAddon ? addonHasSensitiveMarker : basePackageHasSensitiveMarker;
       }
 
       function getAdjustedServicePrice(checkbox) {
