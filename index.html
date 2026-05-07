@@ -901,9 +901,14 @@
         }
       }
 
-      #services .card,
       #services .addon-card {
         cursor: pointer;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        #services .card {
+          cursor: pointer;
+        }
       }
 
       .card-tag {
@@ -1173,6 +1178,50 @@
         font-weight: 600;
         white-space: nowrap;
         text-align: right;
+      }
+
+      @media (max-width: 767px) {
+        main {
+          padding-bottom: calc(118px + env(safe-area-inset-bottom));
+        }
+
+        .price-calculator-summary {
+          top: auto;
+          right: 0;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          border-left: 0;
+          border-right: 0;
+          border-bottom: 0;
+          border-radius: 14px 14px 0 0;
+          padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+          box-shadow: 0 -12px 26px rgba(2, 8, 23, 0.45);
+        }
+
+        .price-calculator-summary__close {
+          display: none;
+        }
+
+        .price-calculator-summary__intro {
+          font-size: 0.74rem;
+          letter-spacing: 0.02em;
+        }
+
+        .price-calculator-breakdown {
+          max-height: 260px;
+          opacity: 1;
+          margin-top: 8px;
+          overflow: hidden;
+          transition: max-height 260ms ease, opacity 200ms ease, margin-top 220ms ease;
+        }
+
+        .price-calculator-summary.is-mobile-collapsed .price-calculator-breakdown {
+          max-height: 0;
+          opacity: 0;
+          margin-top: 0;
+          pointer-events: none;
+        }
       }
 
       @keyframes total-price-pulse-in {
@@ -2349,9 +2398,9 @@
               </div>
             </div>
           </div>
-          <div class="price-calculator-summary" aria-live="polite">
+          <div class="price-calculator-summary" id="price-calculator-summary" aria-live="polite">
             <button class="price-calculator-summary__close" id="price-calculator-close" type="button" aria-label="Close calculator summary">×</button>
-            <p>Your instant savings-ready quote</p>
+            <p class="price-calculator-summary__intro">Your instant savings-ready quote</p>
             <div class="price-calculator-breakdown" id="price-calculator-breakdown">
               <div class="price-calculator-breakdown__row">
                 <span>Packages</span>
@@ -2708,9 +2757,11 @@
       const packageAddonsContainers = document.querySelectorAll("#services .package-addons");
       const clickableBasicBlocks = document.querySelectorAll("#price-calculator-grid > .card");
       const clickableAddonBlocks = document.querySelectorAll("#services .package-addons .addon-card");
-      const priceCalculatorSummary = document.querySelector(".price-calculator-summary");
+      const priceCalculatorSummary = document.getElementById("price-calculator-summary");
       const priceCalculatorCloseButton = document.getElementById("price-calculator-close");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
+      const cardToggleEnabledMediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+      const mobilePriceSummaryMediaQuery = window.matchMedia("(max-width: 767px)");
       const quoteBasicSubtotal = document.getElementById("quote-basic-subtotal");
       const quoteAddonsSubtotal = document.getElementById("quote-addons-subtotal");
       const quotePackageItems = document.getElementById("quote-package-items");
@@ -2746,10 +2797,27 @@
       ];
       const waterSplashThreshold = 700;
       const waterSplashCooldownMs = 800;
+      const basicCardToggleSuppressMs = 1600;
       let lastBookingTrigger = null;
       let lastWaterSplashAt = 0;
       let servicesCarSizeDragRatio = 0;
       let isDraggingServicesCarSize = false;
+      let suppressBasicCardToggleUntil = 0;
+      let isMobileSummaryExpanded = false;
+
+      function applyMobileSummaryLayoutState(expanded = isMobileSummaryExpanded) {
+        if (!priceCalculatorSummary) return;
+        if (!mobilePriceSummaryMediaQuery.matches) {
+          isMobileSummaryExpanded = true;
+          priceCalculatorSummary.classList.remove("is-mobile-collapsed", "is-mobile-expanded");
+          priceCalculatorSummary.setAttribute("aria-expanded", "true");
+          return;
+        }
+        isMobileSummaryExpanded = Boolean(expanded);
+        priceCalculatorSummary.classList.toggle("is-mobile-collapsed", !isMobileSummaryExpanded);
+        priceCalculatorSummary.classList.toggle("is-mobile-expanded", isMobileSummaryExpanded);
+        priceCalculatorSummary.setAttribute("aria-expanded", isMobileSummaryExpanded ? "true" : "false");
+      }
 
       function normalizeCarSizeStep(stepValue) {
         const parsedStep = Number.parseInt(String(stepValue), 10);
@@ -3062,9 +3130,16 @@
 
       function updatePriceCalculatorTotal() {
         if (!priceCalculatorTotal || !servicePriceCheckboxes.length) return;
-        if (priceCalculatorSummary) priceCalculatorSummary.hidden = false;
         const breakdown = calculatePriceBreakdown();
         const total = breakdown.finalTotal;
+        const shouldShowSummary = total > 0;
+        if (priceCalculatorSummary) {
+          const wasHidden = priceCalculatorSummary.hidden;
+          priceCalculatorSummary.hidden = !shouldShowSummary;
+          if (shouldShowSummary && wasHidden && mobilePriceSummaryMediaQuery.matches) {
+            applyMobileSummaryLayoutState(false);
+          }
+        }
         const priceScale =
           total <= 0
             ? 1
@@ -3421,19 +3496,20 @@
         block.classList.add("is-click-flash");
       }
 
+      function suppressBasicCardToggle() {
+        suppressBasicCardToggleUntil = Date.now() + basicCardToggleSuppressMs;
+      }
+
       clickableBasicBlocks.forEach((block) => {
         block.addEventListener("click", (event) => {
+          if (!cardToggleEnabledMediaQuery.matches) return;
+          if (Date.now() < suppressBasicCardToggleUntil) return;
           const target = event.target;
           if (!(target instanceof Element)) return;
-          const eventPath = typeof event.composedPath === "function" ? event.composedPath() : [];
-          const originatedInAddons = eventPath.some((node) => {
-            return node instanceof Element && node.classList.contains("package-addons");
-          });
-          if (originatedInAddons) return;
-          if (target.closest(".package-addons")) return;
+          if (target.closest(".package-addons, .addon-card")) return;
           if (target.closest("input, label, button, a")) return;
 
-          const blockCheckbox = block.querySelector("input[type='checkbox'][data-service-price]");
+          const blockCheckbox = block.querySelector(".service-block-select input[type='checkbox'][data-service-price]");
           if (!(blockCheckbox instanceof HTMLInputElement)) return;
           blockCheckbox.checked = !blockCheckbox.checked;
           blockCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
@@ -3441,7 +3517,20 @@
       });
 
       clickableAddonBlocks.forEach((block) => {
+        block.addEventListener("pointerdown", () => {
+          suppressBasicCardToggle();
+        });
+        block.addEventListener("pointerup", () => {
+          suppressBasicCardToggle();
+        });
+        block.addEventListener("touchstart", () => {
+          suppressBasicCardToggle();
+        });
+        block.addEventListener("touchend", () => {
+          suppressBasicCardToggle();
+        });
         block.addEventListener("click", (event) => {
+          suppressBasicCardToggle();
           event.stopPropagation();
           const target = event.target;
           if (!(target instanceof Element)) return;
@@ -3465,9 +3554,15 @@
           if (parentCard instanceof HTMLElement) parentCard.classList.remove("is-addon-interacting");
         });
         container.addEventListener("pointerdown", (event) => {
+          suppressBasicCardToggle();
+          event.stopPropagation();
+        });
+        container.addEventListener("touchstart", (event) => {
+          suppressBasicCardToggle();
           event.stopPropagation();
         });
         container.addEventListener("click", (event) => {
+          suppressBasicCardToggle();
           event.stopPropagation();
         });
       });
@@ -3544,11 +3639,30 @@
           if (priceCalculatorSummary) priceCalculatorSummary.hidden = true;
         });
       }
+      if (priceCalculatorSummary) {
+        priceCalculatorSummary.addEventListener("click", (event) => {
+          if (!mobilePriceSummaryMediaQuery.matches) return;
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          if (target.closest("button, a, input, label, select, textarea")) return;
+          applyMobileSummaryLayoutState(!isMobileSummaryExpanded);
+        });
+      }
+      if (typeof mobilePriceSummaryMediaQuery.addEventListener === "function") {
+        mobilePriceSummaryMediaQuery.addEventListener("change", () => {
+          applyMobileSummaryLayoutState(false);
+        });
+      } else if (typeof mobilePriceSummaryMediaQuery.addListener === "function") {
+        mobilePriceSummaryMediaQuery.addListener(() => {
+          applyMobileSummaryLayoutState(false);
+        });
+      }
       restoreVehicleSizeStep();
       syncServicesCarSizeSelection();
 
       servicePriceCheckboxes.forEach((checkbox) => {
         checkbox.addEventListener("change", () => {
+          if (checkbox.dataset.addonGroup) suppressBasicCardToggle();
           syncAddonColumns();
           updatePriceCalculatorTotal();
           persistServiceSelections();
@@ -3562,6 +3676,7 @@
       restoreServiceSelections();
       syncAddonColumns();
       updatePriceCalculatorTotal();
+      applyMobileSummaryLayoutState(false);
 
       document.addEventListener("keydown", (event) => {
         if (isBookingThanksVisible() && isScrollAttemptEvent(event)) {
