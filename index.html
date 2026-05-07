@@ -2122,9 +2122,9 @@
             </p>
             <div class="hero-cta">
               <a class="btn btn-primary" href="#services">Get your instant quote now</a>
-              <a class="btn btn-ghost" href="#services">View packages</a>
+              <a class="btn btn-ghost" href="#services">Build your package</a>
             </div>
-            <p class="hero-note">Local new-client offer: save 20% on your first clean this month in our North Island service area.</p>
+            <p class="hero-note">Fast local booking across our North Island service area, with transparent pricing and no hidden fees.</p>
             <ul class="trust-row">
               <li><strong>100% clean</strong> guarantee</li>
               <li><strong>Insured</strong> owner-operator</li>
@@ -2517,9 +2517,9 @@
         <div class="wrap">
           <div class="cta-band">
             <h2>Get your Island Drift Detailing quote in under 10 minutes</h2>
-            <p>Tell us your vehicle and address and we will reply with exact pricing, nearest available slot in Comox Valley, Campbell River, Courtenay, or Cumberland, and your 20% first-clean code.</p>
+            <p>Tell us your vehicle and address and we will reply with exact pricing and the nearest available slot in Comox Valley, Campbell River, Courtenay, or Cumberland.</p>
             <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
-              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Offer CTA">Claim my 20% offer</a>
+              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Book CTA">Get my quote</a>
               <a class="btn btn-ghost" href="tel:+16048340635">Call now: +1 (604) 834-0635</a>
             </div>
           </div>
@@ -2986,11 +2986,11 @@
         const manualDiscountAmount = Math.max(0, totals.basicSubtotal - discountedBasicSubtotal);
         const totalBeforeDiscounts = totals.basicSubtotal + totals.addonsSubtotal;
         const totalAfterManualDiscounts = discountedBasicSubtotal + totals.addonsSubtotal;
-        const volumeDiscountPercent = totalAfterManualDiscounts <= 200
+        const volumeDiscountPercent = totalBeforeDiscounts <= 200
           ? 0
-          : totalAfterManualDiscounts >= 1000
+          : totalBeforeDiscounts >= 1000
             ? 20
-            : ((totalAfterManualDiscounts - 200) / (1000 - 200)) * 20;
+            : ((totalBeforeDiscounts - 200) / (1000 - 200)) * 20;
         const volumeDiscountProgress = Math.min(Math.max(volumeDiscountPercent / 20, 0), 1);
         if (volumeDiscountValue) {
           volumeDiscountValue.textContent = `${Math.round(volumeDiscountPercent)}%`;
@@ -3002,8 +3002,11 @@
           volumeDiscountHead.style.left = `${volumeDiscountProgress * 100}%`;
         }
         const volumeDiscountRatio = volumeDiscountPercent / 100;
-        const finalTotal = Math.max(0, Math.ceil(totalAfterManualDiscounts * (1 - volumeDiscountRatio)));
-        const volumeDiscountAmount = Math.max(0, totalAfterManualDiscounts - finalTotal);
+        const volumeDiscountAmount = Math.ceil(totalBeforeDiscounts * volumeDiscountRatio);
+        const finalTotal = Math.max(
+          0,
+          totalBeforeDiscounts - manualDiscountAmount - volumeDiscountAmount
+        );
         return {
           basicSubtotal: totals.basicSubtotal,
           addonsSubtotal: totals.addonsSubtotal,

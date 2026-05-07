@@ -23,6 +23,21 @@ function readFirst(formData, keys) {
   return "";
 }
 
+function getCalculatorDetailsLines(detailsRaw) {
+  const details = str(detailsRaw);
+  if (!details || details === "Not specified" || details === "Skipped calculator") {
+    return [details || "Not specified"];
+  }
+
+  const segments = details
+    .split("|")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  if (!segments.length) return [details];
+  return segments;
+}
+
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   const chunk = 0x8000;
@@ -31,6 +46,28 @@ function arrayBufferToBase64(buffer) {
     binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
   }
   return btoa(binary);
+}
+
+function getStainPhotoSummaryLines({ photoCount, skippedPhotos }) {
+  const attached = Number.isFinite(photoCount) ? photoCount : 0;
+  const skipped = Number.isFinite(skippedPhotos) ? skippedPhotos : 0;
+
+  if (attached <= 0 && skipped <= 0) {
+    return ["Stain photos: none provided"];
+  }
+
+  if (attached > 0 && skipped <= 0) {
+    return [`Stain photos: ${attached} attached`];
+  }
+
+  if (attached <= 0 && skipped > 0) {
+    return [`Stain photos: ${skipped} skipped (file too large or unsupported)`];
+  }
+
+  return [
+    `Stain photos: ${attached} attached`,
+    `Stain photos: ${skipped} skipped (file too large or unsupported)`,
+  ];
 }
 
 async function sendSlackBookingNotification({
@@ -44,7 +81,7 @@ async function sendSlackBookingNotification({
   preferredStart,
   preferredEnd,
   packageType,
-  calculatorDetails,
+  calculatorDetailsLines,
   photoCount,
   skippedPhotos,
 }) {
@@ -64,9 +101,9 @@ async function sendSlackBookingNotification({
     `*Preferred from:* ${preferredStart}`,
     `*Preferred to:* ${preferredEnd}`,
     `*Package:* ${packageType}`,
-    `*Calculator details:* ${calculatorDetails}`,
-    `*Stain photos attached:* ${photoCount}`,
-    `*Stain photos skipped:* ${skippedPhotos}`,
+    "*Calculator details:*",
+    ...calculatorDetailsLines.map((line) => `• ${line}`),
+    ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }).map((line) => `*${line}*`),
   ].join("\n");
 
   const controller = new AbortController();
@@ -174,6 +211,7 @@ export default async function handler(request) {
   const preferredEnd = str(formData.get("preferred_end"));
   const packageType = str(formData.get("package_type")) || "Not specified";
   const calculatorDetails = str(formData.get("calculator_details")) || "Not specified";
+  const calculatorDetailsLines = getCalculatorDetailsLines(calculatorDetails);
 
   if (!clientName || !clientEmail || !clientMobile || !clientAddress || !preferredStart || !preferredEnd || !packageType) {
     console.warn(`[${requestId}] Missing required fields`, {
@@ -249,9 +287,9 @@ export default async function handler(request) {
     `Preferred from: ${preferredStart}`,
     `Preferred to: ${preferredEnd}`,
     `Package type: ${packageType}`,
-    `Price calculator details: ${calculatorDetails}`,
-    `Stain photos attached: ${photoCount} file(s)`,
-    `Stain photos skipped: ${skippedPhotos} file(s)`,
+    "Price calculator details:",
+    ...calculatorDetailsLines.map((line) => `  - ${line}`),
+    ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }),
   ].join("\n");
 
   const payload = {
@@ -342,7 +380,7 @@ export default async function handler(request) {
       preferredStart,
       preferredEnd,
       packageType,
-      calculatorDetails,
+      calculatorDetailsLines,
       photoCount,
       skippedPhotos,
     });
