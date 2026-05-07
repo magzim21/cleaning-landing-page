@@ -43,8 +43,8 @@ async function sendSlackBookingNotification({
   clientAddress,
   preferredStart,
   preferredEnd,
-  carModel,
   packageType,
+  calculatorDetails,
   photoCount,
   skippedPhotos,
 }) {
@@ -63,8 +63,8 @@ async function sendSlackBookingNotification({
     `*Address:* ${clientAddress}`,
     `*Preferred from:* ${preferredStart}`,
     `*Preferred to:* ${preferredEnd}`,
-    `*Car model:* ${carModel}`,
     `*Package:* ${packageType}`,
+    `*Calculator details:* ${calculatorDetails}`,
     `*Stain photos attached:* ${photoCount}`,
     `*Stain photos skipped:* ${skippedPhotos}`,
   ].join("\n");
@@ -172,10 +172,10 @@ export default async function handler(request) {
   const clientAddress = str(formData.get("client_address"));
   const preferredStart = str(formData.get("preferred_start"));
   const preferredEnd = str(formData.get("preferred_end"));
-  const carModel = str(formData.get("car_model"));
   const packageType = str(formData.get("package_type")) || "Not specified";
+  const calculatorDetails = str(formData.get("calculator_details")) || "Not specified";
 
-  if (!clientName || !clientEmail || !clientMobile || !clientAddress || !preferredStart || !preferredEnd || !carModel || !packageType) {
+  if (!clientName || !clientEmail || !clientMobile || !clientAddress || !preferredStart || !preferredEnd || !packageType) {
     console.warn(`[${requestId}] Missing required fields`, {
       hasName: Boolean(clientName),
       hasEmail: Boolean(clientEmail),
@@ -183,7 +183,6 @@ export default async function handler(request) {
       hasAddress: Boolean(clientAddress),
       hasPreferredStart: Boolean(preferredStart),
       hasPreferredEnd: Boolean(preferredEnd),
-      hasCarModel: Boolean(carModel),
       hasPackageType: Boolean(packageType),
     });
     return new Response(JSON.stringify({ error: "Missing required fields." }), {
@@ -207,30 +206,37 @@ export default async function handler(request) {
   }
 
   for (const item of stainItems.slice(0, MAX_PHOTO_COUNT)) {
-    if (!(item instanceof File) || item.size <= 0) continue;
-    if (item.size > MAX_PHOTO_SIZE_BYTES) {
+    const hasArrayBuffer = item && typeof item.arrayBuffer === "function";
+    const itemSize = Number(item && item.size);
+    if (!hasArrayBuffer || !Number.isFinite(itemSize) || itemSize <= 0) {
+      continue;
+    }
+    if (itemSize > MAX_PHOTO_SIZE_BYTES) {
       console.warn(`[${requestId}] Skipping photo larger than limit`, {
-        filename: item.name,
-        size: item.size,
+        filename: item && item.name,
+        size: itemSize,
       });
       skippedPhotos += 1;
       continue;
     }
-    if (totalPhotoBytes + item.size > MAX_TOTAL_PHOTO_SIZE_BYTES) {
+    if (totalPhotoBytes + itemSize > MAX_TOTAL_PHOTO_SIZE_BYTES) {
       console.warn(`[${requestId}] Skipping photo due to total attachment limit`, {
-        filename: item.name,
-        size: item.size,
+        filename: item && item.name,
+        size: itemSize,
         totalPhotoBytes,
       });
       skippedPhotos += 1;
       continue;
     }
     photoCount += 1;
-    totalPhotoBytes += item.size;
+    totalPhotoBytes += itemSize;
     const buf = await item.arrayBuffer();
+    const filename = str(item && item.name) || `photo-${photoCount}.jpg`;
+    const contentType = str(item && item.type) || "application/octet-stream";
     attachments.push({
-      filename: item.name || "photo",
+      filename,
       content: arrayBufferToBase64(buf),
+      content_type: contentType,
     });
   }
 
@@ -242,8 +248,8 @@ export default async function handler(request) {
     `Client address: ${clientAddress}`,
     `Preferred from: ${preferredStart}`,
     `Preferred to: ${preferredEnd}`,
-    `Car model: ${carModel}`,
     `Package type: ${packageType}`,
+    `Price calculator details: ${calculatorDetails}`,
     `Stain photos attached: ${photoCount} file(s)`,
     `Stain photos skipped: ${skippedPhotos} file(s)`,
   ].join("\n");
@@ -335,8 +341,8 @@ export default async function handler(request) {
       clientAddress,
       preferredStart,
       preferredEnd,
-      carModel,
       packageType,
+      calculatorDetails,
       photoCount,
       skippedPhotos,
     });

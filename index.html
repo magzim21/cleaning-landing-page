@@ -802,8 +802,7 @@
         color: var(--text-muted);
       }
 
-      .services-car-size__ticks button,
-      .booking-car-size__ticks button {
+      .services-car-size__ticks button {
         padding: 2px 4px;
         border: 0;
         border-radius: 8px;
@@ -814,14 +813,12 @@
         cursor: pointer;
       }
 
-      .services-car-size__ticks button:hover,
-      .booking-car-size__ticks button:hover {
+      .services-car-size__ticks button:hover {
         color: var(--text);
         background: rgba(148, 163, 184, 0.12);
       }
 
-      .services-car-size__ticks button:focus-visible,
-      .booking-car-size__ticks button:focus-visible {
+      .services-car-size__ticks button:focus-visible {
         outline: 2px solid rgba(56, 189, 248, 0.75);
         outline-offset: 2px;
       }
@@ -990,8 +987,33 @@
         display: flex;
         flex-direction: column;
         gap: 2px;
-        align-items: flex-end;
-        overflow: visible;
+        align-items: stretch;
+        width: min(280px, calc(100vw - 32px));
+        overflow: hidden;
+      }
+
+      .price-calculator-summary[hidden] {
+        display: none;
+      }
+
+      .price-calculator-summary__close {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.75);
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .price-calculator-summary__close:hover {
+        color: var(--text);
+        background: rgba(30, 41, 59, 0.85);
       }
 
       .price-calculator-summary::before,
@@ -1045,15 +1067,34 @@
       .price-calculator-total {
         --price-scale: 1;
         font-family: "Outfit", sans-serif;
-        font-size: 1.2rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: var(--text);
-        display: inline-block;
+        display: block;
         margin-top: 2px;
+        width: 100%;
+        text-align: right;
         transform: scale(var(--price-scale));
         transform-origin: right top;
-        transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
         will-change: transform;
+      }
+
+      .price-calculator-total-row {
+        margin-top: 2px;
+        width: 100%;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .price-calculator-total-label {
+        font-size: 0.74rem;
+        color: #bbf7d0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
 
       .price-calculator-total.is-increasing {
@@ -1076,6 +1117,62 @@
 
       .price-calculator-total.is-water-wet {
         animation: total-price-water-wet 700ms ease-out;
+      }
+
+      .price-calculator-breakdown {
+        margin-top: 8px;
+        width: 100%;
+        display: grid;
+        gap: 4px;
+        font-size: 0.74rem;
+        color: var(--text-muted);
+      }
+
+      .price-calculator-breakdown__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .price-calculator-breakdown__row strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .price-calculator-breakdown__row--discount {
+        color: #86efac;
+      }
+
+      .price-calculator-breakdown__subitems {
+        margin: -1px 0 2px;
+        display: grid;
+        gap: 2px;
+        padding-left: 8px;
+      }
+
+      .price-calculator-breakdown__subitem {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: 8px;
+        font-size: 0.68rem;
+        color: rgba(148, 163, 184, 0.95);
+      }
+
+      .price-calculator-breakdown__subitem-name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .price-calculator-breakdown__subitem-value {
+        color: var(--text-muted);
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: right;
       }
 
       @keyframes total-price-pulse-in {
@@ -1240,6 +1337,87 @@
       .discount-name,
       .discount-price {
         color: #86efac;
+      }
+
+      .volume-discount {
+        margin-top: 2px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .volume-discount__meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 0.78rem;
+        color: #86efac;
+      }
+
+      .volume-discount__value {
+        font-family: "Outfit", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #bbf7d0;
+      }
+
+      .volume-discount__rail {
+        position: relative;
+        height: 14px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(20, 83, 45, 0.35);
+      }
+
+      .volume-discount__rail::before,
+      .volume-discount__rail::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 18px;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .volume-discount__rail::before {
+        left: 0;
+        background: linear-gradient(90deg, rgba(20, 83, 45, 0.6), rgba(20, 83, 45, 0));
+      }
+
+      .volume-discount__rail::after {
+        right: 0;
+        background: linear-gradient(270deg, rgba(20, 83, 45, 0.6), rgba(20, 83, 45, 0));
+      }
+
+      .volume-discount__fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, rgba(34, 197, 94, 0.72), rgba(74, 222, 128, 0.86));
+        transition: width 220ms ease;
+      }
+
+      .volume-discount__head {
+        position: absolute;
+        top: 50%;
+        left: 0%;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(240, 253, 244, 0.7);
+        background: #22c55e;
+        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.45), 0 0 12px rgba(74, 222, 128, 0.5);
+        transform: translate(-50%, -50%);
+        transition: left 220ms ease;
+      }
+
+      .volume-discount__ticks {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.68rem;
+        color: rgba(187, 247, 208, 0.78);
       }
 
       /* Steps */
@@ -1485,34 +1663,6 @@
         resize: vertical;
       }
 
-      .booking-field--car-size label {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      .booking-car-size__value {
-        color: var(--text);
-        font-weight: 600;
-      }
-
-      .booking-field--car-size input[type="range"] {
-        padding: 0;
-        border: 0;
-        border-radius: 999px;
-        background: transparent;
-        accent-color: var(--accent);
-      }
-
-      .booking-car-size__ticks {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 8px;
-        font-size: 0.72rem;
-        color: var(--text-muted);
-      }
-
       .booking-field input:focus-visible,
       .booking-field select:focus-visible,
       .booking-field textarea:focus-visible {
@@ -1524,6 +1674,53 @@
         margin: 0;
         font-size: 0.78rem;
         color: var(--text-muted);
+      }
+
+      .booking-quote-summary {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.55);
+        padding: 10px 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .booking-quote-summary > p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .booking-quote-summary__hint {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .booking-quote-summary__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .booking-quote-summary__actions button {
+        border: 0;
+        background: none;
+        color: #7dd3fc;
+        padding: 0;
+        font: inherit;
+        font-size: 0.8rem;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .booking-quote-summary__actions button:hover {
+        color: #bae6fd;
+      }
+
+      .booking-quote-summary__empty[hidden],
+      .booking-quote-summary__details[hidden] {
+        display: none;
       }
 
       .booking-form__actions {
@@ -1974,12 +2171,12 @@
                 <li>Dashboard, console, and high-touch surfaces cleaned</li>
                 <li>Interior glass finish + light exterior glass wash</li>
               </ul>
-              <p class="price  vehicle-size-sensitive">CA$149</p>
+              <p class="price  vehicle-size-sensitive">CA$150</p>
               <div class="package-addons" id="addons-panel-interior" aria-hidden="true">
                 <p class="addons-column-title">Interior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-plastic-restoration">
-                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior">
+                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior" checked>
                     <span class="addon-name  vehicle-size-sensitive">Plastic restoration product</span>
                     <span class="addon-price">$25</span>
                   </label>
@@ -2051,7 +2248,7 @@
             </article>
             <article class="card">
               <div class="service-block-select">
-                <input type="checkbox" id="service-basic-exterior" data-service-price="200">
+                <input type="checkbox" id="service-basic-exterior" data-service-price="150">
                 <label for="service-basic-exterior">Basic Exterior Detailing</label>
               </div>
               <ul class="package-points">
@@ -2059,12 +2256,12 @@
                 <li>Wheel and tire cleaning</li>
                 <li>Light exterior glass wash</li>
               </ul>
-              <p class="price vehicle-size-sensitive">CA$199</p>
+              <p class="price vehicle-size-sensitive">CA$200</p>
               <div class="package-addons" id="addons-panel-exterior" aria-hidden="true">
                 <p class="addons-column-title">Exterior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-hard-water-spots">
-                    <input type="checkbox" id="addon-hard-water-spots" data-service-price="20" data-addon-group="exterior">
+                    <input type="checkbox" id="addon-hard-water-spots" data-service-price="20" data-addon-group="exterior" checked>
                     <span class="addon-name">Removing hard water spots from glass</span>
                     <span class="addon-price vehicle-size-sensitive">$20</span> 
                   </label>
@@ -2078,14 +2275,14 @@
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-tire-shine">
-                    <input type="checkbox" id="addon-tire-shine" data-service-price="10" data-addon-group="exterior">
+                    <input type="checkbox" id="addon-tire-shine" data-service-price="10" data-addon-group="exterior" checked>
                     <span class="addon-name">Tire shine product</span>
                     <span class="addon-price vehicle-size-sensitive">$10</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-bonded-contaminants">
-                    <input type="checkbox" id="addon-bonded-contaminants" data-service-price="20" data-addon-group="exterior">
+                    <input type="checkbox" id="addon-bonded-contaminants" data-service-price="20" data-addon-group="exterior" checked>
                     <span class="addon-name">Removing bonded contaminants</span>
                     <span class="addon-price  vehicle-size-sensitive">$30</span>
                   </label>
@@ -2106,7 +2303,7 @@
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-door-trunk-jambs">
-                    <input type="checkbox" id="addon-door-trunk-jambs" data-service-price="60" data-addon-group="exterior">
+                    <input type="checkbox" id="addon-door-trunk-jambs" data-service-price="60" data-addon-group="exterior" checked>
                     <span class="addon-name vehicle-size-sensitive">Cleaning Door and Trunk Jambs</span>
                     <span class="addon-price">$60</span>
                   </label>
@@ -2137,24 +2334,52 @@
                 <span class="addon-price discount-price">-20%</span>
               </label>
             </article>
-            <article class="addon-card discount-card">
-              <label class="addon-label discount-label" for="discount-auto-500">
-                <input type="checkbox" id="discount-auto-500" disabled>
-                <span class="addon-name discount-name">Automatic discount on CA$500+ total</span>
-                <span class="addon-price discount-price">-CA$50</span>
-              </label>
-            </article>
-            <article class="addon-card discount-card">
-              <label class="addon-label discount-label" for="discount-auto-1000">
-                <input type="checkbox" id="discount-auto-1000" disabled>
-                <span class="addon-name discount-name">Automatic discount on CA$1000+ total</span>
-                <span class="addon-price discount-price">-CA$100</span>
-              </label>
-            </article>
+            <div class="volume-discount" aria-label="Volume discount">
+              <div class="volume-discount__meta">
+                <span>Volume discount</span>
+                <span class="volume-discount__value" id="volume-discount-value">0%</span>
+              </div>
+              <div class="volume-discount__rail">
+                <div class="volume-discount__fill" id="volume-discount-fill"></div>
+                <div class="volume-discount__head" id="volume-discount-head" aria-hidden="true"></div>
+              </div>
+              <div class="volume-discount__ticks">
+                <span>CA$200</span>
+                <span>CA$1000</span>
+              </div>
+            </div>
           </div>
           <div class="price-calculator-summary" aria-live="polite">
-            <p>Selected blocks total</p>
-            <p class="price-calculator-total" id="price-calculator-total">CA$0</p>
+            <button class="price-calculator-summary__close" id="price-calculator-close" type="button" aria-label="Close calculator summary">×</button>
+            <p>Your instant savings-ready quote</p>
+            <div class="price-calculator-breakdown" id="price-calculator-breakdown">
+              <div class="price-calculator-breakdown__row">
+                <span>Packages</span>
+                <strong id="quote-basic-subtotal">CA$0</strong>
+              </div>
+              <div class="price-calculator-breakdown__subitems" id="quote-package-items"></div>
+              <div class="price-calculator-breakdown__row">
+                <span>Add-ons</span>
+                <strong id="quote-addons-subtotal">CA$0</strong>
+              </div>
+              <div class="price-calculator-breakdown__subitems" id="quote-addon-items"></div>
+              <div class="price-calculator-breakdown__row">
+                <span>Total before discounts</span>
+                <strong id="quote-before-discount-total">CA$0</strong>
+              </div>
+              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                <span>Clean-car discount</span>
+                <strong id="quote-manual-discount">-CA$0</strong>
+              </div>
+              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                <span>Volume discount</span>
+                <strong id="quote-volume-discount">-CA$0 (0%)</strong>
+              </div>
+            </div>
+            <div class="price-calculator-total-row">
+              <span class="price-calculator-total-label">Grand total</span>
+              <p class="price-calculator-total" id="price-calculator-total">CA$0</p>
+            </div>
           </div>
         </div>
       </section>
@@ -2341,32 +2566,49 @@
             </div>
           </div>
           <div class="booking-field">
-            <label for="car-model">Car model</label>
-            <input id="car-model" name="car_model" type="text" required placeholder="Example: 2020 Toyota RAV4">
-          </div>
-          <div class="booking-field booking-field--car-size">
-            <label for="car-size-slider">
-              Vehicle size
-              <span class="booking-car-size__value" id="car-size-value">SUV / Wagon</span>
-            </label>
-            <input id="car-size-slider" type="range" min="1" max="4" step="1" value="2" aria-describedby="car-size-ticks">
-            <input id="car-size" name="car_size" type="hidden" value="SUV / Wagon">
-            <div class="booking-car-size__ticks" id="car-size-ticks">
-              <button type="button" data-booking-car-size-step="1">Compact / Sedan</button>
-              <button type="button" data-booking-car-size-step="2">SUV / Wagon</button>
-              <button type="button" data-booking-car-size-step="3">Full-size SUV / Truck</button>
-              <button type="button" data-booking-car-size-step="4">Large Truck / Van</button>
+            <label>Price calculator summary</label>
+            <input id="booking-package-type" name="package_type" type="hidden" value="Not specified">
+            <input id="booking-calculator-details" name="calculator_details" type="hidden" value="Not specified">
+            <div class="booking-quote-summary">
+              <p>Your calculator estimate</p>
+              <div class="booking-quote-summary__empty" id="booking-quote-empty">
+                <p class="booking-quote-summary__hint" id="booking-quote-hint">No calculator selections yet. You can open the calculator for an instant quote or skip and continue booking.</p>
+                <div class="booking-quote-summary__actions">
+                  <button id="booking-go-to-calculator" type="button">Open calculator</button>
+                  <button id="booking-skip-calculator" type="button">Skip for now</button>
+                </div>
+              </div>
+              <div class="booking-quote-summary__details" id="booking-quote-details" hidden>
+                <div class="price-calculator-breakdown">
+                  <div class="price-calculator-breakdown__row">
+                    <span>Selected packages</span>
+                    <strong id="booking-quote-basic-subtotal">CA$0</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__subitems" id="booking-quote-package-items"></div>
+                  <div class="price-calculator-breakdown__row">
+                    <span>Add-ons</span>
+                    <strong id="booking-quote-addons-subtotal">CA$0</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__subitems" id="booking-quote-addon-items"></div>
+                  <div class="price-calculator-breakdown__row">
+                    <span>Total before discounts</span>
+                    <strong id="booking-quote-before-discount-total">CA$0</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                    <span>Selected discount</span>
+                    <strong id="booking-quote-manual-discount">-CA$0</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                    <span>Volume savings</span>
+                    <strong id="booking-quote-volume-discount">-CA$0 (0%)</strong>
+                  </div>
+                </div>
+                <div class="price-calculator-total-row">
+                  <span class="price-calculator-total-label">Grand total</span>
+                  <p class="price-calculator-total" id="booking-price-calculator-total">CA$0</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="booking-field">
-            <label for="package-type">Package type</label>
-            <select id="package-type" name="package_type" required>
-              <option value="">Select a package</option>
-              <option value="Express interior refresh">Express interior refresh</option>
-              <option value="Complete interior + exterior">Complete interior + exterior</option>
-              <option value="Deep detail + protect">Deep detail + protect</option>
-              <option value="Not sure yet">Not sure yet</option>
-            </select>
           </div>
           <div class="booking-field">
             <label for="stain-photos">Pictures upload (hard stains if any)</label>
@@ -2453,15 +2695,12 @@
       const servicesCarSizeValueLabel = document.getElementById("services-car-size-value");
       const servicesCarSizeHead = document.getElementById("services-car-size-head");
       const servicesCarSizeTickButtons = document.querySelectorAll("[data-services-car-size-step]");
-      const carSizeSlider = document.getElementById("car-size-slider");
-      const carSizeValueLabel = document.getElementById("car-size-value");
-      const carSizeHiddenInput = document.getElementById("car-size");
-      const bookingCarSizeTickButtons = document.querySelectorAll("[data-booking-car-size-step]");
       const bookingFormStatus = document.getElementById("booking-form-status");
       const servicePriceCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-service-price]");
       const discountCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-discount-percent]");
-      const autoDiscount500Checkbox = document.getElementById("discount-auto-500");
-      const autoDiscount1000Checkbox = document.getElementById("discount-auto-1000");
+      const volumeDiscountValue = document.getElementById("volume-discount-value");
+      const volumeDiscountFill = document.getElementById("volume-discount-fill");
+      const volumeDiscountHead = document.getElementById("volume-discount-head");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
       const interiorAddonsPanel = document.getElementById("addons-panel-interior");
@@ -2470,16 +2709,35 @@
       const clickableBasicBlocks = document.querySelectorAll("#price-calculator-grid > .card");
       const clickableAddonBlocks = document.querySelectorAll("#services .package-addons .addon-card");
       const priceCalculatorSummary = document.querySelector(".price-calculator-summary");
+      const priceCalculatorCloseButton = document.getElementById("price-calculator-close");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
+      const quoteBasicSubtotal = document.getElementById("quote-basic-subtotal");
+      const quoteAddonsSubtotal = document.getElementById("quote-addons-subtotal");
+      const quotePackageItems = document.getElementById("quote-package-items");
+      const quoteAddonItems = document.getElementById("quote-addon-items");
+      const quoteBeforeDiscountTotal = document.getElementById("quote-before-discount-total");
+      const quoteManualDiscount = document.getElementById("quote-manual-discount");
+      const quoteVolumeDiscount = document.getElementById("quote-volume-discount");
+      const bookingPackageTypeInput = document.getElementById("booking-package-type");
+      const bookingCalculatorDetailsInput = document.getElementById("booking-calculator-details");
+      const bookingQuoteEmpty = document.getElementById("booking-quote-empty");
+      const bookingQuoteDetails = document.getElementById("booking-quote-details");
+      const bookingQuoteHint = document.getElementById("booking-quote-hint");
+      const bookingQuoteGoToCalculator = document.getElementById("booking-go-to-calculator");
+      const bookingQuoteSkipCalculator = document.getElementById("booking-skip-calculator");
+      const bookingPriceCalculatorTotal = document.getElementById("booking-price-calculator-total");
+      const bookingQuoteBasicSubtotal = document.getElementById("booking-quote-basic-subtotal");
+      const bookingQuoteAddonsSubtotal = document.getElementById("booking-quote-addons-subtotal");
+      const bookingQuotePackageItems = document.getElementById("booking-quote-package-items");
+      const bookingQuoteAddonItems = document.getElementById("booking-quote-addon-items");
+      const bookingQuoteBeforeDiscountTotal = document.getElementById("booking-quote-before-discount-total");
+      const bookingQuoteManualDiscount = document.getElementById("booking-quote-manual-discount");
+      const bookingQuoteVolumeDiscount = document.getElementById("booking-quote-volume-discount");
       const vehicleSizeSensitiveElements = document.querySelectorAll("#services .vehicle-size-sensitive");
       const bookedFlashStorageKey = "idd-booking-submitted";
       const serviceSelectionsStorageKey = "idd-service-selections";
       const vehicleSizeStorageKey = "idd-vehicle-size-step";
       const defaultVehicleSizeStep = 2;
-      const autoDiscountRules = [
-        { threshold: 500, amount: 50 },
-        { threshold: 1000, amount: 100 },
-      ];
       const carSizeOptions = [
         "Compact / Sedan",
         "SUV / Wagon",
@@ -2552,7 +2810,12 @@
 
       function animatePriceDelta(priceElement, nextAmount, nextLabel) {
         if (!(priceElement instanceof HTMLElement)) return;
-        const previousAmount = Number.parseFloat(priceElement.dataset.currentPriceValue || "");
+        const previousAmountFromDataset = Number.parseFloat(priceElement.dataset.currentPriceValue || "");
+        const currentText = priceElement.textContent || "";
+        const previousAmountFromText = Number.parseFloat(currentText.replace(/[^0-9.]/g, ""));
+        const previousAmount = Number.isFinite(previousAmountFromDataset)
+          ? previousAmountFromDataset
+          : previousAmountFromText;
         if (Number.isFinite(previousAmount) && previousAmount !== nextAmount) {
           priceElement.classList.remove("is-increasing", "is-decreasing");
           void priceElement.offsetWidth;
@@ -2620,21 +2883,31 @@
         });
       }
 
-      function calculateSelectedPriceTotal() {
-        const totals = Array.from(servicePriceCheckboxes).reduce((sum, checkbox) => {
-          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
+      function calculatePriceBreakdown() {
+        const totals = { basicSubtotal: 0, addonsSubtotal: 0, packageItems: [], addonItems: [] };
+        servicePriceCheckboxes.forEach((checkbox) => {
+          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return;
+          const addonGroup = checkbox.dataset.addonGroup;
+          if (addonGroup && !isPackageSelectedForAddonGroup(addonGroup)) return;
           const linePrice = Math.ceil(getAdjustedServicePrice(checkbox));
-          if (checkbox.dataset.addonGroup) {
-            return {
-              basicSubtotal: sum.basicSubtotal,
-              addonsSubtotal: sum.addonsSubtotal + linePrice,
-            };
+          if (addonGroup) {
+            const addonNameNode = checkbox.closest(".addon-label")?.querySelector(".addon-name");
+            const addonName = addonNameNode ? (addonNameNode.textContent || checkbox.id) : checkbox.id;
+            totals.addonsSubtotal += linePrice;
+            totals.addonItems.push({
+              name: addonName.trim().replace(/\s+/g, " "),
+              value: `CA$${linePrice}`,
+            });
+            return;
           }
-          return {
-            basicSubtotal: sum.basicSubtotal + linePrice,
-            addonsSubtotal: sum.addonsSubtotal,
-          };
-        }, { basicSubtotal: 0, addonsSubtotal: 0 });
+          const packageNameNode = checkbox.closest(".service-block-select")?.querySelector("label");
+          const packageName = packageNameNode ? (packageNameNode.textContent || checkbox.id) : checkbox.id;
+          totals.basicSubtotal += linePrice;
+          totals.packageItems.push({
+            name: packageName.trim().replace(/\s+/g, " "),
+            value: `CA$${linePrice}`,
+          });
+        });
         const totalDiscountPercent = Array.from(discountCheckboxes).reduce((sum, checkbox) => {
           if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
           const percent = Number.parseFloat(checkbox.dataset.discountPercent || "0");
@@ -2642,17 +2915,38 @@
         }, 0);
         const discountRatio = Math.min(Math.max(totalDiscountPercent / 100, 0), 1);
         const discountedBasicSubtotal = Math.ceil(totals.basicSubtotal * (1 - discountRatio));
+        const manualDiscountAmount = Math.max(0, totals.basicSubtotal - discountedBasicSubtotal);
+        const totalBeforeDiscounts = totals.basicSubtotal + totals.addonsSubtotal;
         const totalAfterManualDiscounts = discountedBasicSubtotal + totals.addonsSubtotal;
-        const automaticDiscountTotal = autoDiscountRules.reduce((sum, rule) => {
-          return totalAfterManualDiscounts >= rule.threshold ? sum + rule.amount : sum;
-        }, 0);
-        if (autoDiscount500Checkbox instanceof HTMLInputElement) {
-          autoDiscount500Checkbox.checked = totalAfterManualDiscounts >= 500;
+        const volumeDiscountPercent = totalAfterManualDiscounts <= 200
+          ? 0
+          : totalAfterManualDiscounts >= 1000
+            ? 20
+            : ((totalAfterManualDiscounts - 200) / (1000 - 200)) * 20;
+        const volumeDiscountProgress = Math.min(Math.max(volumeDiscountPercent / 20, 0), 1);
+        if (volumeDiscountValue) {
+          volumeDiscountValue.textContent = `${Math.round(volumeDiscountPercent)}%`;
         }
-        if (autoDiscount1000Checkbox instanceof HTMLInputElement) {
-          autoDiscount1000Checkbox.checked = totalAfterManualDiscounts >= 1000;
+        if (volumeDiscountFill) {
+          volumeDiscountFill.style.width = `${volumeDiscountProgress * 100}%`;
         }
-        return Math.max(0, totalAfterManualDiscounts - automaticDiscountTotal);
+        if (volumeDiscountHead) {
+          volumeDiscountHead.style.left = `${volumeDiscountProgress * 100}%`;
+        }
+        const volumeDiscountRatio = volumeDiscountPercent / 100;
+        const finalTotal = Math.max(0, Math.ceil(totalAfterManualDiscounts * (1 - volumeDiscountRatio)));
+        const volumeDiscountAmount = Math.max(0, totalAfterManualDiscounts - finalTotal);
+        return {
+          basicSubtotal: totals.basicSubtotal,
+          addonsSubtotal: totals.addonsSubtotal,
+          packageItems: totals.packageItems,
+          addonItems: totals.addonItems,
+          totalBeforeDiscounts,
+          manualDiscountAmount,
+          volumeDiscountAmount,
+          volumeDiscountPercent,
+          finalTotal,
+        };
       }
 
       function triggerPriceWaterSplash() {
@@ -2665,17 +2959,120 @@
         lastWaterSplashAt = Date.now();
       }
 
+      function renderQuoteSubitems(container, items) {
+        if (!(container instanceof HTMLElement)) return;
+        container.innerHTML = items.map((item) => {
+          return `<div class="price-calculator-breakdown__subitem"><span class="price-calculator-breakdown__subitem-name">${item.name}</span><span class="price-calculator-breakdown__subitem-value">${item.value}</span></div>`;
+        }).join("");
+      }
+
+      function updateQuoteNodes({
+        basicSubtotalNode,
+        addonsSubtotalNode,
+        packageItemsNode,
+        addonItemsNode,
+        beforeDiscountNode,
+        manualDiscountNode,
+        volumeDiscountNode,
+      }, breakdown) {
+        if (basicSubtotalNode) basicSubtotalNode.textContent = `CA$${breakdown.basicSubtotal}`;
+        if (addonsSubtotalNode) addonsSubtotalNode.textContent = `CA$${breakdown.addonsSubtotal}`;
+        renderQuoteSubitems(packageItemsNode, breakdown.packageItems);
+        renderQuoteSubitems(addonItemsNode, breakdown.addonItems);
+        if (beforeDiscountNode) beforeDiscountNode.textContent = `CA$${breakdown.totalBeforeDiscounts}`;
+        if (manualDiscountNode) manualDiscountNode.textContent = `-CA$${breakdown.manualDiscountAmount}`;
+        if (volumeDiscountNode) {
+          volumeDiscountNode.textContent = `-CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`;
+        }
+      }
+
+      function updateBookingQuoteSummary(breakdown) {
+        if (!bookingQuoteEmpty || !bookingQuoteDetails) return;
+        const hasSelectedServices = breakdown.packageItems.length > 0 || breakdown.addonItems.length > 0;
+        const hasSelectedDiscounts = Array.from(discountCheckboxes).some((checkbox) => {
+          return checkbox instanceof HTMLInputElement && checkbox.checked;
+        });
+        const hasVehicleSizeChange = servicesCarSizeSlider instanceof HTMLInputElement
+          && normalizeCarSizeStep(servicesCarSizeSlider.value) !== defaultVehicleSizeStep;
+        const hasInteracted = hasSelectedServices || hasSelectedDiscounts || hasVehicleSizeChange;
+        const packageSummaryLabel = hasSelectedServices
+          ? breakdown.packageItems.map((item) => item.name).join(", ")
+          : hasInteracted
+            ? "Custom quote requested (calculator touched, no package selected)"
+            : "Not specified";
+
+        if (bookingPackageTypeInput instanceof HTMLInputElement) {
+          bookingPackageTypeInput.value = packageSummaryLabel || "Not specified";
+        }
+        const selectedVehicleSize = servicesCarSizeSlider instanceof HTMLInputElement
+          ? (carSizeOptions[normalizeCarSizeStep(servicesCarSizeSlider.value) - 1] || carSizeOptions[defaultVehicleSizeStep - 1])
+          : carSizeOptions[defaultVehicleSizeStep - 1];
+        const selectedDiscounts = Array.from(discountCheckboxes).reduce((labels, checkbox) => {
+          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return labels;
+          const discountLabelNode = checkbox.closest("label")?.querySelector(".discount-name");
+          const discountLabel = discountLabelNode ? (discountLabelNode.textContent || "") : "";
+          if (discountLabel.trim()) labels.push(discountLabel.trim().replace(/\s+/g, " "));
+          return labels;
+        }, []);
+        const packageLines = breakdown.packageItems.length
+          ? breakdown.packageItems.map((item) => `${item.name} (${item.value})`).join(", ")
+          : "None selected";
+        const addonLines = breakdown.addonItems.length
+          ? breakdown.addonItems.map((item) => `${item.name} (${item.value})`).join(", ")
+          : "None selected";
+        const discountLines = selectedDiscounts.length ? selectedDiscounts.join(", ") : "None selected";
+        const calculatorDetails = hasInteracted
+          ? [
+            `Vehicle size: ${selectedVehicleSize}`,
+            `Packages: ${packageLines}`,
+            `Add-ons: ${addonLines}`,
+            `Manual discounts: ${discountLines}`,
+            `Package subtotal: CA$${breakdown.basicSubtotal}`,
+            `Add-ons subtotal: CA$${breakdown.addonsSubtotal}`,
+            `Total before discounts: CA$${breakdown.totalBeforeDiscounts}`,
+            `Selected discount amount: -CA$${breakdown.manualDiscountAmount}`,
+            `Volume savings: -CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`,
+            `Grand total: CA$${breakdown.finalTotal}`,
+          ].join(" | ")
+          : "Not specified";
+        if (bookingCalculatorDetailsInput instanceof HTMLInputElement) {
+          bookingCalculatorDetailsInput.value = calculatorDetails;
+        }
+
+        bookingQuoteEmpty.hidden = hasInteracted;
+        bookingQuoteDetails.hidden = !hasInteracted;
+        if (!hasInteracted) {
+          if (bookingQuoteHint) {
+            bookingQuoteHint.textContent = "No calculator selections yet. You can open the calculator for an instant quote or skip and continue booking.";
+          }
+          return;
+        }
+
+        if (bookingPriceCalculatorTotal) bookingPriceCalculatorTotal.textContent = `CA$${breakdown.finalTotal}`;
+        updateQuoteNodes({
+          basicSubtotalNode: bookingQuoteBasicSubtotal,
+          addonsSubtotalNode: bookingQuoteAddonsSubtotal,
+          packageItemsNode: bookingQuotePackageItems,
+          addonItemsNode: bookingQuoteAddonItems,
+          beforeDiscountNode: bookingQuoteBeforeDiscountTotal,
+          manualDiscountNode: bookingQuoteManualDiscount,
+          volumeDiscountNode: bookingQuoteVolumeDiscount,
+        }, breakdown);
+      }
+
       function updatePriceCalculatorTotal() {
         if (!priceCalculatorTotal || !servicePriceCheckboxes.length) return;
-        const total = calculateSelectedPriceTotal();
+        if (priceCalculatorSummary) priceCalculatorSummary.hidden = false;
+        const breakdown = calculatePriceBreakdown();
+        const total = breakdown.finalTotal;
         const priceScale =
           total <= 0
             ? 1
             : total <= 600
-              ? 1 + (total / 600)
+              ? 1 + (total / 1200)
               : total <= 1000
-                ? 2 + ((total - 600) / 400)
-                : 3;
+                ? 1.5 + ((total - 600) / 1600)
+                : 1.75;
         const totalLabel = `CA$${total}`;
         const previousTotalValue = Number.parseFloat(priceCalculatorTotal.dataset.currentTotalValue || "");
         if (Number.isFinite(previousTotalValue) && previousTotalValue !== total) {
@@ -2699,6 +3096,37 @@
         priceCalculatorTotal.style.setProperty("--price-scale", String(priceScale));
         priceCalculatorTotal.textContent = totalLabel;
         priceCalculatorTotal.dataset.currentTotalValue = String(total);
+        updateQuoteNodes({
+          basicSubtotalNode: quoteBasicSubtotal,
+          addonsSubtotalNode: quoteAddonsSubtotal,
+          packageItemsNode: quotePackageItems,
+          addonItemsNode: quoteAddonItems,
+          beforeDiscountNode: quoteBeforeDiscountTotal,
+          manualDiscountNode: quoteManualDiscount,
+          volumeDiscountNode: quoteVolumeDiscount,
+        }, breakdown);
+        updateBookingQuoteSummary(breakdown);
+      }
+
+      function resetPriceCalculator() {
+        servicePriceCheckboxes.forEach((checkbox) => {
+          if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+        });
+        discountCheckboxes.forEach((checkbox) => {
+          if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+        });
+        if (servicesCarSizeSlider instanceof HTMLInputElement) {
+          servicesCarSizeSlider.value = String(defaultVehicleSizeStep);
+        }
+        try {
+          window.localStorage.removeItem(serviceSelectionsStorageKey);
+          window.localStorage.removeItem(vehicleSizeStorageKey);
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+        syncServicesCarSizeSelection();
+        syncAddonColumns();
+        updatePriceCalculatorTotal();
       }
 
       function syncAddonColumnVisibility(columnElement, isVisible) {
@@ -2907,21 +3335,6 @@
         return valid;
       }
 
-      function syncCarSizeSelection() {
-        if (!(carSizeSlider instanceof HTMLInputElement)) return;
-        const normalizedStep = normalizeCarSizeStep(carSizeSlider.value);
-        const selectedCarSize = carSizeOptions[normalizedStep - 1] || carSizeOptions[0];
-        carSizeSlider.value = String(normalizedStep);
-        if (carSizeValueLabel) carSizeValueLabel.textContent = selectedCarSize;
-        if (carSizeHiddenInput instanceof HTMLInputElement) carSizeHiddenInput.value = selectedCarSize;
-      }
-
-      function setBookingCarSizeStep(stepValue) {
-        if (!(carSizeSlider instanceof HTMLInputElement)) return;
-        carSizeSlider.value = String(normalizeCarSizeStep(stepValue));
-        syncCarSizeSelection();
-      }
-
       function syncServicesCarSizeSelection() {
         if (!(servicesCarSizeSlider instanceof HTMLInputElement) || !servicesCarSizeValueLabel) return;
         const normalizedStep = normalizeCarSizeStep(servicesCarSizeSlider.value);
@@ -3069,17 +3482,36 @@
       bookingCloseButtons.forEach((button) => {
         button.addEventListener("click", () => closeBookingModal());
       });
+      if (bookingQuoteGoToCalculator) {
+        bookingQuoteGoToCalculator.addEventListener("click", () => {
+          closeBookingModal();
+          const servicesSection = document.getElementById("services");
+          if (servicesSection instanceof HTMLElement) {
+            servicesSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      }
+      if (bookingQuoteSkipCalculator) {
+        bookingQuoteSkipCalculator.addEventListener("click", () => {
+          if (bookingQuoteEmpty) bookingQuoteEmpty.hidden = false;
+          if (bookingQuoteDetails) bookingQuoteDetails.hidden = true;
+          if (bookingQuoteHint) {
+            bookingQuoteHint.textContent = "Calculator skipped. You can continue booking and we will confirm the exact quote with you.";
+          }
+          if (bookingPackageTypeInput instanceof HTMLInputElement) {
+            bookingPackageTypeInput.value = "Skipped calculator";
+          }
+          if (bookingCalculatorDetailsInput instanceof HTMLInputElement) {
+            bookingCalculatorDetailsInput.value = "Skipped calculator";
+          }
+        });
+      }
 
       if (preferredStartInput && preferredEndInput) {
         preferredStartInput.addEventListener("change", validatePreferredRange);
         preferredEndInput.addEventListener("change", validatePreferredRange);
       }
 
-      if (carSizeSlider instanceof HTMLInputElement) {
-        carSizeSlider.addEventListener("input", syncCarSizeSelection);
-        carSizeSlider.addEventListener("change", syncCarSizeSelection);
-      }
-      syncCarSizeSelection();
       if (servicesCarSizeSlider instanceof HTMLInputElement) {
         servicesCarSizeSlider.addEventListener("input", () => {
           syncServicesCarSizeSelection();
@@ -3095,11 +3527,6 @@
           setServicesCarSizeStep(button.getAttribute("data-services-car-size-step"), true);
         });
       });
-      bookingCarSizeTickButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          setBookingCarSizeStep(button.getAttribute("data-booking-car-size-step"));
-        });
-      });
       if (servicesCarSizeRail instanceof HTMLElement) {
         servicesCarSizeRail.addEventListener("pointerdown", (event) => {
           event.preventDefault();
@@ -3109,6 +3536,12 @@
       if (servicesCarSizeHead instanceof HTMLElement) {
         servicesCarSizeHead.addEventListener("animationend", () => {
           servicesCarSizeHead.classList.remove("is-bouncing");
+        });
+      }
+      if (priceCalculatorCloseButton) {
+        priceCalculatorCloseButton.addEventListener("click", () => {
+          resetPriceCalculator();
+          if (priceCalculatorSummary) priceCalculatorSummary.hidden = true;
         });
       }
       restoreVehicleSizeStep();
@@ -3162,6 +3595,7 @@
           event.preventDefault();
           console.log("[Booking] Submit requested");
           setBookingStatus("", "");
+          updatePriceCalculatorTotal();
           if (!bookingForm.checkValidity()) {
             console.warn("[Booking] Form validation failed");
             setBookingStatus("Please fill in all required fields before submitting.", "error");
@@ -3211,7 +3645,6 @@
             const flashUntilTimestamp = preferredEndTimestamp;
             const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
             bookingForm.reset();
-            syncCarSizeSelection();
             closeBookingModal();
             if (shouldEnableFlash) {
               requestAnimationFrame(() => {
