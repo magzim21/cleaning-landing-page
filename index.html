@@ -771,27 +771,30 @@
       }
 
       .price-calculator-summary {
-        margin-top: 20px;
-        padding: 18px 20px;
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 70;
+        padding: 12px 14px;
         border: 1px solid var(--border);
         border-radius: var(--radius-sm);
         background: var(--bg-card);
+        box-shadow: 0 10px 24px rgba(2, 8, 23, 0.4);
         display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 2px;
+        align-items: flex-end;
       }
 
       .price-calculator-summary p {
         margin: 0;
         color: var(--text-muted);
-        font-size: 0.95rem;
+        font-size: 0.8rem;
       }
 
       .price-calculator-total {
         font-family: "Outfit", sans-serif;
-        font-size: 1.35rem;
+        font-size: 1.2rem;
         font-weight: 700;
         color: var(--text);
       }
@@ -874,22 +877,22 @@
       .addons-column-title {
         margin: 0 0 2px;
         font-family: "Outfit", sans-serif;
-        font-size: 0.95rem;
+        font-size: 0.82rem;
         font-weight: 600;
-        color: var(--text);
+        color: var(--text-muted);
       }
 
       .addon-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: var(--radius-sm);
-        padding: 12px 14px;
+        padding: 8px 10px;
       }
 
       .addon-label {
         display: flex;
         align-items: flex-start;
-        gap: 8px;
+        gap: 6px;
         cursor: pointer;
       }
 
@@ -901,15 +904,15 @@
       }
 
       .addon-name {
-        font-size: 0.92rem;
-        color: var(--text);
+        font-size: 0.78rem;
+        color: var(--text-muted);
         flex: 1;
       }
 
       .addon-price {
         font-family: "Outfit", sans-serif;
-        font-size: 1rem;
-        font-weight: 700;
+        font-size: 0.8rem;
+        font-weight: 600;
         color: var(--text-muted);
         white-space: nowrap;
       }
@@ -1620,6 +1623,70 @@
                     <span class="addon-price">$50</span>
                   </label>
                 </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-plastic-restoration">
+                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior">
+                    <span class="addon-name">Plastic restoration product</span>
+                    <span class="addon-price">$25</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-odor-treatment">
+                    <input type="checkbox" id="addon-odor-treatment" data-service-price="30" data-addon-group="interior">
+                    <span class="addon-name">Odor treatment</span>
+                    <span class="addon-price">$30</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-leather-treatment">
+                    <input type="checkbox" id="addon-leather-treatment" data-service-price="40" data-addon-group="interior">
+                    <span class="addon-name">Leather treatment with product and deep cleaning</span>
+                    <span class="addon-price">$40</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-deep-clean-under-seats">
+                    <input type="checkbox" id="addon-deep-clean-under-seats" data-service-price="40" data-addon-group="interior">
+                    <span class="addon-name">Deep cleaning under seats</span>
+                    <span class="addon-price">$40</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-pet-fur-removal">
+                    <input type="checkbox" id="addon-pet-fur-removal" data-service-price="70" data-addon-group="interior">
+                    <span class="addon-name">Pet fur removal</span>
+                    <span class="addon-price">$70</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-mold-cleaning">
+                    <input type="checkbox" id="addon-mold-cleaning" data-service-price="60" data-addon-group="interior">
+                    <span class="addon-name">Deep cleaning of mold</span>
+                    <span class="addon-price">$60</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-upholstery-stains">
+                    <input type="checkbox" id="addon-upholstery-stains" data-service-price="50" data-addon-group="interior">
+                    <span class="addon-name">Upholstery stains removal</span>
+                    <span class="addon-price">$50</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-headliner-cleaning">
+                    <input type="checkbox" id="addon-headliner-cleaning" data-service-price="80" data-addon-group="interior">
+                    <span class="addon-name">Headliner cleaning (stains, finger marks)</span>
+                    <span class="addon-price">$80</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-ash-buildup-removal">
+                    <input type="checkbox" id="addon-ash-buildup-removal" data-service-price="70" data-addon-group="interior">
+                    <span class="addon-name">Ash buildup removal</span>
+                    <span class="addon-price">$70</span>
+                  </label>
+                </article>
+
               </div>
               <div class="addons-column" id="addons-column-exterior" hidden>
                 <p class="addons-column-title">Exterior add-ons</p>
@@ -1663,6 +1730,27 @@
                     <input type="checkbox" id="addon-black-plastic" data-service-price="30" data-addon-group="exterior">
                     <span class="addon-name">Restoring black plastic (holds 2 weeks)</span>
                     <span class="addon-price">$30</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-door-trunk-jambs">
+                    <input type="checkbox" id="addon-door-trunk-jambs" data-service-price="60" data-addon-group="exterior">
+                    <span class="addon-name">Cleaning Door and Trunk Jambs</span>
+                    <span class="addon-price">$60</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-engine-bay-cleaning">
+                    <input type="checkbox" id="addon-engine-bay-cleaning" data-service-price="80" data-addon-group="exterior">
+                    <span class="addon-name">Engine Bay Cleaning</span>
+                    <span class="addon-price">$80</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-black-plastic-longterm">
+                    <input type="checkbox" id="addon-black-plastic-longterm" data-service-price="20" data-addon-group="exterior">
+                    <span class="addon-name">Restoring black plastic (holds 6 months, per panel)</span>
+                    <span class="addon-price">$20</span>
                   </label>
                 </article>
               </div>
