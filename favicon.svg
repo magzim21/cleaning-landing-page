@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vancouver Island icon">
+  <defs>
+    <linearGradient id="ocean" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1320" />
+      <stop offset="100%" stop-color="#12233b" />
+    </linearGradient>
+    <linearGradient id="island" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6ee7b7" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#ocean)" />
+  <path
+    d="M42 10
+       C38 12,35 16,33 20
+       C31 24,28 27,24 30
+       C21 32,20 35,19 39
+       C18 43,19 47,22 50
+       C25 53,29 54,33 53
+       C38 52,41 49,43 45
+       C45 41,46 37,47 33
+       C48 28,49 24,48 20
+       C47 16,45 12,42 10 Z"
+    fill="url(#island)"
+  />
+  <path
+    d="M10 46 C18 42, 26 42, 34 46 C42 50, 50 50, 56 46"
+    fill="none"
+    stroke="#7dd3fc"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+</svg>
