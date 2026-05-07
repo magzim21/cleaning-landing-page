@@ -1219,6 +1219,17 @@
 
       .price-calculator-breakdown__row--discount {
         color: #86efac;
+        padding-left: 12px;
+      }
+
+      .price-calculator-breakdown__row--discount-total {
+        padding-left: 0;
+      }
+
+      .price-calculator-breakdown__row--discounts-title {
+        margin-top: 4px;
+        font-weight: 600;
+        color: rgba(203, 213, 225, 0.95);
       }
 
       .price-calculator-breakdown__subitems {
@@ -2351,7 +2362,7 @@
               <button type="button" data-services-car-size-step="4">Large Truck / Van</button>
             </div>
           </div>
-          <div class="discounts-block" id="discounts-panel">
+          <div class="discounts-block" id="discounts-panel" hidden>
             <p class="discounts-title">Discounts</p>
             <article class="addon-card discount-card">
               <label class="addon-label discount-label" for="discount-clean-car">
@@ -2581,6 +2592,9 @@
                 <span>Total before discounts</span>
                 <strong id="quote-before-discount-total">CA$0</strong>
               </div>
+              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discounts-title">
+                <span id="quote-discounts-title">Discounts:</span>
+              </div>
               <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                 <span>Volume discount</span>
                 <strong id="quote-volume-discount">-CA$0 (0%)</strong>
@@ -2592,6 +2606,10 @@
               <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                 <span>Clean-car discount</span>
                 <strong id="quote-manual-discount">-CA$0</strong>
+              </div>
+              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount price-calculator-breakdown__row--discount-total">
+                <span>Total discounts</span>
+                <strong id="quote-total-discounts">-CA$0</strong>
               </div>
             </div>
             <div class="price-calculator-total-row">
@@ -2822,6 +2840,9 @@
                     <span>Total before discounts</span>
                     <strong id="booking-quote-before-discount-total">CA$0</strong>
                   </div>
+                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discounts-title">
+                    <span id="booking-quote-discounts-title">Discounts:</span>
+                  </div>
                   <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                     <span>Volume savings</span>
                     <strong id="booking-quote-volume-discount">-CA$0 (0%)</strong>
@@ -2833,6 +2854,10 @@
                   <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                     <span>Selected discount</span>
                     <strong id="booking-quote-manual-discount">-CA$0</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount price-calculator-breakdown__row--discount-total">
+                    <span>Total discounts</span>
+                    <strong id="booking-quote-total-discounts">-CA$0</strong>
                   </div>
                 </div>
                 <div class="price-calculator-total-row">
@@ -2935,6 +2960,7 @@
       const interiorExteriorDiscountIndicator = document.getElementById("discount-interior-exterior");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
+      const discountsPanel = document.getElementById("discounts-panel");
       const interiorAddonsPanel = document.getElementById("addons-panel-interior");
       const exteriorAddonsPanel = document.getElementById("addons-panel-exterior");
       const packageAddonsContainers = document.querySelectorAll("#services .package-addons");
@@ -2958,6 +2984,8 @@
       const quoteManualDiscount = document.getElementById("quote-manual-discount");
       const quoteVolumeDiscount = document.getElementById("quote-volume-discount");
       const quoteBundleDiscount = document.getElementById("quote-bundle-discount");
+      const quoteTotalDiscounts = document.getElementById("quote-total-discounts");
+      const quoteDiscountsTitle = document.getElementById("quote-discounts-title");
       const quoteVehicleSize = document.getElementById("quote-vehicle-size");
       const bookingPackageTypeInput = document.getElementById("booking-package-type");
       const bookingCalculatorDetailsInput = document.getElementById("booking-calculator-details");
@@ -2979,6 +3007,8 @@
       const bookingQuoteManualDiscount = document.getElementById("booking-quote-manual-discount");
       const bookingQuoteVolumeDiscount = document.getElementById("booking-quote-volume-discount");
       const bookingQuoteBundleDiscount = document.getElementById("booking-quote-bundle-discount");
+      const bookingQuoteTotalDiscounts = document.getElementById("booking-quote-total-discounts");
+      const bookingQuoteDiscountsTitle = document.getElementById("booking-quote-discounts-title");
       const bookingQuoteVehicleSize = document.getElementById("booking-quote-vehicle-size");
       const vehicleSizeSensitiveElements = document.querySelectorAll("#services .vehicle-size-sensitive");
       const bookedFlashStorageKey = "idd-booking-submitted";
@@ -3262,6 +3292,7 @@
         }
         const volumeDiscountRatio = volumeDiscountPercent / 100;
         const volumeDiscountAmount = Math.ceil(totalBeforeDiscounts * volumeDiscountRatio);
+        const totalDiscountAmount = manualDiscountAmount + bundleDiscountAmount + volumeDiscountAmount;
         const discountedTotal = totalBeforeDiscounts - manualDiscountAmount - bundleDiscountAmount - volumeDiscountAmount;
         const minimumChargeTotal = totalBeforeDiscounts > 0 ? 120 : 0;
         const finalTotal = Math.max(minimumChargeTotal, discountedTotal);
@@ -3277,6 +3308,7 @@
           bundleDiscountPercent,
           volumeDiscountAmount,
           volumeDiscountPercent,
+          totalDiscountAmount,
           minimumPriceBackstopApplied,
           finalTotal,
         };
@@ -3361,6 +3393,8 @@
         manualDiscountNode,
         bundleDiscountNode,
         volumeDiscountNode,
+        totalDiscountNode,
+        discountsTitleNode,
       }, breakdown) {
         const packagesRow = basicSubtotalNode instanceof HTMLElement
           ? basicSubtotalNode.closest(".price-calculator-breakdown__row")
@@ -3379,6 +3413,12 @@
           : null;
         const volumeDiscountRow = volumeDiscountNode instanceof HTMLElement
           ? volumeDiscountNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const totalDiscountRow = totalDiscountNode instanceof HTMLElement
+          ? totalDiscountNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const discountsTitleRow = discountsTitleNode instanceof HTMLElement
+          ? discountsTitleNode.closest(".price-calculator-breakdown__row")
           : null;
 
         const hasPackages = breakdown.basicSubtotal > 0 && breakdown.packageItems.length > 0;
@@ -3421,6 +3461,20 @@
         if (!shouldShowVolumeDiscount && volumeDiscountNode instanceof HTMLElement) {
           volumeDiscountNode.textContent = "";
         }
+
+        const shouldShowTotalDiscount = breakdown.totalDiscountAmount > 0;
+        if (totalDiscountRow) totalDiscountRow.hidden = !shouldShowTotalDiscount;
+        if (shouldShowTotalDiscount && totalDiscountNode) {
+          totalDiscountNode.textContent = `-CA$${breakdown.totalDiscountAmount}`;
+        } else if (totalDiscountNode instanceof HTMLElement) {
+          totalDiscountNode.textContent = "";
+        }
+
+        const shouldShowDiscountsSection = shouldShowManualDiscount
+          || shouldShowBundleDiscount
+          || shouldShowVolumeDiscount
+          || shouldShowTotalDiscount;
+        if (discountsTitleRow) discountsTitleRow.hidden = !shouldShowDiscountsSection;
       }
 
       function updateBookingQuoteSummary(breakdown) {
@@ -3468,6 +3522,7 @@
             `Volume savings: -CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`,
             `Interior+Exterior discount: -CA$${breakdown.bundleDiscountAmount} (${Math.round(breakdown.bundleDiscountPercent)}%)`,
             `Selected discount amount: -CA$${breakdown.manualDiscountAmount}`,
+            `Total discounts: -CA$${breakdown.totalDiscountAmount}`,
             `Grand total: CA$${breakdown.finalTotal}`,
           ].join(" | ")
           : "Not specified";
@@ -3502,6 +3557,8 @@
           manualDiscountNode: bookingQuoteManualDiscount,
           bundleDiscountNode: bookingQuoteBundleDiscount,
           volumeDiscountNode: bookingQuoteVolumeDiscount,
+          totalDiscountNode: bookingQuoteTotalDiscounts,
+          discountsTitleNode: bookingQuoteDiscountsTitle,
         }, breakdown);
         animateSummaryRowReflow(bookingPriceCalculatorTotalRow);
       }
@@ -3550,6 +3607,8 @@
           manualDiscountNode: quoteManualDiscount,
           bundleDiscountNode: quoteBundleDiscount,
           volumeDiscountNode: quoteVolumeDiscount,
+          totalDiscountNode: quoteTotalDiscounts,
+          discountsTitleNode: quoteDiscountsTitle,
         }, breakdown);
         animateSummaryRowReflow(priceCalculatorTotalRow);
         updateBookingQuoteSummary(breakdown);
@@ -3589,8 +3648,18 @@
         const showExteriorAddons = Boolean(
           basicExteriorPackageCheckbox instanceof HTMLInputElement && basicExteriorPackageCheckbox.checked
         );
+        const shouldShowDiscounts = showInteriorAddons || showExteriorAddons;
         syncAddonColumnVisibility(interiorAddonsPanel, showInteriorAddons);
         syncAddonColumnVisibility(exteriorAddonsPanel, showExteriorAddons);
+        if (discountsPanel instanceof HTMLElement) {
+          discountsPanel.hidden = !shouldShowDiscounts;
+          discountsPanel.setAttribute("aria-hidden", shouldShowDiscounts ? "false" : "true");
+        }
+        if (!shouldShowDiscounts) {
+          discountCheckboxes.forEach((checkbox) => {
+            if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+          });
+        }
       }
 
       function persistServiceSelections() {
