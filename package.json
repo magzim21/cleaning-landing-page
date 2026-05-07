@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs"
+    "build": "node build.mjs"
   },
   "dependencies": {
     "@datadog/browser-rum": "^6.27.0"
