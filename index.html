@@ -686,6 +686,20 @@
         background: rgba(15, 23, 42, 0.45);
       }
 
+      .services-bundle-note {
+        margin: 0 0 18px;
+        padding: 12px 14px;
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        border-radius: 12px;
+        background: rgba(14, 165, 233, 0.08);
+        color: rgba(226, 232, 240, 0.92);
+        font-size: 0.92rem;
+      }
+
+      .services-bundle-note strong {
+        color: var(--text);
+      }
+
       .services-car-size__label {
         display: flex;
         align-items: baseline;
@@ -1221,6 +1235,59 @@
         gap: 8px;
         font-size: 0.68rem;
         color: rgba(148, 163, 184, 0.95);
+      }
+
+      .price-calculator-breakdown__subitem-button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 2px 0;
+        margin: 0;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background 140ms ease, color 140ms ease;
+      }
+
+      .price-calculator-breakdown__subitem-button:hover {
+        background: rgba(148, 163, 184, 0.12);
+        color: rgba(226, 232, 240, 0.95);
+      }
+
+      .price-calculator-breakdown__subitem-button:focus-visible {
+        outline: 2px solid rgba(56, 189, 248, 0.8);
+        outline-offset: 2px;
+      }
+
+      @keyframes quote-jump-flash {
+        0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.0); }
+        20% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.22); }
+        100% { box-shadow: 0 0 0 14px rgba(56, 189, 248, 0.0); }
+      }
+
+      .quote-jump-flash {
+        animation: quote-jump-flash 900ms ease-out;
+      }
+
+      @keyframes quote-jump-highlight {
+        0% {
+          background: transparent;
+          border-color: rgba(148, 163, 184, 0.22);
+        }
+        25% {
+          background: rgba(56, 189, 248, 0.12);
+          border-color: rgba(56, 189, 248, 0.55);
+        }
+        100% {
+          background: transparent;
+          border-color: rgba(148, 163, 184, 0.22);
+        }
+      }
+
+      .quote-jump-highlight.card,
+      .quote-jump-highlight.addon-card {
+        animation: quote-jump-highlight 1100ms ease-out;
       }
 
       .price-calculator-breakdown__subitem-name {
@@ -2284,6 +2351,9 @@
               <button type="button" data-services-car-size-step="4">Large Truck / Van</button>
             </div>
           </div>
+          <p class="services-bundle-note">
+            Select <strong>Basic Interior</strong> + <strong>Basic Exterior</strong> to unlock an automatic <strong>10% Interior+Exterior discount</strong>.
+          </p>
           <div class="cards" id="price-calculator-grid">
             <article class="card">
               <div class="service-block-select">
@@ -2487,6 +2557,10 @@
             <p class="price-calculator-summary__intro">Your instant savings-ready quote</p>
             <div class="price-calculator-breakdown" id="price-calculator-breakdown">
               <div class="price-calculator-breakdown__row">
+                <span>Vehicle size</span>
+                <strong id="quote-vehicle-size">SUV / Wagon</strong>
+              </div>
+              <div class="price-calculator-breakdown__row">
                 <span>Packages</span>
                 <strong id="quote-basic-subtotal">CA$0</strong>
               </div>
@@ -2503,6 +2577,10 @@
               <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                 <span>Volume discount</span>
                 <strong id="quote-volume-discount">-CA$0 (0%)</strong>
+              </div>
+              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                <span>Interior+Exterior discount</span>
+                <strong id="quote-bundle-discount">-CA$0 (10%)</strong>
               </div>
               <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                 <span>Clean-car discount</span>
@@ -2720,6 +2798,10 @@
               <div class="booking-quote-summary__details" id="booking-quote-details" hidden>
                 <div class="price-calculator-breakdown">
                   <div class="price-calculator-breakdown__row">
+                    <span>Vehicle size</span>
+                    <strong id="booking-quote-vehicle-size">SUV / Wagon</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__row">
                     <span>Selected packages</span>
                     <strong id="booking-quote-basic-subtotal">CA$0</strong>
                   </div>
@@ -2736,6 +2818,10 @@
                   <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                     <span>Volume savings</span>
                     <strong id="booking-quote-volume-discount">-CA$0 (0%)</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                    <span>Interior+Exterior discount</span>
+                    <strong id="booking-quote-bundle-discount">-CA$0 (10%)</strong>
                   </div>
                   <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                     <span>Selected discount</span>
@@ -2847,6 +2933,7 @@
       const clickableBasicBlocks = document.querySelectorAll("#price-calculator-grid > .card");
       const clickableAddonBlocks = document.querySelectorAll("#services .package-addons .addon-card");
       const priceCalculatorSummary = document.getElementById("price-calculator-summary");
+      const priceCalculatorBreakdown = document.getElementById("price-calculator-breakdown");
       const priceCalculatorCloseButton = document.getElementById("price-calculator-close");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
       const priceCalculatorMinimumNote = document.getElementById("price-calculator-min-note");
@@ -2862,6 +2949,8 @@
       const quoteBeforeDiscountTotal = document.getElementById("quote-before-discount-total");
       const quoteManualDiscount = document.getElementById("quote-manual-discount");
       const quoteVolumeDiscount = document.getElementById("quote-volume-discount");
+      const quoteBundleDiscount = document.getElementById("quote-bundle-discount");
+      const quoteVehicleSize = document.getElementById("quote-vehicle-size");
       const bookingPackageTypeInput = document.getElementById("booking-package-type");
       const bookingCalculatorDetailsInput = document.getElementById("booking-calculator-details");
       const bookingQuoteEmpty = document.getElementById("booking-quote-empty");
@@ -2881,6 +2970,8 @@
       const bookingQuoteBeforeDiscountTotal = document.getElementById("booking-quote-before-discount-total");
       const bookingQuoteManualDiscount = document.getElementById("booking-quote-manual-discount");
       const bookingQuoteVolumeDiscount = document.getElementById("booking-quote-volume-discount");
+      const bookingQuoteBundleDiscount = document.getElementById("booking-quote-bundle-discount");
+      const bookingQuoteVehicleSize = document.getElementById("booking-quote-vehicle-size");
       const vehicleSizeSensitiveElements = document.querySelectorAll("#services .vehicle-size-sensitive");
       const bookedFlashStorageKey = "idd-booking-submitted";
       const serviceSelectionsStorageKey = "idd-service-selections";
@@ -2971,6 +3062,13 @@
       function formatPriceForDisplay(amount, currencyPrefix) {
         const roundedUpAmount = Math.ceil(Number(amount) || 0);
         return `${currencyPrefix}${roundedUpAmount}`;
+      }
+
+      function getSelectedVehicleSizeLabel() {
+        const selectedStep = servicesCarSizeSlider instanceof HTMLInputElement
+          ? normalizeCarSizeStep(servicesCarSizeSlider.value)
+          : defaultVehicleSizeStep;
+        return carSizeOptions[selectedStep - 1] || carSizeOptions[defaultVehicleSizeStep - 1] || "SUV / Wagon";
       }
 
       function animatePriceDelta(priceElement, nextAmount, nextLabel) {
@@ -3103,6 +3201,7 @@
             totals.addonItems.push({
               name: addonName.trim().replace(/\s+/g, " "),
               value: `CA$${linePrice}`,
+              targetId: checkbox.id,
             });
             return;
           }
@@ -3112,6 +3211,7 @@
           totals.packageItems.push({
             name: packageName.trim().replace(/\s+/g, " "),
             value: `CA$${linePrice}`,
+            targetId: checkbox.id,
           });
         });
         const totalDiscountPercent = Array.from(discountCheckboxes).reduce((sum, checkbox) => {
@@ -3122,6 +3222,19 @@
         const discountRatio = Math.min(Math.max(totalDiscountPercent / 100, 0), 1);
         const discountedBasicSubtotal = Math.ceil(totals.basicSubtotal * (1 - discountRatio));
         const manualDiscountAmount = Math.max(0, totals.basicSubtotal - discountedBasicSubtotal);
+        const hasSelectedBasicBundle = Boolean(
+          basicInteriorPackageCheckbox instanceof HTMLInputElement
+          && basicExteriorPackageCheckbox instanceof HTMLInputElement
+          && basicInteriorPackageCheckbox.checked
+          && basicExteriorPackageCheckbox.checked
+        );
+        const basicBundleSubtotal = hasSelectedBasicBundle
+          ? Math.ceil(getAdjustedServicePrice(basicInteriorPackageCheckbox) + getAdjustedServicePrice(basicExteriorPackageCheckbox))
+          : 0;
+        const bundleDiscountPercent = 10;
+        const bundleDiscountAmount = hasSelectedBasicBundle
+          ? Math.ceil(basicBundleSubtotal * (bundleDiscountPercent / 100))
+          : 0;
         const totalBeforeDiscounts = totals.basicSubtotal + totals.addonsSubtotal;
         const totalAfterManualDiscounts = discountedBasicSubtotal + totals.addonsSubtotal;
         const volumeDiscountPercent = totalBeforeDiscounts <= 200
@@ -3141,7 +3254,7 @@
         }
         const volumeDiscountRatio = volumeDiscountPercent / 100;
         const volumeDiscountAmount = Math.ceil(totalBeforeDiscounts * volumeDiscountRatio);
-        const discountedTotal = totalBeforeDiscounts - manualDiscountAmount - volumeDiscountAmount;
+        const discountedTotal = totalBeforeDiscounts - manualDiscountAmount - bundleDiscountAmount - volumeDiscountAmount;
         const minimumChargeTotal = totalBeforeDiscounts > 0 ? 120 : 0;
         const finalTotal = Math.max(minimumChargeTotal, discountedTotal);
         const minimumPriceBackstopApplied = totalBeforeDiscounts > 0 && discountedTotal < minimumChargeTotal;
@@ -3152,6 +3265,8 @@
           addonItems: totals.addonItems,
           totalBeforeDiscounts,
           manualDiscountAmount,
+          bundleDiscountAmount,
+          bundleDiscountPercent,
           volumeDiscountAmount,
           volumeDiscountPercent,
           minimumPriceBackstopApplied,
@@ -3172,8 +3287,56 @@
       function renderQuoteSubitems(container, items) {
         if (!(container instanceof HTMLElement)) return;
         container.innerHTML = items.map((item) => {
-          return `<div class="price-calculator-breakdown__subitem"><span class="price-calculator-breakdown__subitem-name">${item.name}</span><span class="price-calculator-breakdown__subitem-value">${item.value}</span></div>`;
+          const safeTarget = item.targetId ? String(item.targetId).replace(/"/g, "&quot;") : "";
+          const targetAttr = safeTarget ? ` data-quote-target="${safeTarget}"` : "";
+          return `<button type="button" class="price-calculator-breakdown__subitem price-calculator-breakdown__subitem-button"${targetAttr}><span class="price-calculator-breakdown__subitem-name">${item.name}</span><span class="price-calculator-breakdown__subitem-value">${item.value}</span></button>`;
         }).join("");
+      }
+
+      function flashQuoteJumpTarget(element) {
+        if (!(element instanceof HTMLElement)) return;
+        element.classList.remove("quote-jump-flash", "quote-jump-highlight");
+        void element.offsetWidth;
+        element.classList.add("quote-jump-flash");
+        if (element.classList.contains("card") || element.classList.contains("addon-card")) {
+          element.classList.add("quote-jump-highlight");
+        }
+      }
+
+      function getQuoteJumpFlashElementForCheckbox(checkbox) {
+        if (!(checkbox instanceof HTMLInputElement)) return null;
+        return checkbox.closest(".addon-card")
+          || checkbox.closest(".card")
+          || checkbox.closest("label")
+          || checkbox;
+      }
+
+      function handleQuoteJumpClick(event) {
+        const targetButton = event.target instanceof Element
+          ? event.target.closest("[data-quote-target]")
+          : null;
+        if (!(targetButton instanceof HTMLElement)) return;
+        const targetId = targetButton.dataset.quoteTarget || "";
+        if (!targetId) return;
+        const checkbox = document.getElementById(targetId);
+        if (!(checkbox instanceof HTMLInputElement)) return;
+
+        const flashElement = getQuoteJumpFlashElementForCheckbox(checkbox);
+        if (flashElement) {
+          flashElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          flashQuoteJumpTarget(flashElement);
+        } else {
+          checkbox.scrollIntoView({ behavior: "smooth", block: "center" });
+          flashQuoteJumpTarget(checkbox);
+        }
+      }
+
+      if (priceCalculatorBreakdown instanceof HTMLElement) {
+        priceCalculatorBreakdown.addEventListener("click", handleQuoteJumpClick);
+      }
+
+      if (bookingQuoteDetails instanceof HTMLElement) {
+        bookingQuoteDetails.addEventListener("click", handleQuoteJumpClick);
       }
 
       function updateQuoteNodes({
@@ -3183,16 +3346,67 @@
         addonItemsNode,
         beforeDiscountNode,
         manualDiscountNode,
+        bundleDiscountNode,
         volumeDiscountNode,
       }, breakdown) {
-        if (basicSubtotalNode) basicSubtotalNode.textContent = `CA$${breakdown.basicSubtotal}`;
-        if (addonsSubtotalNode) addonsSubtotalNode.textContent = `CA$${breakdown.addonsSubtotal}`;
-        renderQuoteSubitems(packageItemsNode, breakdown.packageItems);
-        renderQuoteSubitems(addonItemsNode, breakdown.addonItems);
-        if (beforeDiscountNode) beforeDiscountNode.textContent = `CA$${breakdown.totalBeforeDiscounts}`;
-        if (manualDiscountNode) manualDiscountNode.textContent = `-CA$${breakdown.manualDiscountAmount}`;
+        const packagesRow = basicSubtotalNode instanceof HTMLElement
+          ? basicSubtotalNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const addonsRow = addonsSubtotalNode instanceof HTMLElement
+          ? addonsSubtotalNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const beforeDiscountRow = beforeDiscountNode instanceof HTMLElement
+          ? beforeDiscountNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const manualDiscountRow = manualDiscountNode instanceof HTMLElement
+          ? manualDiscountNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const bundleDiscountRow = bundleDiscountNode instanceof HTMLElement
+          ? bundleDiscountNode.closest(".price-calculator-breakdown__row")
+          : null;
+        const volumeDiscountRow = volumeDiscountNode instanceof HTMLElement
+          ? volumeDiscountNode.closest(".price-calculator-breakdown__row")
+          : null;
+
+        const hasPackages = breakdown.basicSubtotal > 0 && breakdown.packageItems.length > 0;
+        const hasAddons = breakdown.addonsSubtotal > 0 && breakdown.addonItems.length > 0;
+
+        if (packagesRow) packagesRow.hidden = !hasPackages;
+        if (addonsRow) addonsRow.hidden = !hasAddons;
+        if (packageItemsNode instanceof HTMLElement) packageItemsNode.hidden = !hasPackages;
+        if (addonItemsNode instanceof HTMLElement) addonItemsNode.hidden = !hasAddons;
+
+        if (hasPackages && basicSubtotalNode) basicSubtotalNode.textContent = `CA$${breakdown.basicSubtotal}`;
+        if (hasAddons && addonsSubtotalNode) addonsSubtotalNode.textContent = `CA$${breakdown.addonsSubtotal}`;
+        renderQuoteSubitems(packageItemsNode, hasPackages ? breakdown.packageItems : []);
+        renderQuoteSubitems(addonItemsNode, hasAddons ? breakdown.addonItems : []);
+
+        const shouldShowBeforeDiscount = breakdown.totalBeforeDiscounts > 0;
+        if (beforeDiscountRow) beforeDiscountRow.hidden = !shouldShowBeforeDiscount;
+        if (shouldShowBeforeDiscount && beforeDiscountNode) beforeDiscountNode.textContent = `CA$${breakdown.totalBeforeDiscounts}`;
+
+        const shouldShowManualDiscount = breakdown.manualDiscountAmount > 0;
+        if (manualDiscountRow) manualDiscountRow.hidden = !shouldShowManualDiscount;
+        if (shouldShowManualDiscount && manualDiscountNode) {
+          manualDiscountNode.textContent = `-CA$${breakdown.manualDiscountAmount}`;
+        }
+
+        if (bundleDiscountNode) {
+          bundleDiscountNode.textContent = `-CA$${breakdown.bundleDiscountAmount} (${Math.round(breakdown.bundleDiscountPercent)}%)`;
+        }
+        const shouldShowBundleDiscount = breakdown.bundleDiscountAmount > 0;
+        if (bundleDiscountRow) bundleDiscountRow.hidden = !shouldShowBundleDiscount;
+        if (!shouldShowBundleDiscount && bundleDiscountNode instanceof HTMLElement) {
+          bundleDiscountNode.textContent = "";
+        }
+
         if (volumeDiscountNode) {
           volumeDiscountNode.textContent = `-CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`;
+        }
+        const shouldShowVolumeDiscount = breakdown.volumeDiscountAmount > 0;
+        if (volumeDiscountRow) volumeDiscountRow.hidden = !shouldShowVolumeDiscount;
+        if (!shouldShowVolumeDiscount && volumeDiscountNode instanceof HTMLElement) {
+          volumeDiscountNode.textContent = "";
         }
       }
 
@@ -3214,9 +3428,7 @@
         if (bookingPackageTypeInput instanceof HTMLInputElement) {
           bookingPackageTypeInput.value = packageSummaryLabel || "Not specified";
         }
-        const selectedVehicleSize = servicesCarSizeSlider instanceof HTMLInputElement
-          ? (carSizeOptions[normalizeCarSizeStep(servicesCarSizeSlider.value) - 1] || carSizeOptions[defaultVehicleSizeStep - 1])
-          : carSizeOptions[defaultVehicleSizeStep - 1];
+        const selectedVehicleSize = getSelectedVehicleSizeLabel();
         const selectedDiscounts = Array.from(discountCheckboxes).reduce((labels, checkbox) => {
           if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return labels;
           const discountLabelNode = checkbox.closest("label")?.querySelector(".discount-name");
@@ -3241,6 +3453,7 @@
             `Add-ons subtotal: CA$${breakdown.addonsSubtotal}`,
             `Total before discounts: CA$${breakdown.totalBeforeDiscounts}`,
             `Volume savings: -CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`,
+            `Interior+Exterior discount: -CA$${breakdown.bundleDiscountAmount} (${Math.round(breakdown.bundleDiscountPercent)}%)`,
             `Selected discount amount: -CA$${breakdown.manualDiscountAmount}`,
             `Grand total: CA$${breakdown.finalTotal}`,
           ].join(" | ")
@@ -3264,6 +3477,9 @@
         if (bookingPriceCalculatorMinimumNote) {
           bookingPriceCalculatorMinimumNote.hidden = !breakdown.minimumPriceBackstopApplied;
         }
+        if (bookingQuoteVehicleSize) {
+          bookingQuoteVehicleSize.textContent = selectedVehicleSize;
+        }
         updateQuoteNodes({
           basicSubtotalNode: bookingQuoteBasicSubtotal,
           addonsSubtotalNode: bookingQuoteAddonsSubtotal,
@@ -3271,6 +3487,7 @@
           addonItemsNode: bookingQuoteAddonItems,
           beforeDiscountNode: bookingQuoteBeforeDiscountTotal,
           manualDiscountNode: bookingQuoteManualDiscount,
+          bundleDiscountNode: bookingQuoteBundleDiscount,
           volumeDiscountNode: bookingQuoteVolumeDiscount,
         }, breakdown);
         animateSummaryRowReflow(bookingPriceCalculatorTotalRow);
@@ -3307,6 +3524,9 @@
         if (priceCalculatorMinimumNote) {
           priceCalculatorMinimumNote.hidden = !breakdown.minimumPriceBackstopApplied;
         }
+        if (quoteVehicleSize) {
+          quoteVehicleSize.textContent = getSelectedVehicleSizeLabel();
+        }
         updateQuoteNodes({
           basicSubtotalNode: quoteBasicSubtotal,
           addonsSubtotalNode: quoteAddonsSubtotal,
@@ -3314,6 +3534,7 @@
           addonItemsNode: quoteAddonItems,
           beforeDiscountNode: quoteBeforeDiscountTotal,
           manualDiscountNode: quoteManualDiscount,
+          bundleDiscountNode: quoteBundleDiscount,
           volumeDiscountNode: quoteVolumeDiscount,
         }, breakdown);
         animateSummaryRowReflow(priceCalculatorTotalRow);
