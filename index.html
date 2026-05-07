@@ -2121,7 +2121,7 @@
               No lines, no waiting rooms, no hidden fees.
             </p>
             <div class="hero-cta">
-              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Hero CTA">Get your quote</a>
+              <a class="btn btn-primary" href="#services">Get your instant quote now</a>
               <a class="btn btn-ghost" href="#services">View packages</a>
             </div>
             <p class="hero-note">Local new-client offer: save 20% on your first clean this month in our North Island service area.</p>
@@ -3760,6 +3760,7 @@
             const flashUntilTimestamp = preferredEndTimestamp;
             const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
             bookingForm.reset();
+            resetPriceCalculator();
             closeBookingModal();
             if (shouldEnableFlash) {
               requestAnimationFrame(() => {
