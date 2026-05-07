@@ -666,7 +666,7 @@
 
       @media (min-width: 960px) {
         .cards {
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
         }
       }
 
@@ -747,6 +747,171 @@
 
       .package-points li {
         margin-bottom: 6px;
+      }
+
+      .service-block-select {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 14px;
+      }
+
+      .service-block-select input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent);
+      }
+
+      .service-block-select label {
+        font-family: "Outfit", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .price-calculator-summary {
+        margin-top: 20px;
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--bg-card);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .price-calculator-summary p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .price-calculator-total {
+        font-family: "Outfit", sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .price-calculator-total.is-increasing {
+        animation: total-price-scale-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .price-calculator-total.is-decreasing {
+        animation: total-price-scale-out 280ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      @keyframes total-price-scale-in {
+        0% {
+          transform: scale(0.9);
+        }
+        60% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes total-price-scale-out {
+        0% {
+          transform: scale(1);
+        }
+        55% {
+          transform: scale(0.85);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .addons-head {
+        margin: 0 0 12px;
+        font-family: "Outfit", sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+
+      .addons-panel {
+        margin-top: 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateY(-12px);
+        transition: max-height 0.45s ease, opacity 0.3s ease, transform 0.45s ease, margin-top 0.45s ease;
+      }
+
+      .addons-panel.is-visible {
+        margin-top: 24px;
+        max-height: 1400px;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .addons-columns {
+        display: grid;
+        gap: 12px;
+      }
+
+      @media (min-width: 640px) {
+        .addons-columns {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .addons-column {
+        display: grid;
+        gap: 12px;
+      }
+
+      .addons-column[hidden] {
+        display: none;
+      }
+
+      .addons-column-title {
+        margin: 0 0 2px;
+        font-family: "Outfit", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .addon-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+      }
+
+      .addon-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .addon-label input {
+        margin-top: 2px;
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+      }
+
+      .addon-name {
+        font-size: 0.92rem;
+        color: var(--text);
+        flex: 1;
+      }
+
+      .addon-price {
+        font-family: "Outfit", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        white-space: nowrap;
       }
 
       /* Steps */
@@ -1413,26 +1578,27 @@
       <section id="services" class="alt">
         <div class="wrap">
           <div class="section-head">
-            <h2>Car interior cleaning and detailing packages people actually book</h2>
-            <p>Simple options, clear outcomes, and transparent pricing for sedans, SUVs, and family vehicles across the Comox Valley.</p>
+            <h2>Price calculator</h2>
+            <p>Select one or both detailing blocks to estimate your total service price.</p>
           </div>
-          <div class="cards">
+          <div class="cards" id="price-calculator-grid">
             <article class="card">
-              <span class="card-tag">Fastest</span>
-              <h3>Express interior refresh</h3>
-              <p>Fast interior car cleaning for busy drivers, usually completed in about 60-90 minutes.</p>
+              <div class="service-block-select">
+                <input type="checkbox" id="service-basic-interior" data-service-price="149">
+                <label for="service-basic-interior">Basic Interior Detailing</label>
+              </div>
               <ul class="package-points">
                 <li>Quick interior vacuum of seats, carpets, and mats</li>
                 <li>Dashboard, console, and high-touch surfaces cleaned</li>
                 <li>Interior glass finish + optional light exterior rinse</li>
-                <li>Ideal every 2-3 weeks</li>
               </ul>
               <p class="price">From CA$149 <small>/ sedan</small></p>
             </article>
             <article class="card">
-              <span class="card-tag">Most booked</span>
-              <h3>Complete interior + exterior</h3>
-              <p>Best value for weekly drivers, rideshare use, and family cars needing reliable interior car cleaning.</p>
+              <div class="service-block-select">
+                <input type="checkbox" id="service-basic-exterior" data-service-price="199">
+                <label for="service-basic-exterior">Basic Exterior Detailing</label>
+              </div>
               <ul class="package-points">
                 <li>Everything in Express, plus a full interior car cleaning vacuum</li>
                 <li>Dashboard, console, doors, and cupholders cleaned</li>
@@ -1440,18 +1606,71 @@
               </ul>
               <p class="price">From CA$199 <small>/ sedan</small></p>
             </article>
-            <article class="card">
-              <span class="card-tag">Best results</span>
-              <h3>Deep detail + protect</h3>
-              <p>For stubborn buildup, seasonal resets, and that "new car again" finish with car steam cleaning options.</p>
-              <ul class="package-points">
-                <li>Deep interior clean with fabric or leather care</li>
-                <li>Car seat cleaning and car carpet cleaning for high-use vehicles</li>
-                <li>Clay prep + paint-safe decontamination</li>
-                <li>Polymer sealant for lasting gloss</li>
-              </ul>
-              <p class="price">From CA$299 <small>/ sedan</small></p>
-            </article>
+          </div>
+
+          <div class="addons-panel" id="addons-panel" aria-hidden="true">
+            <p class="addons-head">Optional add-ons</p>
+            <div class="addons-columns" id="price-calculator-addons">
+              <div class="addons-column" id="addons-column-interior" hidden>
+                <p class="addons-column-title">Interior add-ons</p>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-upholstery-deep-cleaning">
+                    <input type="checkbox" id="addon-upholstery-deep-cleaning" data-service-price="50" data-addon-group="interior">
+                    <span class="addon-name">Upholstery deep cleaning (shampooing and extraction) for fabric seats</span>
+                    <span class="addon-price">$50</span>
+                  </label>
+                </article>
+              </div>
+              <div class="addons-column" id="addons-column-exterior" hidden>
+                <p class="addons-column-title">Exterior add-ons</p>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-hard-water-spots">
+                    <input type="checkbox" id="addon-hard-water-spots" data-service-price="20" data-addon-group="exterior">
+                    <span class="addon-name">Removing hard water spots from glass</span>
+                    <span class="addon-price">$20</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-chrome-polish">
+                    <input type="checkbox" id="addon-chrome-polish" data-service-price="15" data-addon-group="exterior">
+                    <span class="addon-name">Chrome polish product (wheels)</span>
+                    <span class="addon-price">$15</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-tire-shine">
+                    <input type="checkbox" id="addon-tire-shine" data-service-price="10" data-addon-group="exterior">
+                    <span class="addon-name">Tire shine product</span>
+                    <span class="addon-price">$10</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-bonded-contaminants">
+                    <input type="checkbox" id="addon-bonded-contaminants" data-service-price="20" data-addon-group="exterior">
+                    <span class="addon-name">Removing bonded contaminants</span>
+                    <span class="addon-price">$20</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-stuck-debris">
+                    <input type="checkbox" id="addon-stuck-debris" data-service-price="30" data-addon-group="exterior">
+                    <span class="addon-name">Removing stuck debris</span>
+                    <span class="addon-price">$30</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-black-plastic">
+                    <input type="checkbox" id="addon-black-plastic" data-service-price="30" data-addon-group="exterior">
+                    <span class="addon-name">Restoring black plastic (holds 2 weeks)</span>
+                    <span class="addon-price">$30</span>
+                  </label>
+                </article>
+              </div>
+            </div>
+          </div>
+          <div class="price-calculator-summary" aria-live="polite">
+            <p>Selected blocks total</p>
+            <p class="price-calculator-total" id="price-calculator-total">CA$0</p>
           </div>
         </div>
       </section>
@@ -1732,8 +1951,59 @@
       const preferredStartInput = document.getElementById("preferred-start");
       const preferredEndInput = document.getElementById("preferred-end");
       const bookingFormStatus = document.getElementById("booking-form-status");
+      const servicePriceCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-service-price]");
+      const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
+      const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
+      const addonsPanel = document.getElementById("addons-panel");
+      const interiorAddonsColumn = document.getElementById("addons-column-interior");
+      const exteriorAddonsColumn = document.getElementById("addons-column-exterior");
+      const priceCalculatorTotal = document.getElementById("price-calculator-total");
       const bookedFlashStorageKey = "idd-booking-submitted";
       let lastBookingTrigger = null;
+
+      function updatePriceCalculatorTotal() {
+        if (!priceCalculatorTotal || !servicePriceCheckboxes.length) return;
+        const total = Array.from(servicePriceCheckboxes).reduce((sum, checkbox) => {
+          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
+          const servicePrice = Number.parseFloat(checkbox.dataset.servicePrice || "0");
+          return sum + (Number.isFinite(servicePrice) ? servicePrice : 0);
+        }, 0);
+        const totalLabel = `CA$${total}`;
+        const previousTotalValue = Number.parseFloat(priceCalculatorTotal.dataset.currentTotalValue || "");
+        if (Number.isFinite(previousTotalValue) && previousTotalValue !== total) {
+          priceCalculatorTotal.classList.remove("is-increasing", "is-decreasing");
+          void priceCalculatorTotal.offsetWidth;
+          priceCalculatorTotal.classList.add(total > previousTotalValue ? "is-increasing" : "is-decreasing");
+        }
+        priceCalculatorTotal.textContent = totalLabel;
+        priceCalculatorTotal.dataset.currentTotalValue = String(total);
+      }
+
+      function syncAddonColumnVisibility(columnElement, isVisible) {
+        if (!columnElement) return;
+        columnElement.hidden = !isVisible;
+        if (isVisible) return;
+        const addonCheckboxes = columnElement.querySelectorAll("input[type='checkbox'][data-service-price]");
+        addonCheckboxes.forEach((checkbox) => {
+          if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+        });
+      }
+
+      function syncAddonColumns() {
+        const showInteriorAddons = Boolean(
+          basicInteriorPackageCheckbox instanceof HTMLInputElement && basicInteriorPackageCheckbox.checked
+        );
+        const showExteriorAddons = Boolean(
+          basicExteriorPackageCheckbox instanceof HTMLInputElement && basicExteriorPackageCheckbox.checked
+        );
+        const showAnyAddons = showInteriorAddons || showExteriorAddons;
+        if (addonsPanel) {
+          addonsPanel.classList.toggle("is-visible", showAnyAddons);
+          addonsPanel.setAttribute("aria-hidden", showAnyAddons ? "false" : "true");
+        }
+        syncAddonColumnVisibility(interiorAddonsColumn, showInteriorAddons);
+        syncAddonColumnVisibility(exteriorAddonsColumn, showExteriorAddons);
+      }
 
       function activateBookedFlash() {
         document.body.classList.add("has-booked-flash");
@@ -1900,6 +2170,15 @@
         preferredStartInput.addEventListener("change", validatePreferredRange);
         preferredEndInput.addEventListener("change", validatePreferredRange);
       }
+
+      servicePriceCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          syncAddonColumns();
+          updatePriceCalculatorTotal();
+        });
+      });
+      syncAddonColumns();
+      updatePriceCalculatorTotal();
 
       document.addEventListener("keydown", (event) => {
         if (isBookingThanksVisible() && isScrollAttemptEvent(event)) {
