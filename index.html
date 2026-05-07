@@ -1064,6 +1064,16 @@
         animation: total-price-pulse-out 200ms ease-out;
       }
 
+      .price.is-increasing,
+      .addon-price.is-increasing {
+        animation: total-price-pulse-in 220ms ease-out;
+      }
+
+      .price.is-decreasing,
+      .addon-price.is-decreasing {
+        animation: total-price-pulse-out 200ms ease-out;
+      }
+
       .price-calculator-total.is-water-wet {
         animation: total-price-water-wet 700ms ease-out;
       }
@@ -1197,6 +1207,39 @@
         font-weight: 600;
         color: var(--text-muted);
         white-space: nowrap;
+      }
+
+      .discounts-block {
+        margin-top: 14px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .discounts-title {
+        margin: 0;
+        font-family: "Outfit", sans-serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #86efac;
+      }
+
+      .discount-card {
+        background: rgba(22, 101, 52, 0.2);
+        border-color: rgba(134, 239, 172, 0.4);
+      }
+
+      .discount-label input {
+        accent-color: #22c55e;
+      }
+
+      .discount-label input[disabled] {
+        opacity: 0.85;
+        cursor: not-allowed;
+      }
+
+      .discount-name,
+      .discount-price {
+        color: #86efac;
       }
 
       /* Steps */
@@ -1897,7 +1940,7 @@
           <div class="services-car-size" aria-label="Vehicle size selector">
             <div class="services-car-size__label">
               <span>Vehicle size</span>
-              <span class="services-car-size__value" id="services-car-size-value">Compact / Sedan</span>
+              <span class="services-car-size__value" id="services-car-size-value">SUV / Wagon</span>
             </div>
             <div class="services-car-size__rail" id="services-car-size-rail">
               <div class="services-car-size__track" aria-hidden="true"></div>
@@ -1908,7 +1951,7 @@
                 min="1"
                 max="4"
                 step="1"
-                value="1"
+                value="2"
                 aria-describedby="services-car-size-ticks"
               >
               <div class="services-car-size__head" id="services-car-size-head" aria-hidden="true"></div>
@@ -1923,7 +1966,7 @@
           <div class="cards" id="price-calculator-grid">
             <article class="card">
               <div class="service-block-select">
-                <input type="checkbox" id="service-basic-interior" data-service-price="149">
+                <input type="checkbox" id="service-basic-interior" data-service-price="150">
                 <label for="service-basic-interior">Basic Interior Detailing</label>
               </div>
               <ul class="package-points">
@@ -1931,21 +1974,35 @@
                 <li>Dashboard, console, and high-touch surfaces cleaned</li>
                 <li>Interior glass finish + light exterior glass wash</li>
               </ul>
-              <p class="price">CA$149</p>
+              <p class="price  vehicle-size-sensitive">CA$149</p>
               <div class="package-addons" id="addons-panel-interior" aria-hidden="true">
                 <p class="addons-column-title">Interior add-ons</p>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-plastic-restoration">
+                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior">
+                    <span class="addon-name  vehicle-size-sensitive">Plastic restoration product</span>
+                    <span class="addon-price">$25</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-leather-treatment">
+                    <input type="checkbox" id="addon-leather-treatment" data-service-price="40" data-addon-group="interior">
+                    <span class="addon-name  vehicle-size-sensitive">Leather treatment with product and deep cleaning</span>
+                    <span class="addon-price">$40</span>
+                  </label>
+                </article>
+                <article class="addon-card">
+                  <label class="addon-label" for="addon-headliner-cleaning">
+                    <input type="checkbox" id="addon-headliner-cleaning" data-service-price="80" data-addon-group="interior">
+                    <span class="addon-name  vehicle-size-sensitive">Headliner cleaning (stains, finger marks)</span>
+                    <span class="addon-price">$80</span>
+                  </label>
+                </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-upholstery-deep-cleaning">
                     <input type="checkbox" id="addon-upholstery-deep-cleaning" data-service-price="50" data-addon-group="interior">
                     <span class="addon-name">Upholstery deep cleaning (shampooing and extraction) for fabric seats</span>
-                    <span class="addon-price">$50</span>
-                  </label>
-                </article>
-                <article class="addon-card">
-                  <label class="addon-label" for="addon-plastic-restoration">
-                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior">
-                    <span class="addon-name">Plastic restoration product</span>
-                    <span class="addon-price">$25</span>
+                    <span class="addon-price  vehicle-size-sensitive">$50</span>
                   </label>
                 </article>
                 <article class="addon-card">
@@ -1953,13 +2010,6 @@
                     <input type="checkbox" id="addon-odor-treatment" data-service-price="30" data-addon-group="interior">
                     <span class="addon-name">Odor treatment</span>
                     <span class="addon-price">$30</span>
-                  </label>
-                </article>
-                <article class="addon-card">
-                  <label class="addon-label" for="addon-leather-treatment">
-                    <input type="checkbox" id="addon-leather-treatment" data-service-price="40" data-addon-group="interior">
-                    <span class="addon-name">Leather treatment with product and deep cleaning</span>
-                    <span class="addon-price">$40</span>
                   </label>
                 </article>
                 <article class="addon-card">
@@ -1972,7 +2022,7 @@
                 <article class="addon-card">
                   <label class="addon-label" for="addon-pet-fur-removal">
                     <input type="checkbox" id="addon-pet-fur-removal" data-service-price="70" data-addon-group="interior">
-                    <span class="addon-name">Pet fur removal</span>
+                    <span class="addon-name  vehicle-size-sensitive">Pet fur removal</span>
                     <span class="addon-price">$70</span>
                   </label>
                 </article>
@@ -1991,13 +2041,6 @@
                   </label>
                 </article>
                 <article class="addon-card">
-                  <label class="addon-label" for="addon-headliner-cleaning">
-                    <input type="checkbox" id="addon-headliner-cleaning" data-service-price="80" data-addon-group="interior">
-                    <span class="addon-name">Headliner cleaning (stains, finger marks)</span>
-                    <span class="addon-price">$80</span>
-                  </label>
-                </article>
-                <article class="addon-card">
                   <label class="addon-label" for="addon-ash-buildup-removal">
                     <input type="checkbox" id="addon-ash-buildup-removal" data-service-price="70" data-addon-group="interior">
                     <span class="addon-name">Ash buildup removal</span>
@@ -2008,7 +2051,7 @@
             </article>
             <article class="card">
               <div class="service-block-select">
-                <input type="checkbox" id="service-basic-exterior" data-service-price="199">
+                <input type="checkbox" id="service-basic-exterior" data-service-price="200">
                 <label for="service-basic-exterior">Basic Exterior Detailing</label>
               </div>
               <ul class="package-points">
@@ -2016,73 +2059,97 @@
                 <li>Wheel and tire cleaning</li>
                 <li>Light exterior glass wash</li>
               </ul>
-              <p class="price">CA$199</p>
+              <p class="price vehicle-size-sensitive">CA$199</p>
               <div class="package-addons" id="addons-panel-exterior" aria-hidden="true">
                 <p class="addons-column-title">Exterior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-hard-water-spots">
                     <input type="checkbox" id="addon-hard-water-spots" data-service-price="20" data-addon-group="exterior">
                     <span class="addon-name">Removing hard water spots from glass</span>
-                    <span class="addon-price">$20</span>
+                    <span class="addon-price vehicle-size-sensitive">$20</span> 
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-chrome-polish">
                     <input type="checkbox" id="addon-chrome-polish" data-service-price="15" data-addon-group="exterior">
                     <span class="addon-name">Chrome polish product (wheels)</span>
-                    <span class="addon-price">$15</span>
+                    <span class="addon-price vehicle-size-sensitive">$15</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-tire-shine">
                     <input type="checkbox" id="addon-tire-shine" data-service-price="10" data-addon-group="exterior">
                     <span class="addon-name">Tire shine product</span>
-                    <span class="addon-price">$10</span>
+                    <span class="addon-price vehicle-size-sensitive">$10</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-bonded-contaminants">
                     <input type="checkbox" id="addon-bonded-contaminants" data-service-price="20" data-addon-group="exterior">
                     <span class="addon-name">Removing bonded contaminants</span>
-                    <span class="addon-price">$20</span>
+                    <span class="addon-price  vehicle-size-sensitive">$30</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-stuck-debris">
                     <input type="checkbox" id="addon-stuck-debris" data-service-price="30" data-addon-group="exterior">
                     <span class="addon-name">Removing stuck debris</span>
-                    <span class="addon-price">$30</span>
+                    <span class="addon-price  vehicle-size-sensitive">$30</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-black-plastic">
                     <input type="checkbox" id="addon-black-plastic" data-service-price="30" data-addon-group="exterior">
-                    <span class="addon-name">Restoring black plastic (holds 2 weeks)</span>
+                    <span class="addon-name vehicle-size-sensitive">Quick restoring black plastic (holds 2 weeks)</span>
                     <span class="addon-price">$30</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-door-trunk-jambs">
                     <input type="checkbox" id="addon-door-trunk-jambs" data-service-price="60" data-addon-group="exterior">
-                    <span class="addon-name">Cleaning Door and Trunk Jambs</span>
+                    <span class="addon-name vehicle-size-sensitive">Cleaning Door and Trunk Jambs</span>
                     <span class="addon-price">$60</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-engine-bay-cleaning">
                     <input type="checkbox" id="addon-engine-bay-cleaning" data-service-price="80" data-addon-group="exterior">
-                    <span class="addon-name">Engine Bay Cleaning</span>
+                    <span class="addon-name vehicle-size-sensitive">Engine Bay Cleaning</span>
                     <span class="addon-price">$80</span>
                   </label>
                 </article>
-                <article class="addon-card">
+                <!-- <article class="addon-card">
                   <label class="addon-label" for="addon-black-plastic-longterm">
                     <input type="checkbox" id="addon-black-plastic-longterm" data-service-price="20" data-addon-group="exterior">
-                    <span class="addon-name">Restoring black plastic (holds 6 months, per panel)</span>
+                    <span class="addon-name vehicle-size-sensitive">Restoring black plastic (holds 6 months, per panel)</span>
                     <span class="addon-price">$20</span>
                   </label>
-                </article>
+                </article> -->
               </div>
+            </article>
+          </div>
+          <div class="discounts-block" id="discounts-panel">
+            <p class="discounts-title">Discounts</p>
+            <article class="addon-card discount-card">
+              <label class="addon-label discount-label" for="discount-clean-car">
+                <input type="checkbox" id="discount-clean-car" data-discount-percent="20">
+                <span class="addon-name discount-name">My car is pretty clean already, I just need... (applies to basic package price only)</span>
+                <span class="addon-price discount-price">-20%</span>
+              </label>
+            </article>
+            <article class="addon-card discount-card">
+              <label class="addon-label discount-label" for="discount-auto-500">
+                <input type="checkbox" id="discount-auto-500" disabled>
+                <span class="addon-name discount-name">Automatic discount on CA$500+ total</span>
+                <span class="addon-price discount-price">-CA$50</span>
+              </label>
+            </article>
+            <article class="addon-card discount-card">
+              <label class="addon-label discount-label" for="discount-auto-1000">
+                <input type="checkbox" id="discount-auto-1000" disabled>
+                <span class="addon-name discount-name">Automatic discount on CA$1000+ total</span>
+                <span class="addon-price discount-price">-CA$100</span>
+              </label>
             </article>
           </div>
           <div class="price-calculator-summary" aria-live="polite">
@@ -2141,7 +2208,7 @@
         </div>
       </section>
 
-      <section id="signals">
+      <!-- <section id="signals">
         <div class="wrap">
           <div class="section-head">
             <h2>Help us build your perfect package</h2>
@@ -2170,8 +2237,8 @@
             </article>
           </div>
         </div>
-      </section>
-
+      </section> -->
+<!-- 
       <section class="alt" id="book">
         <div class="wrap">
           <div class="cta-band">
@@ -2183,14 +2250,14 @@
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <section>
         <div class="wrap">
           <div class="section-head">
             <h2>Car cleaning FAQs</h2>
           </div>
-          <div class="steps">
+          <div class="steps"> 
             <article class="step">
               <h3>Do you offer car interior cleaning near me?</h3>
               <p>Yes. We offer mobile interior car cleaning in Comox Valley, Campbell River, Courtenay, Cumberland, and nearby Black Creek neighborhoods.</p>
@@ -2280,10 +2347,10 @@
           <div class="booking-field booking-field--car-size">
             <label for="car-size-slider">
               Vehicle size
-              <span class="booking-car-size__value" id="car-size-value">Compact / Sedan</span>
+              <span class="booking-car-size__value" id="car-size-value">SUV / Wagon</span>
             </label>
-            <input id="car-size-slider" type="range" min="1" max="4" step="1" value="1" aria-describedby="car-size-ticks">
-            <input id="car-size" name="car_size" type="hidden" value="Compact / Sedan">
+            <input id="car-size-slider" type="range" min="1" max="4" step="1" value="2" aria-describedby="car-size-ticks">
+            <input id="car-size" name="car_size" type="hidden" value="SUV / Wagon">
             <div class="booking-car-size__ticks" id="car-size-ticks">
               <button type="button" data-booking-car-size-step="1">Compact / Sedan</button>
               <button type="button" data-booking-car-size-step="2">SUV / Wagon</button>
@@ -2392,6 +2459,9 @@
       const bookingCarSizeTickButtons = document.querySelectorAll("[data-booking-car-size-step]");
       const bookingFormStatus = document.getElementById("booking-form-status");
       const servicePriceCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-service-price]");
+      const discountCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-discount-percent]");
+      const autoDiscount500Checkbox = document.getElementById("discount-auto-500");
+      const autoDiscount1000Checkbox = document.getElementById("discount-auto-1000");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
       const interiorAddonsPanel = document.getElementById("addons-panel-interior");
@@ -2401,8 +2471,15 @@
       const clickableAddonBlocks = document.querySelectorAll("#services .package-addons .addon-card");
       const priceCalculatorSummary = document.querySelector(".price-calculator-summary");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
+      const vehicleSizeSensitiveElements = document.querySelectorAll("#services .vehicle-size-sensitive");
       const bookedFlashStorageKey = "idd-booking-submitted";
       const serviceSelectionsStorageKey = "idd-service-selections";
+      const vehicleSizeStorageKey = "idd-vehicle-size-step";
+      const defaultVehicleSizeStep = 2;
+      const autoDiscountRules = [
+        { threshold: 500, amount: 50 },
+        { threshold: 1000, amount: 100 },
+      ];
       const carSizeOptions = [
         "Compact / Sedan",
         "SUV / Wagon",
@@ -2422,6 +2499,30 @@
         return Math.min(Math.max(parsedStep, 1), carSizeOptions.length);
       }
 
+      function persistVehicleSizeStep(stepValue) {
+        const normalizedStep = normalizeCarSizeStep(stepValue);
+        try {
+          if (normalizedStep === defaultVehicleSizeStep) {
+            window.localStorage.removeItem(vehicleSizeStorageKey);
+            return;
+          }
+          window.localStorage.setItem(vehicleSizeStorageKey, String(normalizedStep));
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+      }
+
+      function restoreVehicleSizeStep() {
+        if (!(servicesCarSizeSlider instanceof HTMLInputElement)) return;
+        try {
+          const savedStep = window.localStorage.getItem(vehicleSizeStorageKey);
+          if (!savedStep) return;
+          servicesCarSizeSlider.value = String(normalizeCarSizeStep(savedStep));
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+      }
+
       function isPackageSelectedForAddonGroup(addonGroup) {
         if (addonGroup === "interior") {
           return Boolean(
@@ -2436,6 +2537,124 @@
         return true;
       }
 
+      function getVehicleSizePriceMultiplier(stepValue = servicesCarSizeSlider instanceof HTMLInputElement ? servicesCarSizeSlider.value : defaultVehicleSizeStep) {
+        const normalizedStep = normalizeCarSizeStep(stepValue);
+        if (normalizedStep === 1) return 0.8;
+        if (normalizedStep === 3) return 1.2;
+        if (normalizedStep === 4) return 1.4;
+        return 1;
+      }
+
+      function formatPriceForDisplay(amount, currencyPrefix) {
+        const roundedUpAmount = Math.ceil(Number(amount) || 0);
+        return `${currencyPrefix}${roundedUpAmount}`;
+      }
+
+      function animatePriceDelta(priceElement, nextAmount, nextLabel) {
+        if (!(priceElement instanceof HTMLElement)) return;
+        const previousAmount = Number.parseFloat(priceElement.dataset.currentPriceValue || "");
+        if (Number.isFinite(previousAmount) && previousAmount !== nextAmount) {
+          priceElement.classList.remove("is-increasing", "is-decreasing");
+          void priceElement.offsetWidth;
+          priceElement.classList.add(nextAmount > previousAmount ? "is-increasing" : "is-decreasing");
+        }
+        priceElement.textContent = nextLabel;
+        priceElement.dataset.currentPriceValue = String(nextAmount);
+      }
+
+      function isVehicleSizeSensitiveCheckbox(checkbox) {
+        if (!(checkbox instanceof HTMLInputElement)) return false;
+        const addonLabel = checkbox.closest(".addon-label");
+        const serviceCard = checkbox.closest(".card");
+        const addonHasSensitiveMarker = addonLabel instanceof Element
+          && Boolean(addonLabel.querySelector(".vehicle-size-sensitive"));
+        const basePackageHasSensitiveMarker = serviceCard instanceof Element
+          && Boolean(serviceCard.querySelector(".price.vehicle-size-sensitive"));
+        return addonHasSensitiveMarker || basePackageHasSensitiveMarker;
+      }
+
+      function getAdjustedServicePrice(checkbox) {
+        if (!(checkbox instanceof HTMLInputElement)) return 0;
+        const servicePrice = Number.parseFloat(checkbox.dataset.servicePrice || "0");
+        if (!Number.isFinite(servicePrice)) return 0;
+        return isVehicleSizeSensitiveCheckbox(checkbox)
+          ? servicePrice * getVehicleSizePriceMultiplier()
+          : servicePrice;
+      }
+
+      function applyVehicleSizeSensitivePricing() {
+        const multiplier = getVehicleSizePriceMultiplier();
+        servicePriceCheckboxes.forEach((checkbox) => {
+          if (!(checkbox instanceof HTMLInputElement)) return;
+          if (!isVehicleSizeSensitiveCheckbox(checkbox)) return;
+          const baseAmount = Number.parseFloat(checkbox.dataset.servicePrice || "0");
+          if (!Number.isFinite(baseAmount)) return;
+
+          const serviceCard = checkbox.closest(".card");
+          const addonLabel = checkbox.closest(".addon-label");
+          const priceElement = addonLabel instanceof Element
+            ? addonLabel.querySelector(".addon-price")
+            : serviceCard instanceof Element
+              ? serviceCard.querySelector(".price")
+              : null;
+          if (!(priceElement instanceof HTMLElement)) return;
+
+          const existingPriceText = priceElement.dataset.basePriceText || priceElement.textContent || "";
+          if (!priceElement.dataset.basePriceText) priceElement.dataset.basePriceText = existingPriceText;
+          const matchedPrefix = existingPriceText.trim().match(/^(CA\$|\$)/);
+          const currencyPrefix = matchedPrefix
+            ? matchedPrefix[1]
+            : checkbox.dataset.addonGroup
+              ? "$"
+              : "CA$";
+          const adjustedAmount = Math.ceil(baseAmount * multiplier);
+          const adjustedLabel = formatPriceForDisplay(adjustedAmount, currencyPrefix);
+          animatePriceDelta(priceElement, adjustedAmount, adjustedLabel);
+        });
+
+        vehicleSizeSensitiveElements.forEach((element) => {
+          if (!(element instanceof HTMLElement)) return;
+          const text = element.textContent || "";
+          if (!text.trim().match(/^(CA\$|\$)\s*\d/)) return;
+          if (!element.dataset.basePriceText) element.dataset.basePriceText = text;
+        });
+      }
+
+      function calculateSelectedPriceTotal() {
+        const totals = Array.from(servicePriceCheckboxes).reduce((sum, checkbox) => {
+          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
+          const linePrice = Math.ceil(getAdjustedServicePrice(checkbox));
+          if (checkbox.dataset.addonGroup) {
+            return {
+              basicSubtotal: sum.basicSubtotal,
+              addonsSubtotal: sum.addonsSubtotal + linePrice,
+            };
+          }
+          return {
+            basicSubtotal: sum.basicSubtotal + linePrice,
+            addonsSubtotal: sum.addonsSubtotal,
+          };
+        }, { basicSubtotal: 0, addonsSubtotal: 0 });
+        const totalDiscountPercent = Array.from(discountCheckboxes).reduce((sum, checkbox) => {
+          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
+          const percent = Number.parseFloat(checkbox.dataset.discountPercent || "0");
+          return sum + (Number.isFinite(percent) ? percent : 0);
+        }, 0);
+        const discountRatio = Math.min(Math.max(totalDiscountPercent / 100, 0), 1);
+        const discountedBasicSubtotal = Math.ceil(totals.basicSubtotal * (1 - discountRatio));
+        const totalAfterManualDiscounts = discountedBasicSubtotal + totals.addonsSubtotal;
+        const automaticDiscountTotal = autoDiscountRules.reduce((sum, rule) => {
+          return totalAfterManualDiscounts >= rule.threshold ? sum + rule.amount : sum;
+        }, 0);
+        if (autoDiscount500Checkbox instanceof HTMLInputElement) {
+          autoDiscount500Checkbox.checked = totalAfterManualDiscounts >= 500;
+        }
+        if (autoDiscount1000Checkbox instanceof HTMLInputElement) {
+          autoDiscount1000Checkbox.checked = totalAfterManualDiscounts >= 1000;
+        }
+        return Math.max(0, totalAfterManualDiscounts - automaticDiscountTotal);
+      }
+
       function triggerPriceWaterSplash() {
         if (!priceCalculatorSummary || !priceCalculatorTotal) return;
         priceCalculatorSummary.classList.remove("is-water-splash");
@@ -2448,13 +2667,7 @@
 
       function updatePriceCalculatorTotal() {
         if (!priceCalculatorTotal || !servicePriceCheckboxes.length) return;
-        const total = Array.from(servicePriceCheckboxes).reduce((sum, checkbox) => {
-          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
-          const addonGroup = checkbox.dataset.addonGroup;
-          if (addonGroup && !isPackageSelectedForAddonGroup(addonGroup)) return sum;
-          const servicePrice = Number.parseFloat(checkbox.dataset.servicePrice || "0");
-          return sum + (Number.isFinite(servicePrice) ? servicePrice : 0);
-        }, 0);
+        const total = calculateSelectedPriceTotal();
         const priceScale =
           total <= 0
             ? 1
@@ -2715,6 +2928,8 @@
         const selectedCarSize = carSizeOptions[normalizedStep - 1] || carSizeOptions[0];
         servicesCarSizeSlider.value = String(normalizedStep);
         servicesCarSizeValueLabel.textContent = selectedCarSize;
+        applyVehicleSizeSensitivePricing();
+        updatePriceCalculatorTotal();
         if (servicesCarSizeHead) {
           const positionPercent = ((normalizedStep - 0.5) / carSizeOptions.length) * 100;
           servicesCarSizeHead.style.left = `${positionPercent}%`;
@@ -2727,6 +2942,7 @@
         const normalizedStep = normalizeCarSizeStep(stepValue);
         servicesCarSizeSlider.value = String(normalizedStep);
         syncServicesCarSizeSelection();
+        persistVehicleSizeStep(normalizedStep);
         if (shouldBounce && servicesCarSizeHead) {
           servicesCarSizeHead.classList.remove("is-bouncing");
           void servicesCarSizeHead.offsetWidth;
@@ -2744,6 +2960,11 @@
           servicesCarSizeHead.style.left = `${ratio * 100}%`;
         }
         const nearestStep = Math.round(ratio * (carSizeOptions.length - 1)) + 1;
+        if (servicesCarSizeSlider instanceof HTMLInputElement) {
+          servicesCarSizeSlider.value = String(nearestStep);
+        }
+        applyVehicleSizeSensitivePricing();
+        updatePriceCalculatorTotal();
         const selectedCarSize = carSizeOptions[nearestStep - 1] || carSizeOptions[0];
         if (servicesCarSizeValueLabel) servicesCarSizeValueLabel.textContent = selectedCarSize;
       }
@@ -2860,8 +3081,14 @@
       }
       syncCarSizeSelection();
       if (servicesCarSizeSlider instanceof HTMLInputElement) {
-        servicesCarSizeSlider.addEventListener("input", syncServicesCarSizeSelection);
-        servicesCarSizeSlider.addEventListener("change", syncServicesCarSizeSelection);
+        servicesCarSizeSlider.addEventListener("input", () => {
+          syncServicesCarSizeSelection();
+          persistVehicleSizeStep(servicesCarSizeSlider.value);
+        });
+        servicesCarSizeSlider.addEventListener("change", () => {
+          syncServicesCarSizeSelection();
+          persistVehicleSizeStep(servicesCarSizeSlider.value);
+        });
       }
       servicesCarSizeTickButtons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -2884,6 +3111,7 @@
           servicesCarSizeHead.classList.remove("is-bouncing");
         });
       }
+      restoreVehicleSizeStep();
       syncServicesCarSizeSelection();
 
       servicePriceCheckboxes.forEach((checkbox) => {
@@ -2891,6 +3119,11 @@
           syncAddonColumns();
           updatePriceCalculatorTotal();
           persistServiceSelections();
+        });
+      });
+      discountCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          updatePriceCalculatorTotal();
         });
       });
       restoreServiceSelections();
