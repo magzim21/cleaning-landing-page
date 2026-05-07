@@ -33,6 +33,28 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
+function getStainPhotoSummaryLines({ photoCount, skippedPhotos }) {
+  const attached = Number.isFinite(photoCount) ? photoCount : 0;
+  const skipped = Number.isFinite(skippedPhotos) ? skippedPhotos : 0;
+
+  if (attached <= 0 && skipped <= 0) {
+    return ["Stain photos: none provided"];
+  }
+
+  if (attached > 0 && skipped <= 0) {
+    return [`Stain photos: ${attached} attached`];
+  }
+
+  if (attached <= 0 && skipped > 0) {
+    return [`Stain photos: ${skipped} skipped (file too large or unsupported)`];
+  }
+
+  return [
+    `Stain photos: ${attached} attached`,
+    `Stain photos: ${skipped} skipped (file too large or unsupported)`,
+  ];
+}
+
 async function sendSlackBookingNotification({
   requestId,
   webhookUrl,
@@ -65,8 +87,7 @@ async function sendSlackBookingNotification({
     `*Preferred to:* ${preferredEnd}`,
     `*Car model:* ${carModel}`,
     `*Package:* ${packageType}`,
-    `*Stain photos attached:* ${photoCount}`,
-    `*Stain photos skipped:* ${skippedPhotos}`,
+    ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }).map((line) => `*${line}*`),
   ].join("\n");
 
   const controller = new AbortController();
@@ -244,8 +265,7 @@ export default async function handler(request) {
     `Preferred to: ${preferredEnd}`,
     `Car model: ${carModel}`,
     `Package type: ${packageType}`,
-    `Stain photos attached: ${photoCount} file(s)`,
-    `Stain photos skipped: ${skippedPhotos} file(s)`,
+    ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }),
   ].join("\n");
 
   const payload = {
