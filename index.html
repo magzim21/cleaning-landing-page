@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Datadog RUM (early load for full session capture) -->
+    <script defer src="/datadog-rum-env.js"></script>
+    <script type="module" src="/datadog-rum.bundle.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18096536070"></script>
     <script>
@@ -1603,8 +1606,7 @@
         transition: background 220ms ease;
       }
 
-      .volume-discount__rail::before,
-      .volume-discount__rail::after {
+      .volume-discount__rail::before {
         content: "";
         position: absolute;
         top: 0;
@@ -1618,12 +1620,6 @@
         left: 0;
         background: linear-gradient(90deg, rgba(20, 83, 45, 0.6), rgba(20, 83, 45, 0));
       }
-
-      .volume-discount__rail::after {
-        right: 0;
-        background: linear-gradient(270deg, rgba(20, 83, 45, 0.6), rgba(20, 83, 45, 0));
-      }
-
       .volume-discount__fill {
         position: absolute;
         inset: 0 auto 0 0;
@@ -2373,7 +2369,6 @@
         <div class="wrap">
           <div class="section-head">
             <h2>Price calculator</h2>
-            <p>Select one or both detailing blocks to estimate your total service price.</p>
           </div>
           <div class="services-car-size" aria-label="Vehicle size selector">
             <div class="services-car-size__label">
@@ -2460,7 +2455,7 @@
                 <p class="addons-column-title">Interior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-plastic-restoration">
-                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior" checked>
+                    <input type="checkbox" id="addon-plastic-restoration" data-service-price="25" data-addon-group="interior">
                     <span class="addon-name  vehicle-size-sensitive">Plastic restoration product</span>
                     <span class="addon-price">$25</span>
                   </label>
@@ -2545,7 +2540,7 @@
                 <p class="addons-column-title">Exterior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-hard-water-spots">
-                    <input type="checkbox" id="addon-hard-water-spots" data-service-price="20" data-addon-group="exterior" checked>
+                    <input type="checkbox" id="addon-hard-water-spots" data-service-price="20" data-addon-group="exterior">
                     <span class="addon-name">Removing hard water spots from glass</span>
                     <span class="addon-price vehicle-size-sensitive">$20</span> 
                   </label>
@@ -2559,14 +2554,14 @@
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-tire-shine">
-                    <input type="checkbox" id="addon-tire-shine" data-service-price="10" data-addon-group="exterior" checked>
+                    <input type="checkbox" id="addon-tire-shine" data-service-price="10" data-addon-group="exterior">
                     <span class="addon-name">Tire shine product</span>
                     <span class="addon-price vehicle-size-sensitive">$10</span>
                   </label>
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-bonded-contaminants">
-                    <input type="checkbox" id="addon-bonded-contaminants" data-service-price="20" data-addon-group="exterior" checked>
+                    <input type="checkbox" id="addon-bonded-contaminants" data-service-price="20" data-addon-group="exterior">
                     <span class="addon-name">Removing bonded contaminants</span>
                     <span class="addon-price  vehicle-size-sensitive">$30</span>
                   </label>
@@ -2587,7 +2582,7 @@
                 </article>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-door-trunk-jambs">
-                    <input type="checkbox" id="addon-door-trunk-jambs" data-service-price="60" data-addon-group="exterior" checked>
+                    <input type="checkbox" id="addon-door-trunk-jambs" data-service-price="60" data-addon-group="exterior">
                     <span class="addon-name vehicle-size-sensitive">Cleaning Door and Trunk Jambs</span>
                     <span class="addon-price">$60</span>
                   </label>
@@ -2850,6 +2845,18 @@
             <label>Price calculator summary</label>
             <input id="booking-package-type" name="package_type" type="hidden" value="Not specified">
             <input id="booking-calculator-details" name="calculator_details" type="hidden" value="Not specified">
+            <input id="booking-calc-vehicle-size" name="calculator_vehicle_size" type="hidden" value="Not specified">
+            <input id="booking-calc-packages" name="calculator_packages" type="hidden" value="Not specified">
+            <input id="booking-calc-addons" name="calculator_addons" type="hidden" value="Not specified">
+            <input id="booking-calc-manual-discounts" name="calculator_manual_discounts" type="hidden" value="Not specified">
+            <input id="booking-calc-package-subtotal" name="calculator_package_subtotal" type="hidden" value="CA$0">
+            <input id="booking-calc-addons-subtotal" name="calculator_addons_subtotal" type="hidden" value="CA$0">
+            <input id="booking-calc-total-before-discounts" name="calculator_total_before_discounts" type="hidden" value="CA$0">
+            <input id="booking-calc-volume-savings" name="calculator_volume_savings" type="hidden" value="-CA$0 (0%)">
+            <input id="booking-calc-bundle-discount" name="calculator_bundle_discount" type="hidden" value="-CA$0 (0%)">
+            <input id="booking-calc-selected-discount-amount" name="calculator_selected_discount_amount" type="hidden" value="-CA$0">
+            <input id="booking-calc-total-discounts" name="calculator_total_discounts" type="hidden" value="-CA$0">
+            <input id="booking-calc-grand-total" name="calculator_grand_total" type="hidden" value="CA$0">
             <div class="booking-quote-summary">
               <p>Your calculator estimate</p>
               <div class="booking-quote-summary__empty" id="booking-quote-empty">
@@ -3001,6 +3008,7 @@
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
       const discountsPanel = document.getElementById("discounts-panel");
+      const cleanCarDiscountCheckbox = document.getElementById("discount-clean-car");
       const interiorAddonsPanel = document.getElementById("addons-panel-interior");
       const exteriorAddonsPanel = document.getElementById("addons-panel-exterior");
       const packageAddonsContainers = document.querySelectorAll("#services .package-addons");
@@ -3029,6 +3037,18 @@
       const quoteVehicleSize = document.getElementById("quote-vehicle-size");
       const bookingPackageTypeInput = document.getElementById("booking-package-type");
       const bookingCalculatorDetailsInput = document.getElementById("booking-calculator-details");
+      const bookingCalcVehicleSizeInput = document.getElementById("booking-calc-vehicle-size");
+      const bookingCalcPackagesInput = document.getElementById("booking-calc-packages");
+      const bookingCalcAddonsInput = document.getElementById("booking-calc-addons");
+      const bookingCalcManualDiscountsInput = document.getElementById("booking-calc-manual-discounts");
+      const bookingCalcPackageSubtotalInput = document.getElementById("booking-calc-package-subtotal");
+      const bookingCalcAddonsSubtotalInput = document.getElementById("booking-calc-addons-subtotal");
+      const bookingCalcTotalBeforeDiscountsInput = document.getElementById("booking-calc-total-before-discounts");
+      const bookingCalcVolumeSavingsInput = document.getElementById("booking-calc-volume-savings");
+      const bookingCalcBundleDiscountInput = document.getElementById("booking-calc-bundle-discount");
+      const bookingCalcSelectedDiscountAmountInput = document.getElementById("booking-calc-selected-discount-amount");
+      const bookingCalcTotalDiscountsInput = document.getElementById("booking-calc-total-discounts");
+      const bookingCalcGrandTotalInput = document.getElementById("booking-calc-grand-total");
       const bookingQuoteEmpty = document.getElementById("booking-quote-empty");
       const bookingQuoteDetails = document.getElementById("booking-quote-details");
       const bookingQuoteHint = document.getElementById("booking-quote-hint");
@@ -3293,14 +3313,16 @@
             targetId: checkbox.id,
           });
         });
-        const totalDiscountPercent = Array.from(discountCheckboxes).reduce((sum, checkbox) => {
-          if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
-          const percent = Number.parseFloat(checkbox.dataset.discountPercent || "0");
-          return sum + (Number.isFinite(percent) ? percent : 0);
-        }, 0);
-        const discountRatio = Math.min(Math.max(totalDiscountPercent / 100, 0), 1);
-        const discountedBasicSubtotal = Math.ceil(totals.basicSubtotal * (1 - discountRatio));
-        const manualDiscountAmount = Math.max(0, totals.basicSubtotal - discountedBasicSubtotal);
+        const cleanCarDiscountPercent = cleanCarDiscountCheckbox instanceof HTMLInputElement
+          && cleanCarDiscountCheckbox.checked
+          ? Number.parseFloat(cleanCarDiscountCheckbox.dataset.discountPercent || "0")
+          : 0;
+        const normalizedCleanCarDiscountPercent = Number.isFinite(cleanCarDiscountPercent)
+          ? Math.min(Math.max(cleanCarDiscountPercent, 0), 100)
+          : 0;
+        const manualDiscountAmount = totals.basicSubtotal > 0
+          ? Math.ceil(totals.basicSubtotal * (normalizedCleanCarDiscountPercent / 100))
+          : 0;
         const hasSelectedBasicBundle = Boolean(
           basicInteriorPackageCheckbox instanceof HTMLInputElement
           && basicExteriorPackageCheckbox instanceof HTMLInputElement
@@ -3315,7 +3337,6 @@
           ? Math.ceil(basicBundleSubtotal * (bundleDiscountPercent / 100))
           : 0;
         const totalBeforeDiscounts = totals.basicSubtotal + totals.addonsSubtotal;
-        const totalAfterManualDiscounts = discountedBasicSubtotal + totals.addonsSubtotal;
         const volumeDiscountPercent = totalBeforeDiscounts <= 200
           ? 0
           : totalBeforeDiscounts >= 1000
@@ -3564,6 +3585,11 @@
           ? breakdown.addonItems.map((item) => `${item.name} (${item.value})`).join(", ")
           : "None selected";
         const discountLines = selectedDiscounts.length ? selectedDiscounts.join(", ") : "None selected";
+        const volumeSavingsLine = `-CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`;
+        const bundleDiscountLine = `-CA$${breakdown.bundleDiscountAmount} (${Math.round(breakdown.bundleDiscountPercent)}%)`;
+        const selectedDiscountAmountLine = `-CA$${breakdown.manualDiscountAmount}`;
+        const totalDiscountsLine = `-CA$${breakdown.totalDiscountAmount}`;
+        const grandTotalLine = `CA$${breakdown.finalTotal}`;
         const calculatorDetails = hasInteracted
           ? [
             `Vehicle size: ${selectedVehicleSize}`,
@@ -3573,15 +3599,51 @@
             `Package subtotal: CA$${breakdown.basicSubtotal}`,
             `Add-ons subtotal: CA$${breakdown.addonsSubtotal}`,
             `Total before discounts: CA$${breakdown.totalBeforeDiscounts}`,
-            `Volume savings: -CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`,
-            `Interior+Exterior discount: -CA$${breakdown.bundleDiscountAmount} (${Math.round(breakdown.bundleDiscountPercent)}%)`,
-            `Selected discount amount: -CA$${breakdown.manualDiscountAmount}`,
-            `Total discounts: -CA$${breakdown.totalDiscountAmount}`,
-            `Grand total: CA$${breakdown.finalTotal}`,
+            `Volume savings: ${volumeSavingsLine}`,
+            `Interior+Exterior discount: ${bundleDiscountLine}`,
+            `Selected discount amount: ${selectedDiscountAmountLine}`,
+            `Total discounts: ${totalDiscountsLine}`,
+            `Grand total: ${grandTotalLine}`,
           ].join(" | ")
           : "Not specified";
         if (bookingCalculatorDetailsInput instanceof HTMLInputElement) {
           bookingCalculatorDetailsInput.value = calculatorDetails;
+        }
+        if (bookingCalcVehicleSizeInput instanceof HTMLInputElement) {
+          bookingCalcVehicleSizeInput.value = hasInteracted ? selectedVehicleSize : "Not specified";
+        }
+        if (bookingCalcPackagesInput instanceof HTMLInputElement) {
+          bookingCalcPackagesInput.value = hasInteracted ? packageLines : "Not specified";
+        }
+        if (bookingCalcAddonsInput instanceof HTMLInputElement) {
+          bookingCalcAddonsInput.value = hasInteracted ? addonLines : "Not specified";
+        }
+        if (bookingCalcManualDiscountsInput instanceof HTMLInputElement) {
+          bookingCalcManualDiscountsInput.value = hasInteracted ? discountLines : "Not specified";
+        }
+        if (bookingCalcPackageSubtotalInput instanceof HTMLInputElement) {
+          bookingCalcPackageSubtotalInput.value = hasInteracted ? `CA$${breakdown.basicSubtotal}` : "CA$0";
+        }
+        if (bookingCalcAddonsSubtotalInput instanceof HTMLInputElement) {
+          bookingCalcAddonsSubtotalInput.value = hasInteracted ? `CA$${breakdown.addonsSubtotal}` : "CA$0";
+        }
+        if (bookingCalcTotalBeforeDiscountsInput instanceof HTMLInputElement) {
+          bookingCalcTotalBeforeDiscountsInput.value = hasInteracted ? `CA$${breakdown.totalBeforeDiscounts}` : "CA$0";
+        }
+        if (bookingCalcVolumeSavingsInput instanceof HTMLInputElement) {
+          bookingCalcVolumeSavingsInput.value = hasInteracted ? volumeSavingsLine : "-CA$0 (0%)";
+        }
+        if (bookingCalcBundleDiscountInput instanceof HTMLInputElement) {
+          bookingCalcBundleDiscountInput.value = hasInteracted ? bundleDiscountLine : "-CA$0 (0%)";
+        }
+        if (bookingCalcSelectedDiscountAmountInput instanceof HTMLInputElement) {
+          bookingCalcSelectedDiscountAmountInput.value = hasInteracted ? selectedDiscountAmountLine : "-CA$0";
+        }
+        if (bookingCalcTotalDiscountsInput instanceof HTMLInputElement) {
+          bookingCalcTotalDiscountsInput.value = hasInteracted ? totalDiscountsLine : "-CA$0";
+        }
+        if (bookingCalcGrandTotalInput instanceof HTMLInputElement) {
+          bookingCalcGrandTotalInput.value = hasInteracted ? grandTotalLine : "CA$0";
         }
 
         bookingQuoteEmpty.hidden = hasInteracted;
@@ -4116,6 +4178,18 @@
           if (bookingCalculatorDetailsInput instanceof HTMLInputElement) {
             bookingCalculatorDetailsInput.value = "Skipped calculator";
           }
+          if (bookingCalcVehicleSizeInput instanceof HTMLInputElement) bookingCalcVehicleSizeInput.value = "Skipped calculator";
+          if (bookingCalcPackagesInput instanceof HTMLInputElement) bookingCalcPackagesInput.value = "Skipped calculator";
+          if (bookingCalcAddonsInput instanceof HTMLInputElement) bookingCalcAddonsInput.value = "Skipped calculator";
+          if (bookingCalcManualDiscountsInput instanceof HTMLInputElement) bookingCalcManualDiscountsInput.value = "Skipped calculator";
+          if (bookingCalcPackageSubtotalInput instanceof HTMLInputElement) bookingCalcPackageSubtotalInput.value = "Skipped calculator";
+          if (bookingCalcAddonsSubtotalInput instanceof HTMLInputElement) bookingCalcAddonsSubtotalInput.value = "Skipped calculator";
+          if (bookingCalcTotalBeforeDiscountsInput instanceof HTMLInputElement) bookingCalcTotalBeforeDiscountsInput.value = "Skipped calculator";
+          if (bookingCalcVolumeSavingsInput instanceof HTMLInputElement) bookingCalcVolumeSavingsInput.value = "Skipped calculator";
+          if (bookingCalcBundleDiscountInput instanceof HTMLInputElement) bookingCalcBundleDiscountInput.value = "Skipped calculator";
+          if (bookingCalcSelectedDiscountAmountInput instanceof HTMLInputElement) bookingCalcSelectedDiscountAmountInput.value = "Skipped calculator";
+          if (bookingCalcTotalDiscountsInput instanceof HTMLInputElement) bookingCalcTotalDiscountsInput.value = "Skipped calculator";
+          if (bookingCalcGrandTotalInput instanceof HTMLInputElement) bookingCalcGrandTotalInput.value = "Skipped calculator";
         });
       }
 

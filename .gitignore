@@ -156,3 +156,5 @@ __pycache__/
 helm/charts/*
 .vercel
 .env*.local
+
+node_modules/

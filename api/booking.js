@@ -38,6 +38,44 @@ function getCalculatorDetailsLines(detailsRaw) {
   return segments;
 }
 
+function getCalculatorFieldSummaryLines(formData) {
+  function shouldSkipCalculatorSummaryValue(value) {
+    const normalizedValue = str(value);
+    if (!normalizedValue) return true;
+    if (
+      normalizedValue === "Not specified"
+      || normalizedValue === "Skipped calculator"
+      || normalizedValue === "None selected"
+    ) {
+      return true;
+    }
+    return /^-?CA\$0(?:\s*\(0%\))?$/.test(normalizedValue);
+  }
+
+  const calculatorFieldPairs = [
+    ["Vehicle size", "calculator_vehicle_size"],
+    ["Packages", "calculator_packages"],
+    ["Add-ons", "calculator_addons"],
+    ["Manual discounts", "calculator_manual_discounts"],
+    ["Package subtotal", "calculator_package_subtotal"],
+    ["Add-ons subtotal", "calculator_addons_subtotal"],
+    ["Total before discounts", "calculator_total_before_discounts"],
+    ["Volume savings", "calculator_volume_savings"],
+    ["Interior+Exterior discount", "calculator_bundle_discount"],
+    ["Selected discount amount", "calculator_selected_discount_amount"],
+    ["Total discounts", "calculator_total_discounts"],
+    ["Grand total", "calculator_grand_total"],
+  ];
+
+  return calculatorFieldPairs
+    .map(([label, key]) => {
+      const value = str(formData.get(key));
+      if (shouldSkipCalculatorSummaryValue(value)) return "";
+      return `${label}: ${value}`;
+    })
+    .filter(Boolean);
+}
+
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   const chunk = 0x8000;
@@ -212,6 +250,8 @@ export default async function handler(request) {
   const packageType = str(formData.get("package_type")) || "Not specified";
   const calculatorDetails = str(formData.get("calculator_details")) || "Not specified";
   const calculatorDetailsLines = getCalculatorDetailsLines(calculatorDetails);
+  const calculatorFieldLines = getCalculatorFieldSummaryLines(formData);
+  const calculatorSummaryLines = calculatorFieldLines.length ? calculatorFieldLines : calculatorDetailsLines;
 
   if (!clientName || !clientEmail || !clientMobile || !clientAddress || !preferredStart || !preferredEnd || !packageType) {
     console.warn(`[${requestId}] Missing required fields`, {
@@ -288,7 +328,7 @@ export default async function handler(request) {
     `Preferred to: ${preferredEnd}`,
     `Package type: ${packageType}`,
     "Price calculator details:",
-    ...calculatorDetailsLines.map((line) => `  - ${line}`),
+    ...calculatorSummaryLines.map((line) => `  - ${line}`),
     ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }),
   ].join("\n");
 
@@ -380,7 +420,7 @@ export default async function handler(request) {
       preferredStart,
       preferredEnd,
       packageType,
-      calculatorDetailsLines,
+      calculatorDetailsLines: calculatorSummaryLines,
       photoCount,
       skippedPhotos,
     });
