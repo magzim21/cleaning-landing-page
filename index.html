@@ -21,6 +21,8 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_CA">
     <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -288,6 +290,14 @@
         .signal-card {
           opacity: 1;
           transform: none;
+          animation: none;
+          transition: none;
+        }
+
+        .price-calculator-total,
+        .price-calculator-total.is-increasing,
+        .price-calculator-total.is-decreasing,
+        .price-calculator-total.is-water-wet {
           animation: none;
           transition: none;
         }
@@ -1092,6 +1102,8 @@
         align-items: baseline;
         justify-content: space-between;
         gap: 10px;
+        transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
       }
 
       .price-calculator-total-label {
@@ -1102,12 +1114,19 @@
         letter-spacing: 0.04em;
       }
 
+      .price-calculator-min-note {
+        margin: 6px 0 0;
+        font-size: 0.68rem;
+        color: #86efac;
+        text-align: right;
+      }
+
       .price-calculator-total.is-increasing {
-        animation: total-price-pulse-in 220ms ease-out;
+        animation: total-price-pulse-in 420ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
       }
 
       .price-calculator-total.is-decreasing {
-        animation: total-price-pulse-out 200ms ease-out;
+        animation: total-price-pulse-out 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .price.is-increasing,
@@ -1226,14 +1245,22 @@
 
       @keyframes total-price-pulse-in {
         0% {
+          transform: translateY(0) scale(var(--price-scale));
           filter: brightness(1);
           text-shadow: none;
         }
-        50% {
-          filter: brightness(1.15);
-          text-shadow: 0 0 10px rgba(56, 189, 248, 0.28);
+        35% {
+          transform: translateY(-3px) scale(calc(var(--price-scale) + 0.14));
+          filter: brightness(1.28) saturate(1.2);
+          text-shadow:
+            0 0 18px rgba(56, 189, 248, 0.56),
+            0 0 8px rgba(14, 165, 233, 0.48);
+        }
+        68% {
+          transform: translateY(0) scale(calc(var(--price-scale) + 0.05));
         }
         100% {
+          transform: translateY(0) scale(var(--price-scale));
           filter: brightness(1);
           text-shadow: none;
         }
@@ -1241,13 +1268,22 @@
 
       @keyframes total-price-pulse-out {
         0% {
+          transform: translateY(0) scale(var(--price-scale));
           filter: brightness(1);
+          text-shadow: none;
         }
-        50% {
-          filter: brightness(0.88);
+        32% {
+          transform: translateY(2px) scale(calc(var(--price-scale) - 0.06));
+          filter: brightness(0.8) saturate(0.92);
+          text-shadow: 0 0 10px rgba(148, 163, 184, 0.3);
+        }
+        66% {
+          transform: translateY(0) scale(calc(var(--price-scale) - 0.02));
         }
         100% {
+          transform: translateY(0) scale(var(--price-scale));
           filter: brightness(1);
+          text-shadow: none;
         }
       }
 
@@ -2383,6 +2419,13 @@
                 <span class="addon-price discount-price">-20%</span>
               </label>
             </article>
+            <article class="addon-card discount-card">
+              <label class="addon-label discount-label" for="discount-seniors-single-moms">
+                <input type="checkbox" id="discount-seniors-single-moms" data-discount-percent="20">
+                <span class="addon-name discount-name">For seniors and single moms</span>
+                <span class="addon-price discount-price">-20%</span>
+              </label>
+            </article>
             <div class="volume-discount" aria-label="Volume discount">
               <div class="volume-discount__meta">
                 <span>Volume discount</span>
@@ -2417,18 +2460,19 @@
                 <strong id="quote-before-discount-total">CA$0</strong>
               </div>
               <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
-                <span>Clean-car discount</span>
-                <strong id="quote-manual-discount">-CA$0</strong>
-              </div>
-              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                 <span>Volume discount</span>
                 <strong id="quote-volume-discount">-CA$0 (0%)</strong>
+              </div>
+              <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                <span>Clean-car discount</span>
+                <strong id="quote-manual-discount">-CA$0</strong>
               </div>
             </div>
             <div class="price-calculator-total-row">
               <span class="price-calculator-total-label">Grand total</span>
               <p class="price-calculator-total" id="price-calculator-total">CA$0</p>
             </div>
+            <p class="price-calculator-min-note" id="price-calculator-min-note" hidden>*Minimum service total is CA$120.</p>
           </div>
         </div>
       </section>
@@ -2644,18 +2688,19 @@
                     <strong id="booking-quote-before-discount-total">CA$0</strong>
                   </div>
                   <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
-                    <span>Selected discount</span>
-                    <strong id="booking-quote-manual-discount">-CA$0</strong>
-                  </div>
-                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
                     <span>Volume savings</span>
                     <strong id="booking-quote-volume-discount">-CA$0 (0%)</strong>
+                  </div>
+                  <div class="price-calculator-breakdown__row price-calculator-breakdown__row--discount">
+                    <span>Selected discount</span>
+                    <strong id="booking-quote-manual-discount">-CA$0</strong>
                   </div>
                 </div>
                 <div class="price-calculator-total-row">
                   <span class="price-calculator-total-label">Grand total</span>
                   <p class="price-calculator-total" id="booking-price-calculator-total">CA$0</p>
                 </div>
+                <p class="price-calculator-min-note" id="booking-price-calculator-min-note" hidden>*Minimum service total is CA$120.</p>
               </div>
             </div>
           </div>
@@ -2760,6 +2805,10 @@
       const priceCalculatorSummary = document.getElementById("price-calculator-summary");
       const priceCalculatorCloseButton = document.getElementById("price-calculator-close");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
+      const priceCalculatorMinimumNote = document.getElementById("price-calculator-min-note");
+      const priceCalculatorTotalRow = priceCalculatorTotal instanceof HTMLElement
+        ? priceCalculatorTotal.closest(".price-calculator-total-row")
+        : null;
       const cardToggleEnabledMediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
       const mobilePriceSummaryMediaQuery = window.matchMedia("(max-width: 767px)");
       const quoteBasicSubtotal = document.getElementById("quote-basic-subtotal");
@@ -2777,6 +2826,10 @@
       const bookingQuoteGoToCalculator = document.getElementById("booking-go-to-calculator");
       const bookingQuoteSkipCalculator = document.getElementById("booking-skip-calculator");
       const bookingPriceCalculatorTotal = document.getElementById("booking-price-calculator-total");
+      const bookingPriceCalculatorMinimumNote = document.getElementById("booking-price-calculator-min-note");
+      const bookingPriceCalculatorTotalRow = bookingPriceCalculatorTotal instanceof HTMLElement
+        ? bookingPriceCalculatorTotal.closest(".price-calculator-total-row")
+        : null;
       const bookingQuoteBasicSubtotal = document.getElementById("booking-quote-basic-subtotal");
       const bookingQuoteAddonsSubtotal = document.getElementById("booking-quote-addons-subtotal");
       const bookingQuotePackageItems = document.getElementById("booking-quote-package-items");
@@ -2893,6 +2946,46 @@
         priceElement.dataset.currentPriceValue = String(nextAmount);
       }
 
+      function animateGrandTotalDelta(priceElement, nextAmount, nextLabel) {
+        if (!(priceElement instanceof HTMLElement)) return;
+        const previousAmountFromDataset = Number.parseFloat(priceElement.dataset.currentTotalValue || "");
+        const previousAmountFromText = Number.parseFloat((priceElement.textContent || "").replace(/[^0-9.]/g, ""));
+        const previousAmount = Number.isFinite(previousAmountFromDataset)
+          ? previousAmountFromDataset
+          : previousAmountFromText;
+        if (Number.isFinite(previousAmount) && previousAmount !== nextAmount) {
+          priceElement.classList.remove("is-increasing", "is-decreasing");
+          void priceElement.offsetWidth;
+          priceElement.classList.add(nextAmount > previousAmount ? "is-increasing" : "is-decreasing");
+        }
+        priceElement.style.setProperty("--price-scale", String(
+          nextAmount <= 0
+            ? 1
+            : nextAmount <= 600
+              ? 1 + (nextAmount / 1200)
+              : nextAmount <= 1000
+                ? 1.5 + ((nextAmount - 600) / 1600)
+                : 1.75
+        ));
+        priceElement.textContent = nextLabel;
+        priceElement.dataset.currentTotalValue = String(nextAmount);
+      }
+
+      function animateSummaryRowReflow(rowElement) {
+        if (!(rowElement instanceof HTMLElement)) return;
+        const currentTop = rowElement.getBoundingClientRect().top;
+        const previousTop = Number.parseFloat(rowElement.dataset.previousTop || "");
+        rowElement.dataset.previousTop = String(currentTop);
+        if (!Number.isFinite(previousTop)) return;
+        const deltaY = previousTop - currentTop;
+        if (Math.abs(deltaY) < 0.5) return;
+        rowElement.style.transition = "none";
+        rowElement.style.transform = `translateY(${deltaY}px)`;
+        void rowElement.offsetWidth;
+        rowElement.style.transition = "";
+        rowElement.style.transform = "translateY(0)";
+      }
+
       function isVehicleSizeSensitiveCheckbox(checkbox) {
         if (!(checkbox instanceof HTMLInputElement)) return false;
         const addonLabel = checkbox.closest(".addon-label");
@@ -3003,10 +3096,10 @@
         }
         const volumeDiscountRatio = volumeDiscountPercent / 100;
         const volumeDiscountAmount = Math.ceil(totalBeforeDiscounts * volumeDiscountRatio);
-        const finalTotal = Math.max(
-          0,
-          totalBeforeDiscounts - manualDiscountAmount - volumeDiscountAmount
-        );
+        const discountedTotal = totalBeforeDiscounts - manualDiscountAmount - volumeDiscountAmount;
+        const minimumChargeTotal = totalBeforeDiscounts > 0 ? 120 : 0;
+        const finalTotal = Math.max(minimumChargeTotal, discountedTotal);
+        const minimumPriceBackstopApplied = totalBeforeDiscounts > 0 && discountedTotal < minimumChargeTotal;
         return {
           basicSubtotal: totals.basicSubtotal,
           addonsSubtotal: totals.addonsSubtotal,
@@ -3016,6 +3109,7 @@
           manualDiscountAmount,
           volumeDiscountAmount,
           volumeDiscountPercent,
+          minimumPriceBackstopApplied,
           finalTotal,
         };
       }
@@ -3101,8 +3195,8 @@
             `Package subtotal: CA$${breakdown.basicSubtotal}`,
             `Add-ons subtotal: CA$${breakdown.addonsSubtotal}`,
             `Total before discounts: CA$${breakdown.totalBeforeDiscounts}`,
-            `Selected discount amount: -CA$${breakdown.manualDiscountAmount}`,
             `Volume savings: -CA$${breakdown.volumeDiscountAmount} (${Math.round(breakdown.volumeDiscountPercent)}%)`,
+            `Selected discount amount: -CA$${breakdown.manualDiscountAmount}`,
             `Grand total: CA$${breakdown.finalTotal}`,
           ].join(" | ")
           : "Not specified";
@@ -3119,7 +3213,12 @@
           return;
         }
 
-        if (bookingPriceCalculatorTotal) bookingPriceCalculatorTotal.textContent = `CA$${breakdown.finalTotal}`;
+        if (bookingPriceCalculatorTotal) {
+          animateGrandTotalDelta(bookingPriceCalculatorTotal, breakdown.finalTotal, `CA$${breakdown.finalTotal}`);
+        }
+        if (bookingPriceCalculatorMinimumNote) {
+          bookingPriceCalculatorMinimumNote.hidden = !breakdown.minimumPriceBackstopApplied;
+        }
         updateQuoteNodes({
           basicSubtotalNode: bookingQuoteBasicSubtotal,
           addonsSubtotalNode: bookingQuoteAddonsSubtotal,
@@ -3129,6 +3228,7 @@
           manualDiscountNode: bookingQuoteManualDiscount,
           volumeDiscountNode: bookingQuoteVolumeDiscount,
         }, breakdown);
+        animateSummaryRowReflow(bookingPriceCalculatorTotalRow);
       }
 
       function updatePriceCalculatorTotal() {
@@ -3143,21 +3243,8 @@
             applyMobileSummaryLayoutState(false);
           }
         }
-        const priceScale =
-          total <= 0
-            ? 1
-            : total <= 600
-              ? 1 + (total / 1200)
-              : total <= 1000
-                ? 1.5 + ((total - 600) / 1600)
-                : 1.75;
         const totalLabel = `CA$${total}`;
         const previousTotalValue = Number.parseFloat(priceCalculatorTotal.dataset.currentTotalValue || "");
-        if (Number.isFinite(previousTotalValue) && previousTotalValue !== total) {
-          priceCalculatorTotal.classList.remove("is-increasing", "is-decreasing");
-          void priceCalculatorTotal.offsetWidth;
-          priceCalculatorTotal.classList.add(total > previousTotalValue ? "is-increasing" : "is-decreasing");
-        }
         const crossedUpThreshold =
           Number.isFinite(previousTotalValue)
           && previousTotalValue < waterSplashThreshold
@@ -3171,9 +3258,10 @@
         if (shouldSplash) {
           triggerPriceWaterSplash();
         }
-        priceCalculatorTotal.style.setProperty("--price-scale", String(priceScale));
-        priceCalculatorTotal.textContent = totalLabel;
-        priceCalculatorTotal.dataset.currentTotalValue = String(total);
+        animateGrandTotalDelta(priceCalculatorTotal, total, totalLabel);
+        if (priceCalculatorMinimumNote) {
+          priceCalculatorMinimumNote.hidden = !breakdown.minimumPriceBackstopApplied;
+        }
         updateQuoteNodes({
           basicSubtotalNode: quoteBasicSubtotal,
           addonsSubtotalNode: quoteAddonsSubtotal,
@@ -3183,6 +3271,7 @@
           manualDiscountNode: quoteManualDiscount,
           volumeDiscountNode: quoteVolumeDiscount,
         }, breakdown);
+        animateSummaryRowReflow(priceCalculatorTotalRow);
         updateBookingQuoteSummary(breakdown);
       }
 
