@@ -1512,6 +1512,23 @@
         margin-top: 14px;
         display: grid;
         gap: 8px;
+        max-height: 260px;
+        opacity: 1;
+        transform: translateY(0);
+        overflow: hidden;
+        transition: max-height 260ms ease, opacity 220ms ease, transform 220ms ease, margin-top 220ms ease;
+      }
+
+      .discounts-block.is-collapsed {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-8px);
+        margin-top: 0;
+        pointer-events: none;
+      }
+
+      .discounts-block[hidden] {
+        display: none;
       }
 
       .discounts-title {
@@ -1523,6 +1540,12 @@
       }
 
       .discount-card {
+        background: var(--bg-card);
+        border-color: var(--border);
+        transition: background 180ms ease, border-color 180ms ease;
+      }
+
+      .discount-card.is-active {
         background: rgba(22, 101, 52, 0.2);
         border-color: rgba(134, 239, 172, 0.4);
       }
@@ -1538,6 +1561,11 @@
 
       .discount-name,
       .discount-price {
+        color: var(--text-muted);
+      }
+
+      .discount-card.is-active .discount-name,
+      .discount-card.is-active .discount-price {
         color: #86efac;
       }
 
@@ -1545,6 +1573,7 @@
         margin-top: 2px;
         display: grid;
         gap: 8px;
+        --volume-green-strength: 0;
       }
 
       .volume-discount__meta {
@@ -1553,14 +1582,16 @@
         justify-content: space-between;
         gap: 10px;
         font-size: 0.78rem;
-        color: #86efac;
+        color: color-mix(in srgb, var(--text-muted) calc(100% - (var(--volume-green-strength) * 100%)), #86efac calc(var(--volume-green-strength) * 100%));
+        transition: color 220ms ease;
       }
 
       .volume-discount__value {
         font-family: "Outfit", sans-serif;
         font-size: 0.9rem;
         font-weight: 600;
-        color: #bbf7d0;
+        color: color-mix(in srgb, var(--text) calc(100% - (var(--volume-green-strength) * 100%)), #bbf7d0 calc(var(--volume-green-strength) * 100%));
+        transition: color 220ms ease;
       }
 
       .volume-discount__rail {
@@ -1568,7 +1599,8 @@
         height: 14px;
         border-radius: 999px;
         overflow: hidden;
-        background: rgba(20, 83, 45, 0.35);
+        background: color-mix(in srgb, rgba(30, 41, 59, 0.5) calc(100% - (var(--volume-green-strength) * 100%)), rgba(20, 83, 45, 0.45) calc(var(--volume-green-strength) * 100%));
+        transition: background 220ms ease;
       }
 
       .volume-discount__rail::before,
@@ -1597,8 +1629,12 @@
         inset: 0 auto 0 0;
         width: 0%;
         border-radius: inherit;
-        background: linear-gradient(90deg, rgba(34, 197, 94, 0.72), rgba(74, 222, 128, 0.86));
-        transition: width 220ms ease;
+        background: linear-gradient(
+          90deg,
+          color-mix(in srgb, rgba(34, 197, 94, 0.35) calc(100% - (var(--volume-green-strength) * 100%)), rgba(34, 197, 94, 0.9) calc(var(--volume-green-strength) * 100%)),
+          color-mix(in srgb, rgba(74, 222, 128, 0.42) calc(100% - (var(--volume-green-strength) * 100%)), rgba(134, 239, 172, 0.95) calc(var(--volume-green-strength) * 100%))
+        );
+        transition: width 220ms ease, background 220ms ease;
       }
 
       .volume-discount__head {
@@ -1609,17 +1645,20 @@
         height: 16px;
         border-radius: 50%;
         border: 2px solid rgba(240, 253, 244, 0.7);
-        background: #22c55e;
-        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.45), 0 0 12px rgba(74, 222, 128, 0.5);
+        background: color-mix(in srgb, #16a34a calc(100% - (var(--volume-green-strength) * 100%)), #86efac calc(var(--volume-green-strength) * 100%));
+        box-shadow:
+          0 0 0 1px color-mix(in srgb, rgba(34, 197, 94, 0.2) calc(100% - (var(--volume-green-strength) * 100%)), rgba(34, 197, 94, 0.55) calc(var(--volume-green-strength) * 100%)),
+          0 0 calc(4px + (18px * var(--volume-green-strength))) color-mix(in srgb, rgba(74, 222, 128, 0.2) calc(100% - (var(--volume-green-strength) * 100%)), rgba(134, 239, 172, 0.65) calc(var(--volume-green-strength) * 100%));
         transform: translate(-50%, -50%);
-        transition: left 220ms ease;
+        transition: left 220ms ease, background 220ms ease, box-shadow 220ms ease;
       }
 
       .volume-discount__ticks {
         display: flex;
         justify-content: space-between;
         font-size: 0.68rem;
-        color: rgba(187, 247, 208, 0.78);
+        color: color-mix(in srgb, rgba(148, 163, 184, 0.82) calc(100% - (var(--volume-green-strength) * 100%)), rgba(187, 247, 208, 0.82) calc(var(--volume-green-strength) * 100%));
+        transition: color 220ms ease;
       }
 
       /* Steps */
@@ -2362,7 +2401,7 @@
               <button type="button" data-services-car-size-step="4">Large Truck / Van</button>
             </div>
           </div>
-          <div class="discounts-block" id="discounts-panel" hidden>
+          <div class="discounts-block is-collapsed" id="discounts-panel" hidden>
             <p class="discounts-title">Discounts</p>
             <article class="addon-card discount-card">
               <label class="addon-label discount-label" for="discount-clean-car">
@@ -2957,6 +2996,7 @@
       const volumeDiscountValue = document.getElementById("volume-discount-value");
       const volumeDiscountFill = document.getElementById("volume-discount-fill");
       const volumeDiscountHead = document.getElementById("volume-discount-head");
+      const volumeDiscountPanel = document.querySelector(".volume-discount");
       const interiorExteriorDiscountIndicator = document.getElementById("discount-interior-exterior");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
@@ -3010,6 +3050,7 @@
       const bookingQuoteTotalDiscounts = document.getElementById("booking-quote-total-discounts");
       const bookingQuoteDiscountsTitle = document.getElementById("booking-quote-discounts-title");
       const bookingQuoteVehicleSize = document.getElementById("booking-quote-vehicle-size");
+      const discountCards = document.querySelectorAll("#discounts-panel .discount-card");
       const vehicleSizeSensitiveElements = document.querySelectorAll("#services .vehicle-size-sensitive");
       const bookedFlashStorageKey = "idd-booking-submitted";
       const serviceSelectionsStorageKey = "idd-service-selections";
@@ -3290,6 +3331,9 @@
         if (volumeDiscountHead) {
           volumeDiscountHead.style.left = `${volumeDiscountProgress * 100}%`;
         }
+        if (volumeDiscountPanel instanceof HTMLElement) {
+          volumeDiscountPanel.style.setProperty("--volume-green-strength", String(volumeDiscountProgress));
+        }
         const volumeDiscountRatio = volumeDiscountPercent / 100;
         const volumeDiscountAmount = Math.ceil(totalBeforeDiscounts * volumeDiscountRatio);
         const totalDiscountAmount = manualDiscountAmount + bundleDiscountAmount + volumeDiscountAmount;
@@ -3317,6 +3361,16 @@
       function syncInteriorExteriorDiscountIndicator(hasSelectedBasicBundle) {
         if (!(interiorExteriorDiscountIndicator instanceof HTMLInputElement)) return;
         interiorExteriorDiscountIndicator.checked = Boolean(hasSelectedBasicBundle);
+        syncDiscountCardStates();
+      }
+
+      function syncDiscountCardStates() {
+        discountCards.forEach((card) => {
+          if (!(card instanceof HTMLElement)) return;
+          const checkbox = card.querySelector("input[type='checkbox']");
+          const isChecked = checkbox instanceof HTMLInputElement && checkbox.checked;
+          card.classList.toggle("is-active", isChecked);
+        });
       }
 
       function triggerPriceWaterSplash() {
@@ -3641,6 +3695,30 @@
         columnElement.setAttribute("aria-hidden", isVisible ? "false" : "true");
       }
 
+      function setDiscountsPanelVisibility(isVisible) {
+        if (!(discountsPanel instanceof HTMLElement)) return;
+        if (isVisible) {
+          discountsPanel.hidden = false;
+          discountsPanel.setAttribute("aria-hidden", "false");
+          requestAnimationFrame(() => {
+            discountsPanel.classList.remove("is-collapsed");
+          });
+          return;
+        }
+
+        discountsPanel.setAttribute("aria-hidden", "true");
+        if (discountsPanel.hidden) {
+          discountsPanel.classList.add("is-collapsed");
+          return;
+        }
+        discountsPanel.classList.add("is-collapsed");
+        window.setTimeout(() => {
+          if (discountsPanel && discountsPanel.classList.contains("is-collapsed")) {
+            discountsPanel.hidden = true;
+          }
+        }, 280);
+      }
+
       function syncAddonColumns() {
         const showInteriorAddons = Boolean(
           basicInteriorPackageCheckbox instanceof HTMLInputElement && basicInteriorPackageCheckbox.checked
@@ -3651,14 +3729,12 @@
         const shouldShowDiscounts = showInteriorAddons || showExteriorAddons;
         syncAddonColumnVisibility(interiorAddonsPanel, showInteriorAddons);
         syncAddonColumnVisibility(exteriorAddonsPanel, showExteriorAddons);
-        if (discountsPanel instanceof HTMLElement) {
-          discountsPanel.hidden = !shouldShowDiscounts;
-          discountsPanel.setAttribute("aria-hidden", shouldShowDiscounts ? "false" : "true");
-        }
+        setDiscountsPanelVisibility(shouldShowDiscounts);
         if (!shouldShowDiscounts) {
           discountCheckboxes.forEach((checkbox) => {
             if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
           });
+          syncDiscountCardStates();
         }
       }
 
@@ -4111,11 +4187,13 @@
       });
       discountCheckboxes.forEach((checkbox) => {
         checkbox.addEventListener("change", () => {
+          syncDiscountCardStates();
           updatePriceCalculatorTotal();
         });
       });
       restoreServiceSelections();
       syncAddonColumns();
+      syncDiscountCardStates();
       updatePriceCalculatorTotal();
       applyMobileSummaryLayoutState(false);
 
