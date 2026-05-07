@@ -658,6 +658,14 @@
         gap: 20px;
       }
 
+      #price-calculator-grid {
+        align-items: start;
+      }
+
+      #price-calculator-grid > .card {
+        min-height: auto;
+      }
+
       @media (min-width: 640px) {
         .cards {
           grid-template-columns: repeat(2, 1fr);
@@ -696,10 +704,44 @@
         animation-delay: 0.28s;
       }
 
-      .card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(56, 189, 248, 0.32);
-        box-shadow: 0 16px 34px rgba(2, 8, 23, 0.45);
+      @media (hover: hover) and (pointer: fine) {
+        .card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(56, 189, 248, 0.32);
+          box-shadow: 0 16px 34px rgba(2, 8, 23, 0.45);
+        }
+      }
+
+      #services .card.is-addon-interacting,
+      #services .card.is-addon-interacting:hover {
+        transform: none;
+        border-color: var(--border);
+        box-shadow: none;
+      }
+
+      #services .card:hover:has(.package-addons:hover) {
+        transform: none;
+        border-color: var(--border);
+        box-shadow: none;
+      }
+
+      .addon-card.is-click-flash {
+        animation: addon-card-click-flash 200ms ease-out;
+      }
+
+      @keyframes addon-card-click-flash {
+        0% {
+          transform: scale(1);
+          border-color: var(--border);
+        }
+        50% {
+          transform: scale(0.985);
+          border-color: rgba(56, 189, 248, 0.4);
+        }
+        100% {
+          transform: scale(1);
+          border-color: var(--border);
+        }
       }
 
       #services .card,
@@ -789,6 +831,49 @@
         flex-direction: column;
         gap: 2px;
         align-items: flex-end;
+        overflow: visible;
+      }
+
+      .price-calculator-summary::before,
+      .price-calculator-summary::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .price-calculator-summary::before {
+        width: 120%;
+        height: 120%;
+        right: -10%;
+        top: -12%;
+        border-radius: 999px;
+        border: 2px solid rgba(125, 211, 252, 0.6);
+        transform: scale(0.55);
+      }
+
+      .price-calculator-summary::after {
+        width: 14px;
+        height: 14px;
+        right: 18px;
+        top: 12px;
+        border-radius: 999px;
+        background:
+          radial-gradient(circle at 35% 35%, rgba(224, 242, 254, 0.95) 0%, rgba(56, 189, 248, 0.55) 58%, rgba(14, 116, 144, 0.18) 100%);
+        box-shadow:
+          -18px 8px 0 -3px rgba(125, 211, 252, 0.55),
+          -30px 18px 0 -5px rgba(56, 189, 248, 0.42),
+          10px 16px 0 -5px rgba(125, 211, 252, 0.45),
+          16px 4px 0 -6px rgba(56, 189, 248, 0.4);
+        transform: scale(0.7);
+      }
+
+      .price-calculator-summary.is-water-splash::before {
+        animation: price-water-ripple 700ms ease-out;
+      }
+
+      .price-calculator-summary.is-water-splash::after {
+        animation: price-water-droplets 700ms ease-out;
       }
 
       .price-calculator-summary p {
@@ -798,85 +883,117 @@
       }
 
       .price-calculator-total {
+        --price-scale: 1;
         font-family: "Outfit", sans-serif;
         font-size: 1.2rem;
         font-weight: 700;
         color: var(--text);
+        display: inline-block;
+        margin-top: 2px;
+        transform: scale(var(--price-scale));
+        transform-origin: right top;
+        transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
       }
 
       .price-calculator-total.is-increasing {
-        animation: total-price-scale-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+        animation: total-price-pulse-in 220ms ease-out;
       }
 
       .price-calculator-total.is-decreasing {
-        animation: total-price-scale-out 280ms cubic-bezier(0.22, 1, 0.36, 1);
+        animation: total-price-pulse-out 200ms ease-out;
       }
 
-      @keyframes total-price-scale-in {
+      .price-calculator-total.is-water-wet {
+        animation: total-price-water-wet 700ms ease-out;
+      }
+
+      @keyframes total-price-pulse-in {
         0% {
-          transform: scale(0.9);
+          filter: brightness(1);
+          text-shadow: none;
         }
-        60% {
-          transform: scale(1.1);
+        50% {
+          filter: brightness(1.15);
+          text-shadow: 0 0 10px rgba(56, 189, 248, 0.28);
         }
         100% {
-          transform: scale(1);
+          filter: brightness(1);
+          text-shadow: none;
         }
       }
 
-      @keyframes total-price-scale-out {
+      @keyframes total-price-pulse-out {
         0% {
-          transform: scale(1);
+          filter: brightness(1);
         }
-        55% {
-          transform: scale(0.85);
+        50% {
+          filter: brightness(0.88);
         }
         100% {
-          transform: scale(1);
+          filter: brightness(1);
         }
       }
 
-      .addons-head {
-        margin: 0 0 12px;
-        font-family: "Outfit", sans-serif;
-        font-size: 1.05rem;
-        font-weight: 600;
+      @keyframes total-price-water-wet {
+        0% {
+          filter: brightness(1) saturate(1);
+          text-shadow: none;
+        }
+        35% {
+          filter: brightness(1.18) saturate(1.2);
+          text-shadow:
+            0 0 16px rgba(125, 211, 252, 0.55),
+            0 0 6px rgba(14, 165, 233, 0.45);
+        }
+        100% {
+          filter: brightness(1) saturate(1);
+          text-shadow: none;
+        }
       }
 
-      .addons-panel {
+      @keyframes price-water-ripple {
+        0% {
+          opacity: 0;
+          transform: scale(0.55);
+        }
+        20% {
+          opacity: 0.7;
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.26);
+        }
+      }
+
+      @keyframes price-water-droplets {
+        0% {
+          opacity: 0;
+          transform: translateY(0) scale(0.7);
+        }
+        25% {
+          opacity: 0.9;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(16px) scale(1.08);
+        }
+      }
+
+      .package-addons {
         margin-top: 0;
         max-height: 0;
         opacity: 0;
         overflow: hidden;
-        transform: translateY(-12px);
-        transition: max-height 0.45s ease, opacity 0.3s ease, transform 0.45s ease, margin-top 0.45s ease;
+        transform: translateY(-8px);
+        transition: max-height 0.4s ease, opacity 0.25s ease, transform 0.4s ease, margin-top 0.4s ease;
       }
 
-      .addons-panel.is-visible {
-        margin-top: 24px;
-        max-height: 1400px;
+      .package-addons.is-visible {
+        margin-top: 12px;
+        max-height: 1800px;
         opacity: 1;
         transform: translateY(0);
-      }
-
-      .addons-columns {
-        display: grid;
-        gap: 12px;
-      }
-
-      @media (min-width: 640px) {
-        .addons-columns {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      .addons-column {
-        display: grid;
-        gap: 12px;
-      }
-
-      .addons-column[hidden] {
-        display: none;
       }
 
       .addons-column-title {
@@ -1601,25 +1718,7 @@
                 <li>Interior glass finish + light exterior glass wash</li>
               </ul>
               <p class="price">From CA$149 <small>/ sedan</small></p>
-            </article>
-            <article class="card">
-              <div class="service-block-select">
-                <input type="checkbox" id="service-basic-exterior" data-service-price="199">
-                <label for="service-basic-exterior">Basic Exterior Detailing</label>
-              </div>
-              <ul class="package-points">
-                <li>Pressure wash, dense foam, and hand-dry with a fresh microfiber towel</li>
-                <li>Wheel and tire cleaning</li>
-                <li>Light exterior glass wash</li>
-              </ul>
-              <p class="price">From CA$199 <small>/ sedan</small></p>
-            </article>
-          </div>
-
-          <div class="addons-panel" id="addons-panel" aria-hidden="true">
-            <p class="addons-head">Optional add-ons</p>
-            <div class="addons-columns" id="price-calculator-addons">
-              <div class="addons-column" id="addons-column-interior" hidden>
+              <div class="package-addons" id="addons-panel-interior" aria-hidden="true">
                 <p class="addons-column-title">Interior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-upholstery-deep-cleaning">
@@ -1691,9 +1790,20 @@
                     <span class="addon-price">$70</span>
                   </label>
                 </article>
-
               </div>
-              <div class="addons-column" id="addons-column-exterior" hidden>
+            </article>
+            <article class="card">
+              <div class="service-block-select">
+                <input type="checkbox" id="service-basic-exterior" data-service-price="199">
+                <label for="service-basic-exterior">Basic Exterior Detailing</label>
+              </div>
+              <ul class="package-points">
+                <li>Pressure wash, dense foam, and hand-dry with a fresh microfiber towel</li>
+                <li>Wheel and tire cleaning</li>
+                <li>Light exterior glass wash</li>
+              </ul>
+              <p class="price">From CA$199 <small>/ sedan</small></p>
+              <div class="package-addons" id="addons-panel-exterior" aria-hidden="true">
                 <p class="addons-column-title">Exterior add-ons</p>
                 <article class="addon-card">
                   <label class="addon-label" for="addon-hard-water-spots">
@@ -1759,7 +1869,7 @@
                   </label>
                 </article>
               </div>
-            </div>
+            </article>
           </div>
           <div class="price-calculator-summary" aria-live="polite">
             <p>Selected blocks total</p>
@@ -2047,21 +2157,47 @@
       const servicePriceCheckboxes = document.querySelectorAll("#services input[type='checkbox'][data-service-price]");
       const basicInteriorPackageCheckbox = document.getElementById("service-basic-interior");
       const basicExteriorPackageCheckbox = document.getElementById("service-basic-exterior");
-      const addonsPanel = document.getElementById("addons-panel");
-      const interiorAddonsColumn = document.getElementById("addons-column-interior");
-      const exteriorAddonsColumn = document.getElementById("addons-column-exterior");
-      const clickablePriceBlocks = document.querySelectorAll("#services .card, #services .addon-card");
+      const interiorAddonsPanel = document.getElementById("addons-panel-interior");
+      const exteriorAddonsPanel = document.getElementById("addons-panel-exterior");
+      const packageAddonsContainers = document.querySelectorAll("#services .package-addons");
+      const clickableBasicBlocks = document.querySelectorAll("#price-calculator-grid > .card");
+      const clickableAddonBlocks = document.querySelectorAll("#services .package-addons .addon-card");
       const priceCalculatorTotal = document.getElementById("price-calculator-total");
       const bookedFlashStorageKey = "idd-booking-submitted";
+      const serviceSelectionsStorageKey = "idd-service-selections";
       let lastBookingTrigger = null;
+
+      function isPackageSelectedForAddonGroup(addonGroup) {
+        if (addonGroup === "interior") {
+          return Boolean(
+            basicInteriorPackageCheckbox instanceof HTMLInputElement && basicInteriorPackageCheckbox.checked
+          );
+        }
+        if (addonGroup === "exterior") {
+          return Boolean(
+            basicExteriorPackageCheckbox instanceof HTMLInputElement && basicExteriorPackageCheckbox.checked
+          );
+        }
+        return true;
+      }
 
       function updatePriceCalculatorTotal() {
         if (!priceCalculatorTotal || !servicePriceCheckboxes.length) return;
         const total = Array.from(servicePriceCheckboxes).reduce((sum, checkbox) => {
           if (!(checkbox instanceof HTMLInputElement) || !checkbox.checked) return sum;
+          const addonGroup = checkbox.dataset.addonGroup;
+          if (addonGroup && !isPackageSelectedForAddonGroup(addonGroup)) return sum;
           const servicePrice = Number.parseFloat(checkbox.dataset.servicePrice || "0");
           return sum + (Number.isFinite(servicePrice) ? servicePrice : 0);
         }, 0);
+        const priceScale =
+          total <= 0
+            ? 1
+            : total <= 600
+              ? 1 + (total / 600)
+              : total <= 1000
+                ? 2 + ((total - 600) / 400)
+                : 3;
         const totalLabel = `CA$${total}`;
         const previousTotalValue = Number.parseFloat(priceCalculatorTotal.dataset.currentTotalValue || "");
         if (Number.isFinite(previousTotalValue) && previousTotalValue !== total) {
@@ -2069,18 +2205,15 @@
           void priceCalculatorTotal.offsetWidth;
           priceCalculatorTotal.classList.add(total > previousTotalValue ? "is-increasing" : "is-decreasing");
         }
+        priceCalculatorTotal.style.setProperty("--price-scale", String(priceScale));
         priceCalculatorTotal.textContent = totalLabel;
         priceCalculatorTotal.dataset.currentTotalValue = String(total);
       }
 
       function syncAddonColumnVisibility(columnElement, isVisible) {
         if (!columnElement) return;
-        columnElement.hidden = !isVisible;
-        if (isVisible) return;
-        const addonCheckboxes = columnElement.querySelectorAll("input[type='checkbox'][data-service-price]");
-        addonCheckboxes.forEach((checkbox) => {
-          if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
-        });
+        columnElement.classList.toggle("is-visible", isVisible);
+        columnElement.setAttribute("aria-hidden", isVisible ? "false" : "true");
       }
 
       function syncAddonColumns() {
@@ -2090,13 +2223,47 @@
         const showExteriorAddons = Boolean(
           basicExteriorPackageCheckbox instanceof HTMLInputElement && basicExteriorPackageCheckbox.checked
         );
-        const showAnyAddons = showInteriorAddons || showExteriorAddons;
-        if (addonsPanel) {
-          addonsPanel.classList.toggle("is-visible", showAnyAddons);
-          addonsPanel.setAttribute("aria-hidden", showAnyAddons ? "false" : "true");
+        syncAddonColumnVisibility(interiorAddonsPanel, showInteriorAddons);
+        syncAddonColumnVisibility(exteriorAddonsPanel, showExteriorAddons);
+      }
+
+      function persistServiceSelections() {
+        const selectedServiceIds = Array.from(servicePriceCheckboxes).reduce((ids, checkbox) => {
+          if (checkbox instanceof HTMLInputElement && checkbox.checked && checkbox.id) {
+            ids.push(checkbox.id);
+          }
+          return ids;
+        }, []);
+
+        try {
+          window.localStorage.setItem(
+            serviceSelectionsStorageKey,
+            JSON.stringify({ selectedServiceIds })
+          );
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
         }
-        syncAddonColumnVisibility(interiorAddonsColumn, showInteriorAddons);
-        syncAddonColumnVisibility(exteriorAddonsColumn, showExteriorAddons);
+      }
+
+      function restoreServiceSelections() {
+        try {
+          const savedValue = window.localStorage.getItem(serviceSelectionsStorageKey);
+          if (!savedValue) return;
+          const parsed = JSON.parse(savedValue);
+          const selectedServiceIds = Array.isArray(parsed && parsed.selectedServiceIds)
+            ? parsed.selectedServiceIds
+            : [];
+          const selectedIdSet = new Set(
+            selectedServiceIds.filter((serviceId) => typeof serviceId === "string")
+          );
+
+          servicePriceCheckboxes.forEach((checkbox) => {
+            if (!(checkbox instanceof HTMLInputElement) || !checkbox.id) return;
+            checkbox.checked = selectedIdSet.has(checkbox.id);
+          });
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
       }
 
       function activateBookedFlash() {
@@ -2249,16 +2416,60 @@
         return valid;
       }
 
-      clickablePriceBlocks.forEach((block) => {
+      function flashAddonCard(block) {
+        block.classList.remove("is-click-flash");
+        void block.offsetWidth;
+        block.classList.add("is-click-flash");
+      }
+
+      clickableBasicBlocks.forEach((block) => {
         block.addEventListener("click", (event) => {
           const target = event.target;
           if (!(target instanceof Element)) return;
+          const eventPath = typeof event.composedPath === "function" ? event.composedPath() : [];
+          const originatedInAddons = eventPath.some((node) => {
+            return node instanceof Element && node.classList.contains("package-addons");
+          });
+          if (originatedInAddons) return;
+          if (target.closest(".package-addons")) return;
           if (target.closest("input, label, button, a")) return;
 
           const blockCheckbox = block.querySelector("input[type='checkbox'][data-service-price]");
           if (!(blockCheckbox instanceof HTMLInputElement)) return;
           blockCheckbox.checked = !blockCheckbox.checked;
           blockCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      });
+
+      clickableAddonBlocks.forEach((block) => {
+        block.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          flashAddonCard(block);
+          if (target.closest("input, label, button, a")) return;
+
+          const blockCheckbox = block.querySelector("input[type='checkbox'][data-service-price]");
+          if (!(blockCheckbox instanceof HTMLInputElement)) return;
+          blockCheckbox.checked = !blockCheckbox.checked;
+          blockCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      });
+
+      packageAddonsContainers.forEach((container) => {
+        container.addEventListener("mouseenter", () => {
+          const parentCard = container.closest(".card");
+          if (parentCard instanceof HTMLElement) parentCard.classList.add("is-addon-interacting");
+        });
+        container.addEventListener("mouseleave", () => {
+          const parentCard = container.closest(".card");
+          if (parentCard instanceof HTMLElement) parentCard.classList.remove("is-addon-interacting");
+        });
+        container.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+        });
+        container.addEventListener("click", (event) => {
+          event.stopPropagation();
         });
       });
 
@@ -2282,8 +2493,10 @@
         checkbox.addEventListener("change", () => {
           syncAddonColumns();
           updatePriceCalculatorTotal();
+          persistServiceSelections();
         });
       });
+      restoreServiceSelections();
       syncAddonColumns();
       updatePriceCalculatorTotal();
 
