@@ -12,8 +12,23 @@
       gtag('js', new Date());
 
       gtag('config', 'AW-18096536070');
+
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof url != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+          send_to: 'AW-18096536070/tDdyCLPi1rEcEIb0jLVD',
+          value: 350.0,
+          currency: 'CAD',
+          event_callback: callback
+        });
+        return false;
+      }
     </script>
-    
+
     <meta charset="utf-8">
     <title>Mobile Car Interior Cleaning in Comox Valley & Campbell River | Island Drift Detailing</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1982,6 +1997,9 @@
             }
 
             setBookingStatus("Booking request sent. Thank you!", "success");
+            if (typeof gtag_report_conversion === "function") {
+              gtag_report_conversion();
+            }
             const flashUntilTimestamp = preferredEndTimestamp;
             const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
             bookingForm.reset();
