@@ -21,7 +21,22 @@
         };
         gtag('event', 'conversion', {
           send_to: 'AW-18096536070/tDdyCLPi1rEcEIb0jLVD',
-          value: 350.0,
+          value: 430.0,
+          currency: 'CAD',
+          event_callback: callback
+        });
+        return false;
+      }
+
+      function gtag_report_contact_conversion(url) {
+        var callback = function () {
+          if (typeof url != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+          send_to: 'AW-18096536070/gcoFCIzA37EcEIb0jLVD',
+          value: 1.0,
           currency: 'CAD',
           event_callback: callback
         });
@@ -1445,7 +1460,7 @@
                 <li>Interior glass finish + optional light exterior rinse</li>
                 <li>Ideal every 2-3 weeks</li>
               </ul>
-              <p class="price">From CA$149 <small>/ sedan</small></p>
+              <p class="price">From CA$229 <small>/ sedan</small></p>
             </article>
             <article class="card">
               <span class="card-tag">Most booked</span>
@@ -1456,7 +1471,7 @@
                 <li>Dashboard, console, doors, and cupholders cleaned</li>
                 <li>Interior glass and odor-neutral finish</li>
               </ul>
-              <p class="price">From CA$199 <small>/ sedan</small></p>
+              <p class="price">From CA$279 <small>/ sedan</small></p>
             </article>
             <article class="card">
               <span class="card-tag">Best results</span>
@@ -1468,7 +1483,7 @@
                 <li>Clay prep + paint-safe decontamination</li>
                 <li>Polymer sealant for lasting gloss</li>
               </ul>
-              <p class="price">From CA$299 <small>/ sedan</small></p>
+              <p class="price">From CA$379 <small>/ sedan</small></p>
             </article>
           </div>
         </div>
@@ -1907,6 +1922,18 @@
         button.addEventListener("click", (event) => {
           event.preventDefault();
           openBookingModal(button.dataset.bookingSource || "Website", button);
+        });
+      });
+
+      document.querySelectorAll('a[href^="tel:"]').forEach((phoneLink) => {
+        phoneLink.addEventListener("click", (event) => {
+          event.preventDefault();
+          const phoneUrl = phoneLink.getAttribute("href");
+          if (typeof gtag_report_contact_conversion === "function") {
+            gtag_report_contact_conversion(phoneUrl);
+            return;
+          }
+          if (phoneUrl) window.location.href = phoneUrl;
         });
       });
 
