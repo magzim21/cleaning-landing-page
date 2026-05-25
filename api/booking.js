@@ -83,8 +83,8 @@ async function sendSlackBookingNotification({
     `*Email:* ${clientEmail}`,
     `*Phone:* ${clientMobile}`,
     `*Address:* ${clientAddress}`,
-    `*Preferred from:* ${preferredStart}`,
-    `*Preferred to:* ${preferredEnd}`,
+    `*Appointment start:* ${preferredStart}`,
+    `*Appointment end:* ${preferredEnd}`,
     `*Car model:* ${carModel}`,
     `*Package:* ${packageType}`,
     ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }).map((line) => `*${line}*`),
@@ -191,19 +191,17 @@ export default async function handler(request) {
     "client_mobile",
   ]);
   const clientAddress = str(formData.get("client_address"));
-  const preferredStart = str(formData.get("preferred_start"));
-  const preferredEnd = str(formData.get("preferred_end"));
+  const preferredStart = str(formData.get("preferred_start")) || "Not selected in Calendly yet";
+  const preferredEnd = str(formData.get("preferred_end")) || "Not selected in Calendly yet";
   const carModel = str(formData.get("car_model"));
   const packageType = str(formData.get("package_type")) || "Not specified";
 
-  if (!clientName || !clientEmail || !clientMobile || !clientAddress || !preferredStart || !preferredEnd || !carModel || !packageType) {
+  if (!clientName || !clientEmail || !clientMobile || !clientAddress || !carModel || !packageType) {
     console.warn(`[${requestId}] Missing required fields`, {
       hasName: Boolean(clientName),
       hasEmail: Boolean(clientEmail),
       hasMobile: Boolean(clientMobile),
       hasAddress: Boolean(clientAddress),
-      hasPreferredStart: Boolean(preferredStart),
-      hasPreferredEnd: Boolean(preferredEnd),
       hasCarModel: Boolean(carModel),
       hasPackageType: Boolean(packageType),
     });
@@ -261,8 +259,8 @@ export default async function handler(request) {
     `Email: ${clientEmail}`,
     `Mobile number: ${clientMobile}`,
     `Client address: ${clientAddress}`,
-    `Preferred from: ${preferredStart}`,
-    `Preferred to: ${preferredEnd}`,
+    `Appointment start: ${preferredStart}`,
+    `Appointment end: ${preferredEnd}`,
     `Car model: ${carModel}`,
     `Package type: ${packageType}`,
     ...getStainPhotoSummaryLines({ photoCount, skippedPhotos }),

@@ -948,7 +948,7 @@
 
       .booking-modal__panel {
         position: relative;
-        width: min(680px, 100%);
+        width: min(760px, 100%);
         max-height: 90vh;
         overflow: auto;
         border-radius: 18px;
@@ -1023,6 +1023,14 @@
       .booking-field textarea {
         min-height: 92px;
         resize: vertical;
+      }
+
+      .booking-field--calendly .calendly-inline-widget {
+        min-width: 320px;
+        height: 700px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
       }
 
       .booking-field input:focus-visible,
@@ -1660,16 +1668,17 @@
             <label for="client-address">Client's address</label>
             <textarea id="client-address" name="client_address" required placeholder="Street, city, postal code"></textarea>
           </div>
-          <div class="booking-form__row">
-            <div class="booking-field">
-              <label for="preferred-start">Preferred date/time from</label>
-              <input id="preferred-start" name="preferred_start" type="datetime-local" required>
-            </div>
-            <div class="booking-field">
-              <label for="preferred-end">Preferred date/time to</label>
-              <input id="preferred-end" name="preferred_end" type="datetime-local" required>
-            </div>
+          <div class="booking-field booking-field--calendly">
+            <label for="booking-calendly-widget">Pick your appointment time</label>
+            <div
+              id="booking-calendly-widget"
+              class="calendly-inline-widget"
+              data-url="https://calendly.com/d/cvx2-y7x-4sd"
+              style="min-width:320px;height:700px;"
+            ></div>
           </div>
+          <input type="hidden" id="preferred-start" name="preferred_start" value="">
+          <input type="hidden" id="preferred-end" name="preferred_end" value="">
           <div class="booking-field">
             <label for="car-model">Car model</label>
             <input id="car-model" name="car_model" type="text" required placeholder="Example: 2020 Toyota RAV4">
@@ -1716,6 +1725,7 @@
       </div>
     </footer>
     <p class="build-revision" aria-hidden="true">rev <span id="build-commit-sha">...</span></p>
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
       const buildCommitSha = document.getElementById("build-commit-sha");
@@ -1764,9 +1774,12 @@
       const bookingCloseButtons = document.querySelectorAll("[data-close-booking]");
       const preferredStartInput = document.getElementById("preferred-start");
       const preferredEndInput = document.getElementById("preferred-end");
+      const bookingCalendlyWidget = document.getElementById("booking-calendly-widget");
       const bookingFormStatus = document.getElementById("booking-form-status");
       const bookedFlashStorageKey = "idd-booking-submitted";
+      const calendlyBookingUrl = "https://calendly.com/d/cvx2-y7x-4sd";
       let lastBookingTrigger = null;
+      let scheduledAppointmentEnd = null;
 
       function activateBookedFlash() {
         document.body.classList.add("has-booked-flash");
@@ -1861,35 +1874,67 @@
         return Boolean(bookingThanksOverlay && !bookingThanksOverlay.hidden);
       }
 
-      function formatDateTimeLocalValue(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      function formatCalendlyDateTime(isoString) {
+        if (!isoString) return "";
+        try {
+          return new Date(isoString).toLocaleString("en-CA", {
+            dateStyle: "medium",
+            timeStyle: "short",
+            timeZone: "America/Vancouver",
+          });
+        } catch (_) {
+          return isoString;
+        }
       }
 
-      function applyDefaultBookingDateRange() {
-        if (!preferredStartInput || !preferredEndInput) return;
-        const now = new Date();
-        const tomorrowAt19 = new Date(now);
-        tomorrowAt19.setDate(tomorrowAt19.getDate() + 1);
-        tomorrowAt19.setHours(19, 0, 0, 0);
+      function ensureCalendlyWidget() {
+        if (!bookingCalendlyWidget || bookingCalendlyWidget.dataset.initialized === "true") return;
 
-        preferredStartInput.value = formatDateTimeLocalValue(now);
-        preferredEndInput.value = formatDateTimeLocalValue(tomorrowAt19);
+        function initWidget() {
+          if (typeof Calendly === "undefined") return false;
+          bookingCalendlyWidget.innerHTML = "";
+          Calendly.initInlineWidget({
+            url: calendlyBookingUrl,
+            parentElement: bookingCalendlyWidget,
+          });
+          bookingCalendlyWidget.dataset.initialized = "true";
+          return true;
+        }
+
+        if (initWidget()) return;
+
+        const waitForCalendly = window.setInterval(() => {
+          if (initWidget()) window.clearInterval(waitForCalendly);
+        }, 100);
+        window.setTimeout(() => window.clearInterval(waitForCalendly), 10000);
       }
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== "https://calendly.com") return;
+        if (!event.data || event.data.event !== "calendly.event_scheduled") return;
+
+        const payload = event.data.payload || {};
+        const startTime = payload.event && payload.event.start_time;
+        const endTime = payload.event && payload.event.end_time;
+
+        if (preferredStartInput && startTime) {
+          preferredStartInput.value = formatCalendlyDateTime(startTime);
+        }
+        if (preferredEndInput && endTime) {
+          preferredEndInput.value = formatCalendlyDateTime(endTime);
+          scheduledAppointmentEnd = Date.parse(endTime);
+        }
+      });
 
       function openBookingModal(triggerLabel, triggerElement) {
         if (!bookingModal) return;
         bookingModal.hidden = false;
         document.body.style.overflow = "hidden";
         setBookingStatus("", "");
-        applyDefaultBookingDateRange();
+        ensureCalendlyWidget();
         if (bookingSourceInput) bookingSourceInput.value = triggerLabel || "Website";
         lastBookingTrigger = triggerElement || null;
-        const firstInput = bookingModal.querySelector("textarea, input, select");
+        const firstInput = bookingModal.querySelector("textarea, input:not([type='hidden']), select");
         if (firstInput) firstInput.focus();
       }
 
@@ -1906,16 +1951,6 @@
         bookingFormStatus.classList.remove("booking-form__status--error", "booking-form__status--success");
         if (type === "error") bookingFormStatus.classList.add("booking-form__status--error");
         if (type === "success") bookingFormStatus.classList.add("booking-form__status--success");
-      }
-
-      function validatePreferredRange() {
-        if (!preferredStartInput || !preferredEndInput) return true;
-        if (!preferredStartInput.value || !preferredEndInput.value) return true;
-        const start = new Date(preferredStartInput.value);
-        const end = new Date(preferredEndInput.value);
-        const valid = end >= start;
-        preferredEndInput.setCustomValidity(valid ? "" : "End date/time must be after start date/time.");
-        return valid;
       }
 
       bookingOpenButtons.forEach((button) => {
@@ -1940,11 +1975,6 @@
       bookingCloseButtons.forEach((button) => {
         button.addEventListener("click", () => closeBookingModal());
       });
-
-      if (preferredStartInput && preferredEndInput) {
-        preferredStartInput.addEventListener("change", validatePreferredRange);
-        preferredEndInput.addEventListener("change", validatePreferredRange);
-      }
 
       document.addEventListener("keydown", (event) => {
         if (isBookingThanksVisible() && isScrollAttemptEvent(event)) {
@@ -1984,16 +2014,10 @@
             bookingForm.reportValidity();
             return;
           }
-          if (!validatePreferredRange()) {
-            console.warn("[Booking] Preferred date range validation failed");
-            setBookingStatus("Preferred end date/time must be after the start date/time.", "error");
-            preferredEndInput.reportValidity();
-            return;
-          }
 
           const submitButton = bookingForm.querySelector('button[type="submit"]');
           const formData = new FormData(bookingForm);
-          const preferredEndTimestamp = Date.parse(String(formData.get("preferred_end") || ""));
+          const flashUntilTimestamp = scheduledAppointmentEnd;
 
           if (submitButton) {
             submitButton.disabled = true;
@@ -2027,9 +2051,11 @@
             if (typeof gtag_report_conversion === "function") {
               gtag_report_conversion();
             }
-            const flashUntilTimestamp = preferredEndTimestamp;
             const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
             bookingForm.reset();
+            if (preferredStartInput) preferredStartInput.value = "";
+            if (preferredEndInput) preferredEndInput.value = "";
+            scheduledAppointmentEnd = null;
             closeBookingModal();
             if (shouldEnableFlash) {
               requestAnimationFrame(() => {
