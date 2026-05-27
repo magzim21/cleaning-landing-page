@@ -44,9 +44,8 @@
       }
     </script>
 
-    <meta charset="utf-8">
     <title>Mobile Car Interior Cleaning in Comox Valley & Campbell River | Island Drift Detailing</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Need car interior cleaning near you? Island Drift Detailing provides owner-operated mobile car cleaning, car detailing, and car steam cleaning across Comox Valley, Campbell River, Courtenay, and Cumberland.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Mobile Car Interior Cleaning | Island Drift Detailing">
@@ -182,6 +181,7 @@
       }
 
       body.has-booked-flash::after {
+        z-index: 150;
         animation: police-flash-intro 0.95s linear 1, police-flash 2.9s linear 0.95s infinite;
       }
 
@@ -934,23 +934,36 @@
         position: fixed;
         inset: 0;
         z-index: 120;
-        display: grid;
-        place-items: center;
+        overflow: visible;
+        pointer-events: none;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
         padding: 20px;
       }
 
       .booking-modal__backdrop {
-        position: absolute;
+        position: fixed;
         inset: 0;
+        z-index: 0;
+        pointer-events: auto;
         background: rgba(2, 6, 12, 0.72);
         backdrop-filter: blur(4px);
       }
 
       .booking-modal__panel {
         position: relative;
+        z-index: 1;
+        pointer-events: auto;
         width: min(760px, 100%);
-        max-height: 90vh;
-        overflow: auto;
+        max-height: calc(100dvh - 40px);
+        margin: 0 auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        display: flex;
+        flex-direction: column;
         border-radius: 18px;
         border: 1px solid var(--border);
         background: linear-gradient(165deg, rgba(15, 22, 36, 0.98), rgba(11, 18, 31, 0.98));
@@ -987,84 +1000,29 @@
         color: var(--text-muted);
       }
 
-      .booking-form {
+      .booking-calendly {
         display: grid;
         gap: 14px;
       }
 
-      .booking-form__row {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      .booking-field {
-        display: grid;
-        gap: 6px;
-      }
-
-      .booking-field label {
-        font-size: 0.86rem;
-        color: var(--text-muted);
-      }
-
-      .booking-field input,
-      .booking-field select,
-      .booking-field textarea {
-        width: 100%;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: rgba(15, 23, 42, 0.65);
-        color: var(--text);
-        font: inherit;
-        padding: 10px 12px;
-      }
-
-      .booking-field textarea {
-        min-height: 92px;
-        resize: vertical;
-      }
-
-      .booking-field--calendly .calendly-inline-widget {
+      .booking-calendly .calendly-inline-widget {
         min-width: 320px;
-        height: 700px;
+        width: 100%;
+        min-height: 0;
         border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid var(--border);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #0c1420;
+        position: relative;
+        z-index: 2;
+        touch-action: manipulation;
       }
 
-      .booking-field input:focus-visible,
-      .booking-field select:focus-visible,
-      .booking-field textarea:focus-visible {
-        outline: 2px solid rgba(56, 189, 248, 0.75);
-        outline-offset: 1px;
-      }
-
-      .booking-help {
-        margin: 0;
-        font-size: 0.78rem;
-        color: var(--text-muted);
-      }
-
-      .booking-form__actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 6px;
-      }
-
-      .booking-form__status {
-        margin: 2px 0 0;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-
-      .booking-form__status--error {
-        color: #fca5a5;
-      }
-
-      .booking-form__status--success {
-        color: #86efac;
+      .booking-calendly .calendly-inline-widget iframe {
+        display: block;
+        width: 100%;
+        border: 0;
+        pointer-events: auto;
+        touch-action: manipulation;
       }
 
       .booking-thanks-overlay[hidden] {
@@ -1132,15 +1090,44 @@
 
       @media (max-width: 767px) {
         .booking-modal {
-          padding: 12px;
+          padding: 0;
+          align-items: stretch;
+          justify-content: stretch;
+        }
+
+        .booking-modal__backdrop {
+          backdrop-filter: none;
+          background: var(--bg-deep);
         }
 
         .booking-modal__panel {
-          padding: 18px;
+          width: 100%;
+          max-height: none;
+          height: 100dvh;
+          min-height: 100dvh;
+          margin: 0;
+          border-radius: 0;
+          border: none;
+          box-shadow: none;
+          padding:
+            max(18px, env(safe-area-inset-top))
+            max(18px, env(safe-area-inset-right))
+            max(18px, env(safe-area-inset-bottom))
+            max(18px, env(safe-area-inset-left));
         }
 
-        .booking-form__row {
-          grid-template-columns: 1fr;
+        .booking-modal__close {
+          top: max(12px, env(safe-area-inset-top));
+          right: max(12px, env(safe-area-inset-right));
+        }
+
+        .booking-calendly .calendly-inline-widget {
+          min-width: 0;
+        }
+
+        html.booking-modal--open,
+        body.booking-modal--open {
+          overflow: hidden;
         }
       }
 
@@ -1622,88 +1609,16 @@
       <div class="booking-modal__panel" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
         <button class="booking-modal__close" type="button" data-close-booking aria-label="Close booking form">×</button>
         <h2 id="booking-modal-title">Book your detailing</h2>
-        <p class="booking-modal__intro">Share the details below and we will reply with your confirmed slot and exact quote.</p>
-        <form class="booking-form" id="booking-form" novalidate>
-          <input type="hidden" id="booking-source" name="booking_source" value="Website">
-          <div class="booking-form__row">
-            <div class="booking-field">
-              <label for="client-name">Name</label>
-              <input
-                id="client-name"
-                name="client_name"
-                type="text"
-                autocomplete="section-booking name"
-                required
-                placeholder="Your full name"
-              >
-            </div>
-            <div class="booking-field">
-              <label for="client-email">Contact email</label>
-              <input
-                id="client-email"
-                name="contact_email"
-                type="email"
-                autocomplete="section-booking home email"
-                inputmode="email"
-                autocapitalize="off"
-                spellcheck="false"
-                required
-                placeholder="name@example.com"
-              >
-            </div>
-          </div>
-          <div class="booking-field">
-            <label for="client-mobile">Mobile number</label>
-            <input
-              id="client-mobile"
-              name="contact_phone"
-              type="tel"
-              autocomplete="section-booking tel-national"
-              inputmode="tel"
-              required
-              placeholder="+1 778 984 0698"
-            >
-          </div>
-          <div class="booking-field">
-            <label for="client-address">Client's address</label>
-            <textarea id="client-address" name="client_address" required placeholder="Street, city, postal code"></textarea>
-          </div>
-          <div class="booking-field booking-field--calendly">
-            <label for="booking-calendly-widget">Pick your appointment time</label>
-            <div
-              id="booking-calendly-widget"
-              class="calendly-inline-widget"
-              data-url="https://calendly.com/d/cvx2-y7x-4sd"
-              style="min-width:320px;height:700px;"
-            ></div>
-          </div>
-          <input type="hidden" id="preferred-start" name="preferred_start" value="">
-          <input type="hidden" id="preferred-end" name="preferred_end" value="">
-          <div class="booking-field">
-            <label for="car-model">Car model</label>
-            <input id="car-model" name="car_model" type="text" required placeholder="Example: 2020 Toyota RAV4">
-          </div>
-          <div class="booking-field">
-            <label for="package-type">Package type</label>
-            <select id="package-type" name="package_type" required>
-              <option value="">Select a package</option>
-              <option value="Express interior refresh">Express interior refresh</option>
-              <option value="Complete interior + exterior">Complete interior + exterior</option>
-              <option value="Deep detail + protect">Deep detail + protect</option>
-              <option value="Not sure yet">Not sure yet</option>
-            </select>
-          </div>
-          <div class="booking-field">
-            <label for="stain-photos">Pictures upload (hard stains if any)</label>
-            <input id="stain-photos" name="stain_photos" type="file" accept="image/*" multiple>
-            <p class="booking-help">Optional. You can attach stain photos so we can estimate time and treatment.</p>
-          </div>
-          <div class="booking-form__actions">
-            <button class="btn btn-primary" type="submit">Send booking request</button>
-            <button class="btn btn-ghost" type="button" data-close-booking>Cancel</button>
-          </div>
-          <p class="booking-form__status" id="booking-form-status" aria-live="polite"></p>
-        </form>
+        <p class="booking-modal__intro">Choose a time that works for you.</p>
+        <div class="booking-calendly" id="booking-calendly-slot">
+          <div
+            id="booking-calendly-widget"
+            class="calendly-inline-widget"
+            data-url="https://calendly.com/d/cvx2-y7x-4sd?hide_gdpr_banner=1&embed_type=Inline&background_color=0c1420&text_color=ffffff&primary_color=ffffff"
+            data-resize="true"
+            style="min-width:320px;"
+          ></div>
+        </div>
       </div>
     </div>
     <div class="booking-thanks-overlay" id="booking-thanks-overlay" hidden aria-live="polite">
@@ -1768,18 +1683,82 @@
 
       const bookingModal = document.getElementById("booking-modal");
       const bookingThanksOverlay = document.getElementById("booking-thanks-overlay");
-      const bookingForm = document.getElementById("booking-form");
-      const bookingSourceInput = document.getElementById("booking-source");
       const bookingOpenButtons = document.querySelectorAll(".js-open-booking");
       const bookingCloseButtons = document.querySelectorAll("[data-close-booking]");
-      const preferredStartInput = document.getElementById("preferred-start");
-      const preferredEndInput = document.getElementById("preferred-end");
       const bookingCalendlyWidget = document.getElementById("booking-calendly-widget");
-      const bookingFormStatus = document.getElementById("booking-form-status");
       const bookedFlashStorageKey = "idd-booking-submitted";
-      const calendlyBookingUrl = "https://calendly.com/d/cvx2-y7x-4sd";
+      const pendingConfirmationStorageKey = "idd-booking-confirmed-pending";
+      const defaultFlashDurationMs = 2 * 60 * 60 * 1000;
+      const calendlyBookingBasePath = "https://calendly.com/d/cvx2-y7x-4sd";
+
+      function getCalendlyBookingUrl() {
+        const url = new URL(calendlyBookingBasePath);
+        url.searchParams.set("hide_gdpr_banner", "1");
+        url.searchParams.set("embed_type", "Inline");
+        url.searchParams.set(
+          "embed_domain",
+          window.location.hostname || window.location.host || "localhost"
+        );
+        url.searchParams.set("background_color", "0c1420");
+        url.searchParams.set("text_color", "ffffff");
+        url.searchParams.set("primary_color", "ffffff");
+        return url.toString();
+      }
       let lastBookingTrigger = null;
-      let scheduledAppointmentEnd = null;
+      let lockedScrollY = 0;
+      const mobileBookingQuery = window.matchMedia("(max-width: 767px)");
+      const modalTouchNoop = () => {};
+
+      function lockPageScroll() {
+        lockedScrollY = window.scrollY;
+        if (mobileBookingQuery.matches) {
+          document.documentElement.classList.add("booking-modal--open");
+          document.body.classList.add("booking-modal--open");
+          return;
+        }
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${lockedScrollY}px`;
+        document.body.style.left = "0";
+        document.body.style.right = "0";
+        document.body.style.width = "100%";
+      }
+
+      function unlockPageScroll() {
+        document.documentElement.classList.remove("booking-modal--open");
+        document.body.classList.remove("booking-modal--open");
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.style.width = "";
+        window.scrollTo(0, lockedScrollY);
+      }
+
+      function bindModalTouchWorkaround() {
+        if (mobileBookingQuery.matches) return;
+        document.addEventListener("touchstart", modalTouchNoop, { passive: true, capture: true });
+      }
+
+      function unbindModalTouchWorkaround() {
+        document.removeEventListener("touchstart", modalTouchNoop, { capture: true });
+      }
+
+      function bindCalendlyTouchWorkaround() {
+        if (!bookingCalendlyWidget || bookingCalendlyWidget.dataset.touchBound === "true") return;
+        const noopTouch = () => {};
+        bookingCalendlyWidget.addEventListener("touchstart", noopTouch, { passive: true });
+        bookingCalendlyWidget.dataset.touchBound = "true";
+
+        const attachIframeTouch = () => {
+          const iframe = bookingCalendlyWidget.querySelector("iframe");
+          if (!iframe) {
+            window.setTimeout(attachIframeTouch, 100);
+            return;
+          }
+          iframe.addEventListener("touchstart", noopTouch, { passive: true });
+        };
+        attachIframeTouch();
+      }
 
       function activateBookedFlash() {
         document.body.classList.add("has-booked-flash");
@@ -1835,11 +1814,13 @@
         }
       }
 
-      restoreBookedFlash();
+      if ((window.location.pathname.replace(/\/+$/, "") || "/") !== "/booking-confirmed") {
+        restoreBookedFlash();
+      }
 
       function showBookingThanksOverlay() {
         if (!bookingThanksOverlay) return;
-        document.body.style.overflow = "hidden";
+        lockPageScroll();
         bookingThanksOverlay.hidden = false;
         bookingThanksOverlay.classList.remove("is-visible");
         void bookingThanksOverlay.offsetWidth;
@@ -1850,7 +1831,7 @@
         if (!bookingThanksOverlay || bookingThanksOverlay.hidden) return;
         bookingThanksOverlay.classList.remove("is-visible");
         bookingThanksOverlay.hidden = true;
-        document.body.style.overflow = "";
+        unlockPageScroll();
       }
 
       function isScrollAttemptEvent(event) {
@@ -1874,17 +1855,230 @@
         return Boolean(bookingThanksOverlay && !bookingThanksOverlay.hidden);
       }
 
-      function formatCalendlyDateTime(isoString) {
-        if (!isoString) return "";
-        try {
-          return new Date(isoString).toLocaleString("en-CA", {
-            dateStyle: "medium",
-            timeStyle: "short",
-            timeZone: "America/Vancouver",
-          });
-        } catch (_) {
-          return isoString;
+      function getBookingConfirmedParamsFromLocation() {
+        const params = {};
+        for (const [key, value] of new URLSearchParams(window.location.search).entries()) {
+          if (key === "notified") continue;
+          if (value) params[key] = value;
         }
+        return params;
+      }
+
+      function normalizeBookingConfirmedParams(params) {
+        return Object.fromEntries(
+          Object.entries(params || {}).filter(([key, value]) => key !== "notified" && String(value || "").trim())
+        );
+      }
+
+      function readPendingConfirmationParams() {
+        try {
+          const pending = sessionStorage.getItem(pendingConfirmationStorageKey);
+          if (!pending) return {};
+          return normalizeBookingConfirmedParams(JSON.parse(pending));
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function storePendingConfirmationParams(params) {
+        try {
+          sessionStorage.setItem(pendingConfirmationStorageKey, JSON.stringify(params));
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+      }
+
+      function clearPendingConfirmationParams() {
+        try {
+          sessionStorage.removeItem(pendingConfirmationStorageKey);
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+      }
+
+      function resolveFlashUntilTimestamp(endTime) {
+        const parsed = endTime ? Date.parse(endTime) : NaN;
+        if (Number.isFinite(parsed) && parsed > Date.now()) return parsed;
+        return Date.now() + defaultFlashDurationMs;
+      }
+
+      function buildBookingConfirmedParamsFromCalendly(payload) {
+        const params = {};
+        const invitee = payload?.invitee || {};
+        const event = payload?.event || {};
+        const eventType = payload?.event_type || {};
+        const questionsAndAnswers = payload?.questions_and_answers || [];
+
+        for (const [key, value] of Object.entries(invitee)) {
+          if (value == null || value === "") continue;
+          if (typeof value === "object") continue;
+          params[`invitee_${key}`] = String(value);
+        }
+        for (const [key, value] of Object.entries(event)) {
+          if (value == null || value === "") continue;
+          if (typeof value === "object") continue;
+          params[`event_${key}`] = String(value);
+        }
+        for (const [key, value] of Object.entries(eventType)) {
+          if (value == null || value === "") continue;
+          if (typeof value === "object") continue;
+          params[`event_type_${key}`] = String(value);
+        }
+        for (const [key, value] of Object.entries(payload || {})) {
+          if (["invitee", "event", "event_type", "questions_and_answers"].includes(key)) continue;
+          if (value == null || value === "") continue;
+          if (typeof value === "object") continue;
+          params[key] = String(value);
+        }
+
+        if (invitee.name) params.invitee_full_name = String(invitee.name);
+        if (invitee.email) params.invitee_email = String(invitee.email);
+        if (event.start_time) params.event_start_time = String(event.start_time);
+        if (event.end_time) params.event_end_time = String(event.end_time);
+        if (eventType.name) params.event_type_name = String(eventType.name);
+        if (eventType.uuid) params.event_type_uuid = String(eventType.uuid);
+
+        questionsAndAnswers.forEach((item, index) => {
+          const question = item?.question;
+          const answer = item?.answer;
+          if (!answer) return;
+          const position = item?.position || index + 1;
+          params[`answer_${position}`] = answer;
+          if (question) params[`question_${position}`] = question;
+        });
+
+        return params;
+      }
+
+      function getBookingConfirmedNotifyKey(params) {
+        const serialized = Object.keys(params)
+          .sort()
+          .map((key) => `${key}=${params[key]}`)
+          .join("&");
+        return `idd-booking-confirmed-notify:${serialized || "empty"}`;
+      }
+
+      async function sendBookingConfirmedNotification(params, { force = false } = {}) {
+        const normalizedParams = normalizeBookingConfirmedParams(params);
+        if (Object.keys(normalizedParams).length === 0) {
+          console.warn("[Booking] No params to send for confirmation notification");
+          return false;
+        }
+
+        const notifyKey = getBookingConfirmedNotifyKey(normalizedParams);
+        if (!force) {
+          try {
+            if (sessionStorage.getItem(notifyKey) === "sent") {
+              console.info("[Booking] Confirmation notification already sent for this booking");
+              return true;
+            }
+          } catch (_) {
+            /* Ignore storage failures (private mode / restricted storage). */
+          }
+        }
+
+        console.info("[Booking] Sending confirmation notification", normalizedParams);
+
+        try {
+          const response = await fetch("/api/booking-confirmed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            keepalive: true,
+            body: JSON.stringify({
+              params: normalizedParams,
+              source_url: window.location.href,
+            }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            console.error("[Booking] Confirmation notify failed", response.status, payload);
+            return false;
+          }
+          try {
+            sessionStorage.setItem(notifyKey, "sent");
+          } catch (_) {
+            /* Ignore storage failures (private mode / restricted storage). */
+          }
+          console.info("[Booking] Confirmation notification sent");
+          return true;
+        } catch (error) {
+          console.error("[Booking] Confirmation notify failed", error);
+          return false;
+        }
+      }
+
+      function showBookingConfirmationExperience(endTime) {
+        if (typeof gtag_report_conversion === "function") {
+          gtag_report_conversion();
+        }
+        persistBookedFlash(resolveFlashUntilTimestamp(endTime));
+        requestAnimationFrame(() => {
+          startBookedFlashNow();
+          showBookingThanksOverlay();
+        });
+      }
+
+      async function initBookingConfirmedRoute() {
+        const path = window.location.pathname.replace(/\/+$/, "") || "/";
+        if (path !== "/booking-confirmed") return;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const alreadyNotified = urlParams.get("notified") === "1";
+
+        let params = getBookingConfirmedParamsFromLocation();
+        if (Object.keys(params).length === 0) {
+          params = readPendingConfirmationParams();
+        }
+
+        const endTime =
+          params.event_end_time ||
+          params.end_time ||
+          urlParams.get("event_end_time") ||
+          urlParams.get("end_time");
+
+        if (!alreadyNotified && Object.keys(params).length > 0) {
+          const sent = await sendBookingConfirmedNotification(params);
+          if (!sent) {
+            console.error(
+              "[Booking] Failed to send confirmation notification from /booking-confirmed page"
+            );
+          }
+        } else if (!alreadyNotified && Object.keys(params).length === 0) {
+          console.warn("[Booking] /booking-confirmed loaded without booking params");
+        } else if (alreadyNotified) {
+          console.info("[Booking] Confirmation already handled server-side (notified=1)");
+        }
+
+        clearPendingConfirmationParams();
+        showBookingConfirmationExperience(endTime);
+
+        if (window.history.replaceState) {
+          window.history.replaceState(null, "", "/booking-confirmed");
+        }
+      }
+
+      function handleCalendlyBookingComplete(payload) {
+        const params = normalizeBookingConfirmedParams(
+          buildBookingConfirmedParamsFromCalendly(payload || {})
+        );
+        storePendingConfirmationParams(params);
+
+        if (Object.keys(params).length === 0) {
+          console.warn("[Booking] Calendly event_scheduled payload had no usable params", payload);
+          window.location.href = "/booking-confirmed";
+          return;
+        }
+
+        const query = new URLSearchParams(params).toString();
+        window.location.href = `/api/booking-confirmed?${query}`;
+      }
+
+      function syncCalendlyWidgetHeight(heightValue) {
+        if (!bookingCalendlyWidget || !heightValue) return;
+        const height = parseInt(String(heightValue).replace("px", ""), 10);
+        if (!Number.isFinite(height) || height <= 0) return;
+        bookingCalendlyWidget.style.minHeight = "0";
+        bookingCalendlyWidget.style.height = `${height}px`;
       }
 
       function ensureCalendlyWidget() {
@@ -1893,11 +2087,14 @@
         function initWidget() {
           if (typeof Calendly === "undefined") return false;
           bookingCalendlyWidget.innerHTML = "";
+          bookingCalendlyWidget.style.minHeight = "0";
           Calendly.initInlineWidget({
-            url: calendlyBookingUrl,
+            url: getCalendlyBookingUrl(),
             parentElement: bookingCalendlyWidget,
+            resize: true,
           });
           bookingCalendlyWidget.dataset.initialized = "true";
+          bindCalendlyTouchWorkaround();
           return true;
         }
 
@@ -1911,46 +2108,36 @@
 
       window.addEventListener("message", (event) => {
         if (event.origin !== "https://calendly.com") return;
-        if (!event.data || event.data.event !== "calendly.event_scheduled") return;
+        if (!event.data || !event.data.event) return;
+
+        if (event.data.event === "calendly.page_height") {
+          const height = event.data.payload && event.data.payload.height;
+          syncCalendlyWidgetHeight(height);
+          return;
+        }
+
+        if (event.data.event !== "calendly.event_scheduled") return;
 
         const payload = event.data.payload || {};
-        const startTime = payload.event && payload.event.start_time;
-        const endTime = payload.event && payload.event.end_time;
-
-        if (preferredStartInput && startTime) {
-          preferredStartInput.value = formatCalendlyDateTime(startTime);
-        }
-        if (preferredEndInput && endTime) {
-          preferredEndInput.value = formatCalendlyDateTime(endTime);
-          scheduledAppointmentEnd = Date.parse(endTime);
-        }
+        handleCalendlyBookingComplete(payload);
       });
 
-      function openBookingModal(triggerLabel, triggerElement) {
+      function openBookingModal(_triggerLabel, triggerElement) {
         if (!bookingModal) return;
         bookingModal.hidden = false;
-        document.body.style.overflow = "hidden";
-        setBookingStatus("", "");
+        lockPageScroll();
+        bindModalTouchWorkaround();
         ensureCalendlyWidget();
-        if (bookingSourceInput) bookingSourceInput.value = triggerLabel || "Website";
+        bindCalendlyTouchWorkaround();
         lastBookingTrigger = triggerElement || null;
-        const firstInput = bookingModal.querySelector("textarea, input:not([type='hidden']), select");
-        if (firstInput) firstInput.focus();
       }
 
       function closeBookingModal() {
         if (!bookingModal) return;
         bookingModal.hidden = true;
-        document.body.style.overflow = "";
+        unbindModalTouchWorkaround();
+        unlockPageScroll();
         if (lastBookingTrigger) lastBookingTrigger.focus();
-      }
-
-      function setBookingStatus(message, type) {
-        if (!bookingFormStatus) return;
-        bookingFormStatus.textContent = message || "";
-        bookingFormStatus.classList.remove("booking-form__status--error", "booking-form__status--success");
-        if (type === "error") bookingFormStatus.classList.add("booking-form__status--error");
-        if (type === "success") bookingFormStatus.classList.add("booking-form__status--success");
       }
 
       bookingOpenButtons.forEach((button) => {
@@ -2003,82 +2190,7 @@
         }
       }, { passive: true });
 
-      if (bookingForm) {
-        bookingForm.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          console.log("[Booking] Submit requested");
-          setBookingStatus("", "");
-          if (!bookingForm.checkValidity()) {
-            console.warn("[Booking] Form validation failed");
-            setBookingStatus("Please fill in all required fields before submitting.", "error");
-            bookingForm.reportValidity();
-            return;
-          }
-
-          const submitButton = bookingForm.querySelector('button[type="submit"]');
-          const formData = new FormData(bookingForm);
-          const flashUntilTimestamp = scheduledAppointmentEnd;
-
-          if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.setAttribute("aria-busy", "true");
-          }
-          setBookingStatus("Sending your booking request...", "");
-
-          try {
-            console.log("[Booking] Sending request to /api/booking");
-            const response = await fetch("/api/booking", {
-              method: "POST",
-              body: formData,
-            });
-            const payload = await response.json().catch(() => ({}));
-            console.log("[Booking] Received response", {
-              ok: response.ok,
-              status: response.status,
-              payload,
-            });
-
-            if (!response.ok) {
-              const message =
-                typeof payload.error === "string" && payload.error
-                  ? payload.error
-                  : "We could not send your booking. Please try again or email book@maxim.run.";
-              setBookingStatus(message, "error");
-              return;
-            }
-
-            setBookingStatus("Booking request sent. Thank you!", "success");
-            if (typeof gtag_report_conversion === "function") {
-              gtag_report_conversion();
-            }
-            const shouldEnableFlash = persistBookedFlash(flashUntilTimestamp);
-            bookingForm.reset();
-            if (preferredStartInput) preferredStartInput.value = "";
-            if (preferredEndInput) preferredEndInput.value = "";
-            scheduledAppointmentEnd = null;
-            closeBookingModal();
-            if (shouldEnableFlash) {
-              requestAnimationFrame(() => {
-                startBookedFlashNow();
-                showBookingThanksOverlay();
-              });
-            } else {
-              showBookingThanksOverlay();
-            }
-          } catch (error) {
-            console.error("[Booking] Request failed", error);
-            setBookingStatus(
-              "Something went wrong while sending your booking request. Please try again or email book@maxim.run.",
-              "error"
-            );
-          } finally {
-            if (submitButton) {
-              submitButton.disabled = false;
-              submitButton.removeAttribute("aria-busy");
-            }
-          }
-        });
-      }
+      initBookingConfirmedRoute();
     </script>
   </body>
 </html>

@@ -1,5 +1,41 @@
 {
   "framework": null,
   "buildCommand": "npm run build",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/booking-confirmed",
+      "has": [{ "type": "query", "key": "notified", "value": "1" }],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/booking-confirmed",
+      "has": [{ "type": "query", "key": "invitee_email" }],
+      "destination": "/api/booking-confirmed"
+    },
+    {
+      "source": "/booking-confirmed",
+      "has": [{ "type": "query", "key": "invitee_full_name" }],
+      "destination": "/api/booking-confirmed"
+    },
+    {
+      "source": "/booking-confirmed",
+      "has": [{ "type": "query", "key": "event_start_time" }],
+      "destination": "/api/booking-confirmed"
+    },
+    {
+      "source": "/booking-confirmed",
+      "has": [{ "type": "query", "key": "event_type_name" }],
+      "destination": "/api/booking-confirmed"
+    },
+    {
+      "source": "/booking-confirmed",
+      "has": [{ "type": "query", "key": "event_type_uuid" }],
+      "destination": "/api/booking-confirmed"
+    },
+    {
+      "source": "/booking-confirmed",
+      "destination": "/index.html"
+    }
+  ]
 }
