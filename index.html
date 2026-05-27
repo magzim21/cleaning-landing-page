@@ -735,6 +735,24 @@
         box-shadow: 0 16px 34px rgba(2, 8, 23, 0.45);
       }
 
+      .card--booking {
+        cursor: pointer;
+      }
+
+      .card--booking:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .card-book-cta {
+        margin-top: auto;
+        padding-top: 18px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--accent);
+      }
+
       .card-tag {
         font-size: 0.75rem;
         font-weight: 600;
@@ -1389,7 +1407,7 @@
             <ul class="trust-row">
               <li><strong>100% clean</strong> guarantee</li>
               <li><strong>Insured</strong> owner-operator</li>
-              <li><strong>Eco</strong>-safe products</li>
+              <li><strong>Wow-level</strong> results</li>
             </ul>
           </div>
           <aside class="hero-card" aria-labelledby="today-title">
@@ -1445,40 +1463,65 @@
             <p>Simple options, clear outcomes, and transparent pricing for sedans, SUVs, and family vehicles across the Comox Valley.</p>
           </div>
           <div class="cards">
-            <article class="card">
-              <span class="card-tag">Fastest</span>
-              <h3>Express interior refresh</h3>
-              <p>Fast interior car cleaning for busy drivers, usually completed in about 60-90 minutes.</p>
+            <article
+              class="card card--booking js-open-booking-package"
+              tabindex="0"
+              role="button"
+              data-calendly-url="https://calendly.com/main-bk7w/interior-detailing"
+              data-booking-source="Interior Detailing"
+              aria-label="Book Interior Detailing"
+            >
+              <span class="card-tag">Interior</span>
+              <h3>Interior Detailing</h3>
+              <p>Full interior detail with as much time and effort as needed for a wow, perfect, “never seen my car that clean” finish.</p>
               <ul class="package-points">
-                <li>Quick interior vacuum of seats, carpets, and mats</li>
-                <li>Dashboard, console, and high-touch surfaces cleaned</li>
-                <li>Interior glass finish + optional light exterior rinse</li>
-                <li>Ideal every 2-3 weeks</li>
+                <li>Seats, carpets, mats, dash, console, doors, cupholders, vents, and interior glass</li>
+                <li>Deep clean under the seats</li>
+                <li>Quick wash of the exterior glass</li>
+                <li>Every reachable interior surface cleaned until it looks its best</li>
+                <li>Upholstery shampooing not included — available as an add-on</li>
               </ul>
               <p class="price">From CA$229 <small>/ sedan</small></p>
+              <p class="card-book-cta">Click to book your detailing →</p>
             </article>
-            <article class="card">
-              <span class="card-tag">Most booked</span>
-              <h3>Complete interior + exterior</h3>
-              <p>Best value for weekly drivers, rideshare use, and family cars needing reliable interior car cleaning.</p>
+            <article
+              class="card card--booking js-open-booking-package"
+              tabindex="0"
+              role="button"
+              data-calendly-url="https://calendly.com/main-bk7w/express-interior-refresh-clone"
+              data-booking-source="Exterior Detailing"
+              aria-label="Book Exterior Detailing"
+            >
+              <span class="card-tag">Exterior</span>
+              <h3>Exterior Detailing</h3>
+              <p>Full exterior detail with as much time and effort as needed for a wow, perfect, “never seen my car that clean” finish.</p>
               <ul class="package-points">
-                <li>Everything in Express, plus a full interior car cleaning vacuum</li>
-                <li>Dashboard, console, doors, and cupholders cleaned</li>
-                <li>Interior glass and odor-neutral finish</li>
+                <li>Wash, decontamination, wheels, tires, trim, and paint-safe finishing</li>
+                <li>Debris removed and door/trunk jambs washed</li>
+                <li>Every exterior surface worked until it looks its best</li>
+                <li>Enough effort on each visit to achieve a true showroom-level result</li>
               </ul>
-              <p class="price">From CA$279 <small>/ sedan</small></p>
+              <p class="price">From CA$229 <small>/ sedan</small></p>
+              <p class="card-book-cta">Click to book your detailing →</p>
             </article>
-            <article class="card">
-              <span class="card-tag">Best results</span>
-              <h3>Deep detail + protect</h3>
-              <p>For stubborn buildup, seasonal resets, and that "new car again" finish with car steam cleaning options.</p>
+            <article
+              class="card card--booking js-open-booking-package"
+              tabindex="0"
+              role="button"
+              data-calendly-url="https://calendly.com/main-bk7w/exterior-detailing-clone"
+              data-booking-source="Interior + Exterior Detailing"
+              aria-label="Book Interior + Exterior Detailing"
+            >
+              <span class="card-tag">Most booked</span>
+              <h3>Interior + Exterior Detailing</h3>
+              <p>The complete package — everything in our Interior and Exterior details, inside and out, for that full wow effect.</p>
               <ul class="package-points">
-                <li>Deep interior clean with fabric or leather care</li>
-                <li>Car seat cleaning and car carpet cleaning for high-use vehicles</li>
-                <li>Clay prep + paint-safe decontamination</li>
-                <li>Polymer sealant for lasting gloss</li>
+                <li>Everything in Interior Detailing and Exterior Detailing combined</li>
+                <li>As much time and effort as your vehicle needs — no rushed shortcuts</li>
+                <li>Upholstery shampooing not included — available as an add-on</li>
               </ul>
               <p class="price">From CA$379 <small>/ sedan</small></p>
+              <p class="card-book-cta">Click to book your detailing →</p>
             </article>
           </div>
         </div>
@@ -1588,12 +1631,12 @@
               <p>Yes. We offer mobile interior car cleaning in Comox Valley, Campbell River, Courtenay, Cumberland, and nearby Black Creek neighborhoods.</p>
             </article>
             <article class="step">
-              <h3>What is included in car cleaning interior service?</h3>
-              <p>Most bookings include vacuuming, dashboard and console wipe-down, door panel cleaning, interior glass, and optional seat and carpet deep cleaning.</p>
+              <h3>What is included in each detailing package?</h3>
+              <p>Each package covers everything needed for a wow, perfect finish — as much time and effort as your vehicle requires. Upholstery shampooing is not included in the base price but can be added on request.</p>
             </article>
             <article class="step">
-              <h3>How long does Express interior refresh take?</h3>
-              <p>Most express appointments are completed in 60-90 minutes for sedans. Larger vehicles or heavy buildup may need extra time.</p>
+              <h3>How long does a detailing appointment take?</h3>
+              <p>Timing depends on vehicle size and condition. Most appointments run 2–4 hours. We take the time needed to achieve that “never seen my car that clean” result.</p>
             </article>
             <article class="step">
               <h3>Do you provide car steam cleaning?</h3>
@@ -1691,8 +1734,8 @@
       const defaultFlashDurationMs = 2 * 60 * 60 * 1000;
       const calendlyBookingBasePath = "https://calendly.com/d/cvx2-y7x-4sd";
 
-      function getCalendlyBookingUrl() {
-        const url = new URL(calendlyBookingBasePath);
+      function getCalendlyEmbedUrl(basePath) {
+        const url = new URL(basePath || calendlyBookingBasePath);
         url.searchParams.set("hide_gdpr_banner", "1");
         url.searchParams.set("embed_type", "Inline");
         url.searchParams.set(
@@ -1703,6 +1746,49 @@
         url.searchParams.set("text_color", "ffffff");
         url.searchParams.set("primary_color", "ffffff");
         return url.toString();
+      }
+
+      function getCalendlyBookingUrl() {
+        return getCalendlyEmbedUrl(calendlyBookingBasePath);
+      }
+
+      function loadCalendlyWidget(basePath) {
+        if (!bookingCalendlyWidget) return;
+
+        const targetPath = basePath || calendlyBookingBasePath;
+        if (
+          bookingCalendlyWidget.dataset.initialized === "true"
+          && bookingCalendlyWidget.dataset.calendlyPath === targetPath
+        ) {
+          return;
+        }
+
+        function initWidget() {
+          if (typeof Calendly === "undefined") return false;
+          bookingCalendlyWidget.innerHTML = "";
+          bookingCalendlyWidget.style.minHeight = "0";
+          delete bookingCalendlyWidget.dataset.touchBound;
+          Calendly.initInlineWidget({
+            url: getCalendlyEmbedUrl(targetPath),
+            parentElement: bookingCalendlyWidget,
+            resize: true,
+          });
+          bookingCalendlyWidget.dataset.initialized = "true";
+          bookingCalendlyWidget.dataset.calendlyPath = targetPath;
+          bindCalendlyTouchWorkaround();
+          return true;
+        }
+
+        if (initWidget()) return;
+
+        const waitForCalendly = window.setInterval(() => {
+          if (initWidget()) window.clearInterval(waitForCalendly);
+        }, 100);
+        window.setTimeout(() => window.clearInterval(waitForCalendly), 10000);
+      }
+
+      function ensureCalendlyWidget(basePath) {
+        loadCalendlyWidget(basePath);
       }
       let lastBookingTrigger = null;
       let lockedScrollY = 0;
@@ -2081,29 +2167,22 @@
         bookingCalendlyWidget.style.height = `${height}px`;
       }
 
-      function ensureCalendlyWidget() {
-        if (!bookingCalendlyWidget || bookingCalendlyWidget.dataset.initialized === "true") return;
+      function openBookingModal(_triggerLabel, triggerElement) {
+        if (!bookingModal) return;
+        bookingModal.hidden = false;
+        lockPageScroll();
+        bindModalTouchWorkaround();
+        ensureCalendlyWidget(triggerElement?.dataset?.calendlyUrl);
+        bindCalendlyTouchWorkaround();
+        lastBookingTrigger = triggerElement || null;
+      }
 
-        function initWidget() {
-          if (typeof Calendly === "undefined") return false;
-          bookingCalendlyWidget.innerHTML = "";
-          bookingCalendlyWidget.style.minHeight = "0";
-          Calendly.initInlineWidget({
-            url: getCalendlyBookingUrl(),
-            parentElement: bookingCalendlyWidget,
-            resize: true,
-          });
-          bookingCalendlyWidget.dataset.initialized = "true";
-          bindCalendlyTouchWorkaround();
-          return true;
-        }
-
-        if (initWidget()) return;
-
-        const waitForCalendly = window.setInterval(() => {
-          if (initWidget()) window.clearInterval(waitForCalendly);
-        }, 100);
-        window.setTimeout(() => window.clearInterval(waitForCalendly), 10000);
+      function closeBookingModal() {
+        if (!bookingModal) return;
+        bookingModal.hidden = true;
+        unbindModalTouchWorkaround();
+        unlockPageScroll();
+        if (lastBookingTrigger) lastBookingTrigger.focus();
       }
 
       window.addEventListener("message", (event) => {
@@ -2122,28 +2201,23 @@
         handleCalendlyBookingComplete(payload);
       });
 
-      function openBookingModal(_triggerLabel, triggerElement) {
-        if (!bookingModal) return;
-        bookingModal.hidden = false;
-        lockPageScroll();
-        bindModalTouchWorkaround();
-        ensureCalendlyWidget();
-        bindCalendlyTouchWorkaround();
-        lastBookingTrigger = triggerElement || null;
-      }
-
-      function closeBookingModal() {
-        if (!bookingModal) return;
-        bookingModal.hidden = true;
-        unbindModalTouchWorkaround();
-        unlockPageScroll();
-        if (lastBookingTrigger) lastBookingTrigger.focus();
-      }
-
       bookingOpenButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
           event.preventDefault();
           openBookingModal(button.dataset.bookingSource || "Website", button);
+        });
+      });
+
+      document.querySelectorAll(".js-open-booking-package").forEach((card) => {
+        const openPackageBooking = (event) => {
+          event.preventDefault();
+          openBookingModal(card.dataset.bookingSource || "Package", card);
+        };
+
+        card.addEventListener("click", openPackageBooking);
+        card.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          openPackageBooking(event);
         });
       });
 
