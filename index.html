@@ -28,19 +28,13 @@
         return false;
       }
 
-      function gtag_report_contact_conversion(url) {
-        var callback = function () {
-          if (typeof url != 'undefined') {
-            window.location = url;
-          }
-        };
+      function gtag_report_contact_conversion() {
         gtag('event', 'conversion', {
           send_to: 'AW-18096536070/gcoFCIzA37EcEIb0jLVD',
           value: 1.0,
           currency: 'CAD',
-          event_callback: callback
+          transport_type: 'beacon'
         });
-        return false;
       }
     </script>
 
@@ -323,6 +317,96 @@
           transform: none;
           animation: none;
           transition: none;
+        }
+
+        .promo-ticker__track {
+          animation: none;
+          justify-content: center;
+          width: 100%;
+        }
+
+        .promo-ticker__segment:not(:first-child) {
+          display: none;
+        }
+      }
+
+      /* Promo ticker */
+      .promo-ticker {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 45;
+        height: 34px;
+        background: rgba(5, 10, 16, 0.96);
+        border-bottom: 1px solid rgba(74, 222, 128, 0.28);
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+        overflow: hidden;
+      }
+
+      .promo-ticker.is-visible {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .promo-ticker__link {
+        display: block;
+        height: 100%;
+        text-decoration: none;
+        color: #86efac;
+      }
+
+      .promo-ticker__link:hover,
+      .promo-ticker__link:focus-visible {
+        color: #bbf7d0;
+        text-decoration: none;
+      }
+
+      .promo-ticker__viewport {
+        overflow: hidden;
+        height: 100%;
+      }
+
+      .promo-ticker__track {
+        display: flex;
+        width: max-content;
+        will-change: transform;
+        animation: promo-ticker-scroll 14.4s linear infinite;
+      }
+
+      .promo-ticker__segment {
+        flex-shrink: 0;
+        padding: 0 3rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        line-height: 34px;
+        white-space: nowrap;
+      }
+
+      @keyframes promo-ticker-scroll {
+        from {
+          transform: translate3d(0, 0, 0);
+        }
+        to {
+          transform: translate3d(calc(var(--promo-marquee-step, 50%) * -1), 0, 0);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .promo-ticker__track {
+          animation-duration: 4.32s;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .promo-ticker__segment {
+          padding: 0 6rem;
         }
       }
 
@@ -1372,6 +1456,20 @@
     </style>
   </head>
   <body>
+    <div class="promo-ticker" id="promo-ticker" aria-label="New client promotion">
+      <a
+        class="promo-ticker__link js-open-booking"
+        href="#booking-modal"
+        data-booking-source="Promo ticker"
+      >
+        <div class="promo-ticker__viewport">
+          <div class="promo-ticker__track">
+            <span class="promo-ticker__segment" data-promo-segment></span>
+            <span class="promo-ticker__segment" data-promo-segment aria-hidden="true"></span>
+          </div>
+        </div>
+      </a>
+    </div>
     <header class="site-header">
       <div class="inner">
         <a class="brand" href="#top">
@@ -1403,7 +1501,7 @@
               <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Hero CTA">Get your quote</a>
               <a class="btn btn-ghost" href="#services">View packages</a>
             </div>
-            <p class="hero-note">Local new-client offer: save 20% on your first clean this month in our North Island service area.</p>
+            <p class="hero-note" id="hero-offer-note">Local new-client offer: save 20% on your first clean in our North Island service area.</p>
             <ul class="trust-row">
               <li><strong>100% clean</strong> guarantee</li>
               <li><strong>Insured</strong> owner-operator</li>
@@ -1652,7 +1750,7 @@
       <div class="booking-modal__panel" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
         <button class="booking-modal__close" type="button" data-close-booking aria-label="Close booking form">×</button>
         <h2 id="booking-modal-title">Book your detailing</h2>
-        <p class="booking-modal__intro">Choose a time that works for you.</p>
+        <p class="booking-modal__intro">Please select a convenient time slot below. Your exact service duration and final price depend on your vehicle’s size and package selection. A finalized quote will be sent to you for approval prior to your appointment.</p>
         <div class="booking-calendly" id="booking-calendly-slot">
           <div
             id="booking-calendly-widget"
@@ -1687,6 +1785,41 @@
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
       const buildCommitSha = document.getElementById("build-commit-sha");
+      const promoTicker = document.getElementById("promo-ticker");
+      const promoMonthName = new Date().toLocaleString("en-CA", { month: "long" });
+      const promoOfferText = `· New clients: save 20% on your first clean in ${promoMonthName} · `;
+
+      document.querySelectorAll("[data-promo-segment]").forEach((segment) => {
+        segment.textContent = promoOfferText;
+      });
+
+      const promoTickerTrack = promoTicker?.querySelector(".promo-ticker__track");
+
+      function syncPromoTickerMarquee() {
+        if (!promoTickerTrack) return;
+        const firstSegment = promoTickerTrack.querySelector(".promo-ticker__segment");
+        if (!firstSegment) return;
+        promoTickerTrack.style.setProperty("--promo-marquee-step", `${firstSegment.offsetWidth}px`);
+      }
+
+      syncPromoTickerMarquee();
+      window.addEventListener("resize", syncPromoTickerMarquee, { passive: true });
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(syncPromoTickerMarquee);
+      }
+
+      const heroOfferNote = document.getElementById("hero-offer-note");
+      if (heroOfferNote) {
+        heroOfferNote.textContent = `Local new-client offer: save 20% on your first clean in ${promoMonthName} in our North Island service area.`;
+      }
+
+      function updatePromoTicker() {
+        if (!promoTicker) return;
+        promoTicker.classList.toggle("is-visible", window.scrollY > 80);
+      }
+
+      window.addEventListener("scroll", updatePromoTicker, { passive: true });
+      updatePromoTicker();
 
       async function setBuildCommitSha() {
         if (!buildCommitSha) return;
@@ -2222,14 +2355,8 @@
       });
 
       document.querySelectorAll('a[href^="tel:"]').forEach((phoneLink) => {
-        phoneLink.addEventListener("click", (event) => {
-          event.preventDefault();
-          const phoneUrl = phoneLink.getAttribute("href");
-          if (typeof gtag_report_contact_conversion === "function") {
-            gtag_report_contact_conversion(phoneUrl);
-            return;
-          }
-          if (phoneUrl) window.location.href = phoneUrl;
+        phoneLink.addEventListener("click", () => {
+          gtag_report_contact_conversion();
         });
       });
 
