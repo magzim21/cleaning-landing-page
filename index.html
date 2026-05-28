@@ -1765,7 +1765,7 @@
       <div class="booking-modal__panel" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
         <button class="booking-modal__close" type="button" data-close-booking aria-label="Close booking form">×</button>
         <h2 id="booking-modal-title">Book your detailing</h2>
-        <p class="booking-modal__intro">Please select a convenient time slot below. Your exact service duration and final price depend on your vehicle’s size and package selection. A finalized quote will be sent to you for approval prior to your appointment.</p>
+        <p class="booking-modal__intro">A finalized quote will be sent to you for approval prior to your appointment. Your exact service duration and final price depend on your vehicle’s size and package selection. For convenience, select a time slot below. </p>
         <div class="booking-calendly" id="booking-calendly-slot">
           <div
             id="booking-calendly-widget"
@@ -1900,6 +1900,20 @@
         return getCalendlyEmbedUrl(calendlyBookingBasePath);
       }
 
+      function resetCalendlyWidget() {
+        if (!bookingCalendlyWidget) return;
+        if (calendlyInitWaitId !== null) {
+          window.clearInterval(calendlyInitWaitId);
+          calendlyInitWaitId = null;
+        }
+        bookingCalendlyWidget.innerHTML = "";
+        bookingCalendlyWidget.style.minHeight = "0";
+        bookingCalendlyWidget.style.height = "";
+        delete bookingCalendlyWidget.dataset.initialized;
+        delete bookingCalendlyWidget.dataset.calendlyPath;
+        delete bookingCalendlyWidget.dataset.touchBound;
+      }
+
       function loadCalendlyWidget(basePath) {
         if (!bookingCalendlyWidget) return;
 
@@ -1915,6 +1929,7 @@
           if (typeof Calendly === "undefined") return false;
           bookingCalendlyWidget.innerHTML = "";
           bookingCalendlyWidget.style.minHeight = "0";
+          bookingCalendlyWidget.style.height = "";
           delete bookingCalendlyWidget.dataset.touchBound;
           Calendly.initInlineWidget({
             url: getCalendlyEmbedUrl(targetPath),
@@ -1929,16 +1944,25 @@
 
         if (initWidget()) return;
 
-        const waitForCalendly = window.setInterval(() => {
-          if (initWidget()) window.clearInterval(waitForCalendly);
+        calendlyInitWaitId = window.setInterval(() => {
+          if (initWidget()) {
+            window.clearInterval(calendlyInitWaitId);
+            calendlyInitWaitId = null;
+          }
         }, 100);
-        window.setTimeout(() => window.clearInterval(waitForCalendly), 10000);
+        window.setTimeout(() => {
+          if (calendlyInitWaitId !== null) {
+            window.clearInterval(calendlyInitWaitId);
+            calendlyInitWaitId = null;
+          }
+        }, 10000);
       }
 
       function ensureCalendlyWidget(basePath) {
         loadCalendlyWidget(basePath);
       }
       let lastBookingTrigger = null;
+      let calendlyInitWaitId = null;
       let lockedScrollY = 0;
       const mobileBookingQuery = window.matchMedia("(max-width: 767px)");
       const modalTouchNoop = () => {};
@@ -2330,6 +2354,7 @@
         bookingModal.hidden = true;
         unbindModalTouchWorkaround();
         unlockPageScroll();
+        resetCalendlyWidget();
         if (lastBookingTrigger) lastBookingTrigger.focus();
       }
 
