@@ -751,7 +751,6 @@
       }
 
       .section-head {
-        max-width: 560px;
         margin-bottom: 40px;
       }
 
@@ -773,17 +772,18 @@
       .cards {
         display: grid;
         gap: 20px;
+        align-items: stretch;
       }
 
       @media (min-width: 640px) {
         .cards {
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
 
       @media (min-width: 960px) {
         .cards {
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
       }
 
@@ -794,7 +794,7 @@
         padding: 24px;
         display: flex;
         flex-direction: column;
-        min-height: 100%;
+        height: 100%;
         opacity: 0;
         transform: translateY(14px) scale(0.985);
         animation: proof-card-enter 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -828,9 +828,13 @@
         outline-offset: 3px;
       }
 
-      .card-book-cta {
+      .card-footer {
         margin-top: auto;
         padding-top: 18px;
+      }
+
+      .card-book-cta {
+        margin: 12px 0 0;
         font-size: 1.15rem;
         font-weight: 700;
         line-height: 1.3;
@@ -850,38 +854,43 @@
         font-family: "Outfit", sans-serif;
         font-size: 1.25rem;
         font-weight: 600;
+        line-height: 1.25;
         margin: 0 0 10px;
       }
 
-      .card p {
+      .card-desc,
+      .package-points {
         margin: 0 0 16px;
         color: var(--text-muted);
-        font-size: 0.95rem;
-        flex: 1;
+        font-size: 1rem;
+        line-height: 1.55;
       }
 
-      .price {
+      .card .price {
+        margin: 0;
         font-family: "Outfit", sans-serif;
         font-size: 1.5rem;
         font-weight: 700;
+        line-height: 1.2;
         color: var(--text);
       }
 
-      .price small {
+      .card .price small {
         font-size: 0.85rem;
         font-weight: 500;
         color: var(--text-muted);
       }
 
       .package-points {
-        margin: 0 0 16px;
         padding-left: 18px;
-        color: var(--text-muted);
-        font-size: 0.9rem;
       }
 
       .package-points li {
         margin-bottom: 6px;
+      }
+
+      .package-points li:last-child {
+        margin-bottom: 0;
       }
 
       /* Steps */
@@ -1557,8 +1566,8 @@
       <section id="services" class="alt">
         <div class="wrap">
           <div class="section-head">
-            <h2>Car interior cleaning and detailing packages people actually book</h2>
-            <p>Simple options, clear outcomes, and transparent pricing for sedans, SUVs, and family vehicles across the Comox Valley.</p>
+            <h2>Detailing packages</h2>
+            <p>Three clear options for sedans, SUVs, and family vehicles. Fixed quote before we start — no surprises.</p>
           </div>
           <div class="cards">
             <article
@@ -1571,7 +1580,7 @@
             >
               <span class="card-tag">Interior</span>
               <h3>Interior Detailing</h3>
-              <p>Full interior detail with as much time and effort as needed for a wow, perfect, “never seen my car that clean” finish.</p>
+              <p class="card-desc">Full interior detail with as much time and effort as needed for a wow, perfect, “never seen my car that clean” finish.</p>
               <ul class="package-points">
                 <li>Seats, carpets, mats, dash, console, doors, cupholders, vents, and interior glass</li>
                 <li>Deep clean under the seats</li>
@@ -1579,8 +1588,10 @@
                 <li>Every reachable interior surface cleaned until it looks its best</li>
                 <li>Upholstery shampooing not included — available as an add-on</li>
               </ul>
-              <p class="price">From CA$229 <small>/ sedan</small></p>
-              <p class="card-book-cta">Click to book your detailing →</p>
+              <div class="card-footer">
+                <p class="price">From CA$229 <small>/ sedan</small></p>
+                <p class="card-book-cta">Click to book your detailing →</p>
+              </div>
             </article>
             <article
               class="card card--booking js-open-booking-package"
@@ -1592,15 +1603,17 @@
             >
               <span class="card-tag">Exterior</span>
               <h3>Exterior Detailing</h3>
-              <p>Full exterior detail with as much time and effort as needed for a wow, perfect, “never seen my car that clean” finish.</p>
+              <p class="card-desc">Full exterior detail with as much time and effort as needed for a wow, perfect, “never seen my car that clean” finish.</p>
               <ul class="package-points">
                 <li>Wash, decontamination, wheels, tires, trim, and paint-safe finishing</li>
                 <li>Debris removed and door/trunk jambs washed</li>
                 <li>Every exterior surface worked until it looks its best</li>
                 <li>Enough effort on each visit to achieve a true showroom-level result</li>
               </ul>
-              <p class="price">From CA$229 <small>/ sedan</small></p>
-              <p class="card-book-cta">Click to book your detailing →</p>
+              <div class="card-footer">
+                <p class="price">From CA$229 <small>/ sedan</small></p>
+                <p class="card-book-cta">Click to book your detailing →</p>
+              </div>
             </article>
             <article
               class="card card--booking js-open-booking-package"
@@ -1612,14 +1625,16 @@
             >
               <span class="card-tag">Most booked</span>
               <h3>Interior + Exterior Detailing</h3>
-              <p>The complete package — everything in our Interior and Exterior details, inside and out, for that full wow effect.</p>
+              <p class="card-desc">The complete package — everything in our Interior and Exterior details, inside and out, for that full wow effect.</p>
               <ul class="package-points">
                 <li>Everything in Interior Detailing and Exterior Detailing combined</li>
                 <li>As much time and effort as your vehicle needs — no rushed shortcuts</li>
                 <li>Upholstery shampooing not included — available as an add-on</li>
               </ul>
-              <p class="price">From CA$379 <small>/ sedan</small></p>
-              <p class="card-book-cta">Click to book your detailing →</p>
+              <div class="card-footer">
+                <p class="price">From CA$379 <small>/ sedan</small></p>
+                <p class="card-book-cta">Click to book your detailing →</p>
+              </div>
             </article>
           </div>
         </div>
