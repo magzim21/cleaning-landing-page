@@ -15,26 +15,6 @@
     },
     {
       "source": "/booking-confirmed",
-      "has": [{ "type": "query", "key": "invitee_full_name" }],
-      "destination": "/api/booking-confirmed"
-    },
-    {
-      "source": "/booking-confirmed",
-      "has": [{ "type": "query", "key": "event_start_time" }],
-      "destination": "/api/booking-confirmed"
-    },
-    {
-      "source": "/booking-confirmed",
-      "has": [{ "type": "query", "key": "event_type_name" }],
-      "destination": "/api/booking-confirmed"
-    },
-    {
-      "source": "/booking-confirmed",
-      "has": [{ "type": "query", "key": "event_type_uuid" }],
-      "destination": "/api/booking-confirmed"
-    },
-    {
-      "source": "/booking-confirmed",
       "destination": "/index.html"
     }
   ]

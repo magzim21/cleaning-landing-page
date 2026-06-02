@@ -294,12 +294,9 @@ async function deliverBookingConfirmation({ requestId, params, sourceUrl }) {
 async function claimBookingDelivery(params) {
   try {
     const cacheKey = getDedupCacheRequest(params);
-    const existing = await caches.default.match(cacheKey);
-    if (existing) {
-      const status = await existing.text();
-      if (status === "delivered" || status === "inflight") {
-        return false;
-      }
+
+    if (await wasBookingAlreadyDelivered(params)) {
+      return false;
     }
 
     await caches.default.put(
@@ -308,6 +305,15 @@ async function claimBookingDelivery(params) {
         headers: { "Cache-Control": "max-age=300" },
       })
     );
+
+    const afterClaim = await caches.default.match(cacheKey);
+    if (!afterClaim) return true;
+
+    const status = await afterClaim.text();
+    if (status !== "inflight") {
+      return false;
+    }
+
     return true;
   } catch (error) {
     console.warn("Booking dedup claim failed", error);
