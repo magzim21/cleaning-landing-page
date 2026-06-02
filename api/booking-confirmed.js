@@ -182,29 +182,49 @@ async function sendBookingEmail({ requestId, subject, text, replyTo, dedupKey })
   console.log(`[${requestId}] Booking email sent successfully`);
 }
 
-async function sendBookingSlack({ requestId, text }) {
+async function sendBookingSlack({ requestId, text, dedupKey }) {
   const normalizedWebhookUrl = str(process.env.SLACK_WEBHOOK_URL).replace(/^['"]|['"]$/g, "");
   if (!normalizedWebhookUrl) {
     console.warn(`[${requestId}] SLACK_WEBHOOK_URL is missing, skipping Slack notification`);
     return;
   }
 
+  const slackDedupKey = str(dedupKey);
+  if (slackDedupKey) {
+    const slackCacheKey = new Request(
+      `https://booking-slack-dedup.internal/${encodeURIComponent(slackDedupKey)}`
+    );
+    try {
+      const existing = await caches.default.match(slackCacheKey);
+      if (existing) {
+        console.log(`[${requestId}] Duplicate Slack notification skipped`, { dedupKey: slackDedupKey });
+        return;
+      }
+      await caches.default.put(
+        slackCacheKey,
+        new Response("sent", {
+          headers: { "Cache-Control": "max-age=86400" },
+        })
+      );
+    } catch (error) {
+      console.warn(`[${requestId}] Slack dedup cache failed`, error);
+    }
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort("Slack request timeout"), SLACK_TIMEOUT_MS);
 
-  const payload = JSON.stringify({
-    text: str(text),
-    mrkdwn: true,
-  });
-
-  async function postToSlack() {
+  try {
     const slackResponse = await fetch(normalizedWebhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       signal: controller.signal,
-      body: payload,
+      body: JSON.stringify({
+        text: str(text),
+        mrkdwn: true,
+      }),
     });
 
     if (!slackResponse.ok) {
@@ -215,22 +235,16 @@ async function sendBookingSlack({ requestId, text }) {
         }`
       );
     }
-  }
 
-  try {
-    await postToSlack();
+    console.log(`[${requestId}] Slack notification sent`);
   } catch (error) {
     if (error && error.name === "AbortError") {
       throw new Error(`Slack webhook timed out after ${SLACK_TIMEOUT_MS}ms`);
     }
-
-    console.warn(`[${requestId}] Slack notification first attempt failed, retrying once`, error);
-    await postToSlack();
+    throw error;
   } finally {
     clearTimeout(timeoutId);
   }
-
-  console.log(`[${requestId}] Slack notification sent`);
 }
 
 async function deliverBookingConfirmation({ requestId, params, sourceUrl }) {
@@ -244,6 +258,8 @@ async function deliverBookingConfirmation({ requestId, params, sourceUrl }) {
     console.log(`[${requestId}] Duplicate booking confirmation skipped`, { dedupKey });
     return { duplicate: true };
   }
+
+  await markBookingDelivered(params);
 
   const lines = [
     "New Calendly booking",
@@ -278,12 +294,12 @@ async function deliverBookingConfirmation({ requestId, params, sourceUrl }) {
       await sendBookingSlack({
         requestId,
         text: slackText,
+        dedupKey,
       });
     } catch (error) {
       console.error(`[${requestId}] Failed to send Slack notification`, error);
     }
 
-    await markBookingDelivered(params);
     return { duplicate: false };
   } catch (error) {
     await releaseBookingDeliveryClaim(params);
@@ -348,13 +364,7 @@ async function markBookingDelivered(params) {
 
 async function releaseBookingDeliveryClaim(params) {
   try {
-    const cacheKey = getDedupCacheRequest(params);
-    const existing = await caches.default.match(cacheKey);
-    if (!existing) return;
-    const status = await existing.text();
-    if (status === "inflight") {
-      await caches.default.delete(cacheKey);
-    }
+    await caches.default.delete(getDedupCacheRequest(params));
   } catch (error) {
     console.warn("Booking dedup claim release failed", error);
   }
