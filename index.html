@@ -23,6 +23,7 @@
           send_to: 'AW-18096536070/tDdyCLPi1rEcEIb0jLVD',
           value: 430.0,
           currency: 'CAD',
+          transport_type: 'beacon',
           event_callback: callback
         });
         return false;
@@ -1110,26 +1111,37 @@
       .booking-calendly {
         display: grid;
         gap: 14px;
+        min-height: 0;
       }
 
       .booking-calendly .calendly-inline-widget {
         min-width: 320px;
         width: 100%;
-        min-height: 0;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: #0c1420;
+        min-height: 630px;
+        border-radius: 14px;
+        /* Calendly's basic embed applies `text_color` to ALL text including
+           typed text inside white input fields. To guarantee black text in
+           the inputs, we must use a light background_color + dark text_color
+           in the URL params. So we render the Calendly form as a clean white
+           "card" sitting inside the dark modal panel. */
+        background: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
         position: relative;
         z-index: 2;
-        touch-action: manipulation;
+        touch-action: auto;
+        color-scheme: light;
+        overflow: visible;
       }
 
       .booking-calendly .calendly-inline-widget iframe {
         display: block;
         width: 100%;
+        min-height: 630px;
         border: 0;
         pointer-events: auto;
-        touch-action: manipulation;
+        touch-action: auto;
+        color-scheme: light;
       }
 
       .booking-thanks-overlay[hidden] {
@@ -1477,7 +1489,7 @@
     </div>
     <header class="site-header">
       <div class="inner">
-        <a class="brand" href="#top">
+        <a class="brand" href="/" aria-label="Island Drift Detailing — home">
           Island Drift Detailing
         </a>
         <div class="header-center" aria-label="Business address and mobile number">
@@ -1506,7 +1518,7 @@
               <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Hero CTA">Get your quote</a>
               <a class="btn btn-ghost" href="#services">View packages</a>
             </div>
-            <p class="hero-note" id="hero-offer-note">Local new-client offer: save 20% on your first clean in our North Island service area.</p>
+            <p class="hero-note" id="hero-offer-note">Local new-client offer: save 10% on your first clean in our North Island service area.</p>
             <ul class="trust-row">
               <li><strong>100% clean</strong> guarantee</li>
               <li><strong>Insured</strong> owner-operator</li>
@@ -1720,9 +1732,9 @@
         <div class="wrap">
           <div class="cta-band">
             <h2>Get your Island Drift Detailing quote in under 10 minutes</h2>
-            <p>Tell us your vehicle and address and we will reply with exact pricing, nearest available slot in Comox Valley, Campbell River, Courtenay, or Cumberland, and your 20% first-clean code.</p>
+            <p>Tell us your vehicle and address and we will reply with exact pricing, nearest available slot in Comox Valley, Campbell River, Courtenay, or Cumberland, and your 10% first-clean code.</p>
             <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
-              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Offer CTA">Claim my 20% offer</a>
+              <a class="btn btn-primary js-open-booking" href="#booking-modal" data-booking-source="Offer CTA">Claim my 10% offer</a>
               <a class="btn btn-ghost" href="tel:+17789840698">Call now: +1 778 984 0698</a>
             </div>
           </div>
@@ -1766,9 +1778,6 @@
           <div
             id="booking-calendly-widget"
             class="calendly-inline-widget"
-            data-url="https://calendly.com/d/cvq4-j88-zg5?hide_gdpr_banner=1&embed_type=Inline&background_color=0c1420&text_color=ffffff&primary_color=ffffff"
-            data-resize="true"
-            style="min-width:320px;"
           ></div>
         </div>
       </div>
@@ -1798,7 +1807,7 @@
       const buildCommitSha = document.getElementById("build-commit-sha");
       const promoTicker = document.getElementById("promo-ticker");
       const promoMonthName = new Date().toLocaleString("en-CA", { month: "long" });
-      const promoOfferText = `· New clients: save 20% on your first clean in ${promoMonthName} · `;
+      const promoOfferText = `· New clients: save 10% on your first clean in ${promoMonthName} · `;
 
       document.querySelectorAll("[data-promo-segment]").forEach((segment) => {
         segment.textContent = promoOfferText;
@@ -1852,7 +1861,7 @@
 
       const heroOfferNote = document.getElementById("hero-offer-note");
       if (heroOfferNote) {
-        heroOfferNote.textContent = `Local new-client offer: save 20% on your first clean in ${promoMonthName} in our North Island service area.`;
+        heroOfferNote.textContent = `Local new-client offer: save 10% on your first clean in ${promoMonthName} in our North Island service area.`;
       }
 
       function updatePromoTicker() {
@@ -1917,9 +1926,9 @@
           "embed_domain",
           window.location.hostname || window.location.host || "localhost"
         );
-        url.searchParams.set("background_color", "0c1420");
-        url.searchParams.set("text_color", "ffffff");
-        url.searchParams.set("primary_color", "ffffff");
+        url.searchParams.set("background_color", "ffffff");
+        url.searchParams.set("text_color", "0a2540");
+        url.searchParams.set("primary_color", "0066ff");
         return url.toString();
       }
 
@@ -2235,12 +2244,118 @@
         return params;
       }
 
-      function getBookingConfirmedNotifyKey(params) {
-        const serialized = Object.keys(params)
+      function mergeBookingConfirmationParams(...sources) {
+        const merged = {};
+        for (const source of sources) {
+          Object.assign(merged, normalizeBookingConfirmedParams(source));
+        }
+        return merged;
+      }
+
+      function getStableBookingIdentity(params) {
+        const normalized = normalizeBookingConfirmedParams(params);
+        const identityParts = [
+          normalized.invitee_email || normalized.email || "",
+          normalized.event_start_time || normalized.event_start || "",
+          normalized.event_end_time || normalized.event_end || "",
+          normalized.event_type_uuid || "",
+        ].filter(Boolean);
+
+        if (identityParts.length > 0) {
+          return identityParts.join("|");
+        }
+
+        return Object.keys(normalized)
           .sort()
-          .map((key) => `${key}=${params[key]}`)
+          .map((key) => `${key}=${normalized[key]}`)
+          .join("&");
+      }
+
+      function getBookingGtagKey(params) {
+        return `idd-booking-gtag:${getStableBookingIdentity(params) || "unknown"}`;
+      }
+
+      function getBookingConfirmedNotifyKey(params) {
+        const normalized = normalizeBookingConfirmedParams(params);
+        const serialized = Object.keys(normalized)
+          .sort()
+          .map((key) => `${key}=${normalized[key]}`)
           .join("&");
         return `idd-booking-confirmed-notify:${serialized || "empty"}`;
+      }
+
+      function getBookingConversionKeys(params) {
+        const resolved = mergeBookingConfirmationParams(readPendingConfirmationParams(), params);
+        return {
+          notifyKey: getBookingConfirmedNotifyKey(resolved),
+          gtagKey: getBookingGtagKey(resolved),
+        };
+      }
+
+      function hasBookingConversionFired(params) {
+        const resolved = mergeBookingConfirmationParams(readPendingConfirmationParams(), params);
+        const { gtagKey, notifyKey } = getBookingConversionKeys(resolved);
+
+        try {
+          if (sessionStorage.getItem(gtagKey) === "sent") return true;
+          if (sessionStorage.getItem(notifyKey) === "sent") return true;
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+        return false;
+      }
+
+      function shouldRedirectForBookingCompletion(params) {
+        return !hasBookingConversionFired(params);
+      }
+
+      function markBookingConversionComplete(params) {
+        const resolved = mergeBookingConfirmationParams(readPendingConfirmationParams(), params);
+        if (Object.keys(resolved).length === 0) return;
+
+        const { notifyKey } = getBookingConversionKeys(resolved);
+        try {
+          sessionStorage.setItem(notifyKey, "sent");
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+      }
+
+      function fireBookingConversionOnce(params) {
+        const resolved = mergeBookingConfirmationParams(readPendingConfirmationParams(), params);
+        const gtagKey = getBookingGtagKey(resolved);
+
+        try {
+          if (sessionStorage.getItem(gtagKey) === "sent") {
+            console.info("[Booking] Google conversion already fired for this booking");
+            return false;
+          }
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+
+        if (typeof gtag_report_conversion === "function") {
+          gtag_report_conversion();
+        } else if (typeof gtag === "function") {
+          gtag("event", "conversion", {
+            send_to: "AW-18096536070/tDdyCLPi1rEcEIb0jLVD",
+            value: 430.0,
+            currency: "CAD",
+            transport_type: "beacon",
+          });
+        } else {
+          console.warn("[Booking] Google tag not ready; conversion not fired");
+          return false;
+        }
+
+        try {
+          sessionStorage.setItem(gtagKey, "sent");
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+
+        console.info("[Booking] Google conversion fired");
+        return true;
       }
 
       async function sendBookingConfirmedNotification(params, { force = false } = {}) {
@@ -2253,7 +2368,8 @@
         const notifyKey = getBookingConfirmedNotifyKey(normalizedParams);
         if (!force) {
           try {
-            if (sessionStorage.getItem(notifyKey) === "sent") {
+            const state = sessionStorage.getItem(notifyKey);
+            if (state === "sent") {
               console.info("[Booking] Confirmation notification already sent for this booking");
               return true;
             }
@@ -2292,10 +2408,8 @@
         }
       }
 
-      function showBookingConfirmationExperience(endTime) {
-        if (typeof gtag_report_conversion === "function") {
-          gtag_report_conversion();
-        }
+      function showBookingConfirmationExperience(endTime, params) {
+        fireBookingConversionOnce(params);
         persistBookedFlash(resolveFlashUntilTimestamp(endTime));
         requestAnimationFrame(() => {
           startBookedFlashNow();
@@ -2310,10 +2424,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const alreadyNotified = urlParams.get("notified") === "1";
 
-        let params = getBookingConfirmedParamsFromLocation();
-        if (Object.keys(params).length === 0) {
-          params = readPendingConfirmationParams();
-        }
+        let params = mergeBookingConfirmationParams(
+          readPendingConfirmationParams(),
+          getBookingConfirmedParamsFromLocation()
+        );
 
         const endTime =
           params.event_end_time ||
@@ -2321,21 +2435,22 @@
           urlParams.get("event_end_time") ||
           urlParams.get("end_time");
 
-        if (!alreadyNotified && Object.keys(params).length > 0) {
-          const sent = await sendBookingConfirmedNotification(params);
-          if (!sent) {
-            console.error(
-              "[Booking] Failed to send confirmation notification from /booking-confirmed page"
-            );
-          }
-        } else if (!alreadyNotified && Object.keys(params).length === 0) {
-          console.warn("[Booking] /booking-confirmed loaded without booking params");
-        } else if (alreadyNotified) {
+        if (alreadyNotified) {
+          markBookingConversionComplete(params);
           console.info("[Booking] Confirmation already handled server-side (notified=1)");
+        } else if (Object.keys(params).length > 0) {
+          if (shouldRedirectForBookingCompletion(params)) {
+            const query = new URLSearchParams(params).toString();
+            window.location.replace(`/api/booking-confirmed?${query}`);
+            return;
+          }
+          console.info("[Booking] Confirmation delivery already in progress, skipping client redirect");
+        } else {
+          console.warn("[Booking] /booking-confirmed loaded without booking params");
         }
 
         clearPendingConfirmationParams();
-        showBookingConfirmationExperience(endTime);
+        showBookingConfirmationExperience(endTime, params);
 
         if (window.history.replaceState) {
           window.history.replaceState(null, "", "/booking-confirmed");
@@ -2347,23 +2462,22 @@
           buildBookingConfirmedParamsFromCalendly(payload || {})
         );
         storePendingConfirmationParams(params);
-
-        if (Object.keys(params).length === 0) {
-          console.warn("[Booking] Calendly event_scheduled payload had no usable params", payload);
-          window.location.href = "/booking-confirmed";
-          return;
-        }
-
-        const query = new URLSearchParams(params).toString();
-        window.location.href = `/api/booking-confirmed?${query}`;
+        console.info(
+          "[Booking] Stored pending confirmation params; Calendly redirect will deliver notifications"
+        );
       }
 
       function syncCalendlyWidgetHeight(heightValue) {
         if (!bookingCalendlyWidget || !heightValue) return;
         const height = parseInt(String(heightValue).replace("px", ""), 10);
         if (!Number.isFinite(height) || height <= 0) return;
-        bookingCalendlyWidget.style.minHeight = "0";
+        bookingCalendlyWidget.style.minHeight = `${height}px`;
         bookingCalendlyWidget.style.height = `${height}px`;
+        const iframe = bookingCalendlyWidget.querySelector("iframe");
+        if (iframe) {
+          iframe.style.minHeight = `${height}px`;
+          iframe.style.height = `${height}px`;
+        }
       }
 
       function openBookingModal(_triggerLabel, triggerElement) {
@@ -2372,7 +2486,6 @@
         lockPageScroll();
         bindModalTouchWorkaround();
         ensureCalendlyWidget(triggerElement?.dataset?.calendlyUrl);
-        bindCalendlyTouchWorkaround();
         lastBookingTrigger = triggerElement || null;
       }
 

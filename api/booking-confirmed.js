@@ -97,7 +97,32 @@ function buildConfirmationPageUrl(origin, params) {
   return redirectUrl.toString();
 }
 
-async function sendBookingEmail({ requestId, subject, text, replyTo }) {
+function getStableBookingDedupKey(params) {
+  const identity = [
+    str(params.invitee_email || params.email),
+    str(params.event_start_time || params.event_start),
+    str(params.event_end_time || params.event_end),
+    str(params.event_type_uuid),
+    str(params.invitee_uuid),
+  ].filter(Boolean);
+
+  if (identity.length > 0) {
+    return identity.join("|");
+  }
+
+  return Object.keys(params)
+    .sort()
+    .map((key) => `${key}=${params[key]}`)
+    .join("&");
+}
+
+function getDedupCacheRequest(params) {
+  return new Request(
+    `https://booking-dedup.internal/${encodeURIComponent(getStableBookingDedupKey(params) || "empty")}`
+  );
+}
+
+async function sendBookingEmail({ requestId, subject, text, replyTo, dedupKey }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     throw new Error("Email delivery is not configured.");
@@ -121,12 +146,15 @@ async function sendBookingEmail({ requestId, subject, text, replyTo }) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort("Resend request timeout"), RESEND_TIMEOUT_MS);
 
+  const idempotencyKey = str(dedupKey) || `booking-${requestId}`;
+
   try {
     const sendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKey,
       },
       signal: controller.signal,
       body: JSON.stringify(payload),
@@ -210,6 +238,13 @@ async function deliverBookingConfirmation({ requestId, params, sourceUrl }) {
     throw new Error("Missing booking details.");
   }
 
+  const dedupKey = getStableBookingDedupKey(params);
+
+  if (!(await claimBookingDelivery(params))) {
+    console.log(`[${requestId}] Duplicate booking confirmation skipped`, { dedupKey });
+    return { duplicate: true };
+  }
+
   const lines = [
     "New Calendly booking",
     "",
@@ -230,20 +265,92 @@ async function deliverBookingConfirmation({ requestId, params, sourceUrl }) {
     .filter(Boolean)
     .join("\n");
 
-  await sendBookingEmail({
-    requestId,
-    subject: buildSubject(params),
-    text: emailText,
-    replyTo: params.invitee_email || params.email,
-  });
-
   try {
-    await sendBookingSlack({
+    await sendBookingEmail({
       requestId,
-      text: slackText,
+      subject: buildSubject(params),
+      text: emailText,
+      replyTo: params.invitee_email || params.email,
+      dedupKey,
     });
+
+    try {
+      await sendBookingSlack({
+        requestId,
+        text: slackText,
+      });
+    } catch (error) {
+      console.error(`[${requestId}] Failed to send Slack notification`, error);
+    }
+
+    await markBookingDelivered(params);
+    return { duplicate: false };
   } catch (error) {
-    console.error(`[${requestId}] Failed to send Slack notification`, error);
+    await releaseBookingDeliveryClaim(params);
+    throw error;
+  }
+}
+
+async function claimBookingDelivery(params) {
+  try {
+    const cacheKey = getDedupCacheRequest(params);
+    const existing = await caches.default.match(cacheKey);
+    if (existing) {
+      const status = await existing.text();
+      if (status === "delivered" || status === "inflight") {
+        return false;
+      }
+    }
+
+    await caches.default.put(
+      cacheKey,
+      new Response("inflight", {
+        headers: { "Cache-Control": "max-age=300" },
+      })
+    );
+    return true;
+  } catch (error) {
+    console.warn("Booking dedup claim failed", error);
+    return true;
+  }
+}
+
+async function wasBookingAlreadyDelivered(params) {
+  try {
+    const hit = await caches.default.match(getDedupCacheRequest(params));
+    if (!hit) return false;
+    const status = await hit.text();
+    return status === "delivered" || status === "inflight";
+  } catch (error) {
+    console.warn("Booking dedup cache lookup failed", error);
+    return false;
+  }
+}
+
+async function markBookingDelivered(params) {
+  try {
+    await caches.default.put(
+      getDedupCacheRequest(params),
+      new Response("delivered", {
+        headers: { "Cache-Control": "max-age=86400" },
+      })
+    );
+  } catch (error) {
+    console.warn("Booking dedup cache write failed", error);
+  }
+}
+
+async function releaseBookingDeliveryClaim(params) {
+  try {
+    const cacheKey = getDedupCacheRequest(params);
+    const existing = await caches.default.match(cacheKey);
+    if (!existing) return;
+    const status = await existing.text();
+    if (status === "inflight") {
+      await caches.default.delete(cacheKey);
+    }
+  } catch (error) {
+    console.warn("Booking dedup claim release failed", error);
   }
 }
 
