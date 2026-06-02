@@ -5,16 +5,6 @@
   "rewrites": [
     {
       "source": "/booking-confirmed",
-      "has": [{ "type": "query", "key": "notified", "value": "1" }],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/booking-confirmed",
-      "has": [{ "type": "query", "key": "invitee_email" }],
-      "destination": "/api/booking-confirmed"
-    },
-    {
-      "source": "/booking-confirmed",
       "destination": "/index.html"
     }
   ]
