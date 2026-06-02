@@ -15,12 +15,20 @@ ipconfig getifaddr en0 # for accessing the local version from the mobile phone.
 In Calendly, set the event confirmation redirect to:
 
 ```
-https://YOUR-DOMAIN/api/booking-confirmed?event_type_name={{event_type_name}}&event_type_uuid={{event_type_uuid}}&event_start_time={{event_start_time}}&event_end_time={{event_end_time}}&guests={{guests}}&assigned_to={{assigned_to}}&invitee_full_name={{invitee_full_name}}&invitee_email={{invitee_email}}
+https://YOUR-DOMAIN/booking-confirmed?event_type_name={{event_type_name}}&event_type_uuid={{event_type_uuid}}&event_start_time={{event_start_time}}&event_end_time={{event_end_time}}&guests={{guests}}&assigned_to={{assigned_to}}&invitee_full_name={{invitee_full_name}}&invitee_email={{invitee_email}}
 ```
 
-**This must be the only path that triggers the API.** Do not also configure `/booking-confirmed?...` as a Calendly redirect — that would hit the API a second time and duplicate email + Slack.
+Every query parameter in that URL is captured as-is, formatted in plain language, and sent to email + Slack. Add or remove Calendly variables freely — whatever is in the URL gets forwarded.
 
-The API sends email + Slack, then redirects to `/booking-confirmed?notified=1` where the Google Ads conversion fires once and the thank-you overlay is shown.
+### How delivery stays exactly-once
+
+`/booking-confirmed` loads the page. The browser is the single delivery trigger:
+
+1. The page reads the booking params and computes a stable booking key.
+2. It guards delivery with `localStorage` (atomic + durable per browser) so a booking can never be delivered twice from the same device — even on refresh or double navigation.
+3. It sends **one** `POST` to `/api/booking-confirmed`, which sends the email + Slack message, and fires the Google Ads conversion once.
+
+The legacy `/api/booking-confirmed?...` redirect URL still works (it delivers server-side, then redirects to `/booking-confirmed?notified=1` for the thank-you UI + conversion), but prefer the `/booking-confirmed?...` URL above so there is a single, reliable delivery path.
 
 Required env vars: `RESEND_API_KEY`, `SLACK_WEBHOOK_URL`, `BOOKING_EMAIL_TO`, `BOOKING_EMAIL_FROM`.
 

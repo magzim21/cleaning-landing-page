@@ -2367,34 +2367,125 @@
         });
       }
 
-      function initBookingConfirmedRoute() {
+      function getBookingDeliveryKey(params) {
+        return `idd-booking-delivered:${getStableBookingIdentity(params) || "unknown"}`;
+      }
+
+      async function deliverBookingNotification(params) {
+        const normalized = normalizeBookingConfirmedParams(params);
+        if (Object.keys(normalized).length === 0) {
+          console.warn("[Booking] No params to deliver");
+          return false;
+        }
+
+        try {
+          const response = await fetch("/api/booking-confirmed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            keepalive: true,
+            body: JSON.stringify({
+              params: normalized,
+              source_url: window.location.href,
+            }),
+          });
+          if (!response.ok) {
+            const payload = await response.json().catch(() => ({}));
+            console.error("[Booking] Notification delivery failed", response.status, payload);
+            return false;
+          }
+          console.info("[Booking] Notification delivered (email + Slack)");
+          return true;
+        } catch (error) {
+          console.error("[Booking] Notification delivery failed", error);
+          return false;
+        }
+      }
+
+      async function initBookingConfirmedRoute() {
         const path = window.location.pathname.replace(/\/+$/, "") || "/";
         if (path !== "/booking-confirmed") return;
 
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get("notified") !== "1") {
-          // Email/Slack are delivered only by /api/booking-confirmed (Calendly redirect).
-          // Never redirect or POST from here — that duplicated notifications with the Vercel rewrite.
-          return;
-        }
+        const alreadyNotified = urlParams.get("notified") === "1";
 
         const params = mergeBookingConfirmationParams(
           readPendingConfirmationParams(),
           getBookingConfirmedParamsFromLocation()
         );
 
+        const identity = getStableBookingIdentity(params);
         const endTime =
           params.event_end_time ||
           params.end_time ||
           urlParams.get("event_end_time") ||
           urlParams.get("end_time");
 
-        clearPendingConfirmationParams();
+        const cleanUrl = () => {
+          if (window.history.replaceState) {
+            window.history.replaceState(null, "", "/booking-confirmed");
+          }
+        };
+
+        // No booking to act on (e.g. bare /booking-confirmed after replaceState, or a direct visit).
+        if (!identity) {
+          return;
+        }
+
+        // Legacy/server path: /api/booking-confirmed already sent email + Slack and redirected here.
+        // Only run the thank-you UI + conversion tag; never deliver again.
+        if (alreadyNotified) {
+          clearPendingConfirmationParams();
+          showBookingConfirmationExperience(endTime, params);
+          cleanUrl();
+          return;
+        }
+
+        // Browser is the single delivery trigger. localStorage is atomic + durable per browser,
+        // so the same booking can never be delivered twice from this device.
+        const deliveryKey = getBookingDeliveryKey(params);
+        let state = null;
+        try {
+          state = localStorage.getItem(deliveryKey);
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+
+        const inflightFresh =
+          typeof state === "string" &&
+          state.startsWith("delivering:") &&
+          Date.now() - Number(state.split(":")[1] || 0) < 120000;
+
+        if (state === "sent" || inflightFresh) {
+          // Already delivered (or another tab is delivering) for this booking — UI only.
+          clearPendingConfirmationParams();
+          showBookingConfirmationExperience(endTime, params);
+          cleanUrl();
+          return;
+        }
+
+        try {
+          localStorage.setItem(deliveryKey, `delivering:${Date.now()}`);
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
+        }
+
+        // Show thank-you + fire conversion immediately for good UX (gtag dedupes itself).
         showBookingConfirmationExperience(endTime, params);
 
-        if (window.history.replaceState) {
-          window.history.replaceState(null, "", "/booking-confirmed");
+        const delivered = await deliverBookingNotification(params);
+        try {
+          if (delivered) {
+            localStorage.setItem(deliveryKey, "sent");
+          } else {
+            // Allow a retry on the next visit if delivery failed.
+            localStorage.removeItem(deliveryKey);
+          }
+        } catch (_) {
+          /* Ignore storage failures (private mode / restricted storage). */
         }
+
+        clearPendingConfirmationParams();
+        cleanUrl();
       }
 
       function handleCalendlyBookingComplete(payload) {
