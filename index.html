@@ -1114,6 +1114,7 @@
         min-height: 0;
       }
 
+      .booking-calendly #booking-calendly-widget,
       .booking-calendly .calendly-inline-widget {
         min-width: 320px;
         width: 100%;
@@ -1134,6 +1135,7 @@
         overflow: visible;
       }
 
+      .booking-calendly #booking-calendly-widget iframe,
       .booking-calendly .calendly-inline-widget iframe {
         display: block;
         width: 100%;
@@ -1240,6 +1242,7 @@
           right: max(12px, env(safe-area-inset-right));
         }
 
+        .booking-calendly #booking-calendly-widget,
         .booking-calendly .calendly-inline-widget {
           min-width: 0;
         }
@@ -1775,10 +1778,7 @@
         <h2 id="booking-modal-title">Book your detailing</h2>
         <p class="booking-modal__intro"><b>A finalized quote will be sent to you for approval prior to your appointment.</b> Your exact service duration and final price depend on your vehicle’s size and package selection. For convenience, select a time slot below. </p>
         <div class="booking-calendly" id="booking-calendly-slot">
-          <div
-            id="booking-calendly-widget"
-            class="calendly-inline-widget"
-          ></div>
+          <div id="booking-calendly-widget" class="booking-calendly-mount"></div>
         </div>
       </div>
     </div>
@@ -1801,7 +1801,6 @@
       </div>
     </footer>
     <p class="build-revision" aria-hidden="true">rev <span id="build-commit-sha">...</span></p>
-    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
       const buildCommitSha = document.getElementById("build-commit-sha");
@@ -1917,6 +1916,7 @@
       const pendingConfirmationStorageKey = "idd-booking-confirmed-pending";
       const defaultFlashDurationMs = 2 * 60 * 60 * 1000;
       const calendlyBookingBasePath = "https://calendly.com/d/cvq4-j88-zg5";
+      let calendlyScriptPromise = null;
 
       function getCalendlyEmbedUrl(basePath) {
         const url = new URL(basePath || calendlyBookingBasePath);
@@ -1929,7 +1929,41 @@
         url.searchParams.set("background_color", "ffffff");
         url.searchParams.set("text_color", "0a2540");
         url.searchParams.set("primary_color", "0066ff");
+        url.searchParams.set("hide_event_type_details", "1");
+        url.searchParams.set("hide_landing_page_details", "1");
         return url.toString();
+      }
+
+      function loadCalendlyScript() {
+        if (typeof Calendly !== "undefined") {
+          return Promise.resolve();
+        }
+        if (calendlyScriptPromise) {
+          return calendlyScriptPromise;
+        }
+
+        calendlyScriptPromise = new Promise((resolve, reject) => {
+          const existing = document.querySelector('script[data-calendly-widget="true"]');
+          if (existing) {
+            existing.addEventListener("load", () => resolve(), { once: true });
+            existing.addEventListener(
+              "error",
+              () => reject(new Error("Calendly script failed to load")),
+              { once: true }
+            );
+            return;
+          }
+
+          const script = document.createElement("script");
+          script.src = "https://assets.calendly.com/assets/external/widget.js";
+          script.async = true;
+          script.dataset.calendlyWidget = "true";
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error("Calendly script failed to load"));
+          document.head.appendChild(script);
+        });
+
+        return calendlyScriptPromise;
       }
 
       function getCalendlyBookingUrl() {
@@ -1943,11 +1977,39 @@
           calendlyInitWaitId = null;
         }
         bookingCalendlyWidget.innerHTML = "";
+        bookingCalendlyWidget.className = "booking-calendly-mount";
+        bookingCalendlyWidget.removeAttribute("data-url");
         bookingCalendlyWidget.style.minHeight = "0";
         bookingCalendlyWidget.style.height = "";
         delete bookingCalendlyWidget.dataset.initialized;
         delete bookingCalendlyWidget.dataset.calendlyPath;
-        delete bookingCalendlyWidget.dataset.touchBound;
+      }
+
+      function initCalendlyWidgetInstance(basePath) {
+        if (!bookingCalendlyWidget || typeof Calendly === "undefined") return false;
+
+        const targetPath = basePath || calendlyBookingBasePath;
+        const embedUrl = getCalendlyEmbedUrl(targetPath);
+        if (!embedUrl) {
+          console.error("[Booking] Missing Calendly embed URL for", targetPath);
+          return false;
+        }
+
+        bookingCalendlyWidget.innerHTML = "";
+        bookingCalendlyWidget.className = "booking-calendly-mount";
+        bookingCalendlyWidget.style.minHeight = "0";
+        bookingCalendlyWidget.style.height = "";
+        bookingCalendlyWidget.dataset.url = embedUrl;
+
+        Calendly.initInlineWidget({
+          url: embedUrl,
+          parentElement: bookingCalendlyWidget,
+          resize: true,
+        });
+
+        bookingCalendlyWidget.dataset.initialized = "true";
+        bookingCalendlyWidget.dataset.calendlyPath = targetPath;
+        return true;
       }
 
       function loadCalendlyWidget(basePath) {
@@ -1961,37 +2023,38 @@
           return;
         }
 
-        function initWidget() {
-          if (typeof Calendly === "undefined") return false;
-          bookingCalendlyWidget.innerHTML = "";
-          bookingCalendlyWidget.style.minHeight = "0";
-          bookingCalendlyWidget.style.height = "";
-          delete bookingCalendlyWidget.dataset.touchBound;
-          Calendly.initInlineWidget({
-            url: getCalendlyEmbedUrl(targetPath),
-            parentElement: bookingCalendlyWidget,
-            resize: true,
-          });
-          bookingCalendlyWidget.dataset.initialized = "true";
-          bookingCalendlyWidget.dataset.calendlyPath = targetPath;
-          bindCalendlyTouchWorkaround();
-          return true;
+        function startWidgetInit() {
+          if (initCalendlyWidgetInstance(targetPath)) {
+            if (calendlyInitWaitId !== null) {
+              window.clearInterval(calendlyInitWaitId);
+              calendlyInitWaitId = null;
+            }
+            return true;
+          }
+          return false;
         }
 
-        if (initWidget()) return;
+        loadCalendlyScript()
+          .then(() => {
+            if (startWidgetInit()) return;
 
-        calendlyInitWaitId = window.setInterval(() => {
-          if (initWidget()) {
-            window.clearInterval(calendlyInitWaitId);
-            calendlyInitWaitId = null;
-          }
-        }, 100);
-        window.setTimeout(() => {
-          if (calendlyInitWaitId !== null) {
-            window.clearInterval(calendlyInitWaitId);
-            calendlyInitWaitId = null;
-          }
-        }, 10000);
+            calendlyInitWaitId = window.setInterval(() => {
+              if (startWidgetInit()) {
+                window.clearInterval(calendlyInitWaitId);
+                calendlyInitWaitId = null;
+              }
+            }, 100);
+
+            window.setTimeout(() => {
+              if (calendlyInitWaitId !== null) {
+                window.clearInterval(calendlyInitWaitId);
+                calendlyInitWaitId = null;
+              }
+            }, 10000);
+          })
+          .catch((error) => {
+            console.error("[Booking] Failed to load Calendly script", error);
+          });
       }
 
       function ensureCalendlyWidget(basePath) {
@@ -2035,23 +2098,6 @@
 
       function unbindModalTouchWorkaround() {
         document.removeEventListener("touchstart", modalTouchNoop, { capture: true });
-      }
-
-      function bindCalendlyTouchWorkaround() {
-        if (!bookingCalendlyWidget || bookingCalendlyWidget.dataset.touchBound === "true") return;
-        const noopTouch = () => {};
-        bookingCalendlyWidget.addEventListener("touchstart", noopTouch, { passive: true });
-        bookingCalendlyWidget.dataset.touchBound = "true";
-
-        const attachIframeTouch = () => {
-          const iframe = bookingCalendlyWidget.querySelector("iframe");
-          if (!iframe) {
-            window.setTimeout(attachIframeTouch, 100);
-            return;
-          }
-          iframe.addEventListener("touchstart", noopTouch, { passive: true });
-        };
-        attachIframeTouch();
       }
 
       function activateBookedFlash() {
