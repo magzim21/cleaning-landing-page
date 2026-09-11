@@ -6,6 +6,26 @@
     {
       "source": "/booking-confirmed",
       "destination": "/index.html"
+    },
+    {
+      "source": "/used-car-reset",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/odour-removal",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/sell-your-car",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/work-truck-detailing",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/family-car-reset",
+      "destination": "/index.html"
     }
   ]
 }
