@@ -85,3 +85,20 @@ execSync(
   "npx esbuild src/datadog-rum-init.js --bundle --minify --outfile=datadog-rum.bundle.js --format=esm --platform=browser",
   { cwd: root, stdio: "inherit" }
 );
+
+execSync(
+  "npx esbuild src/landing-variants.js --bundle --minify --outfile=landing-variants.bundle.js --format=esm --platform=browser",
+  { cwd: root, stdio: "inherit" }
+);
+
+const indexPath = path.join(root, "index.html");
+const landingScriptTag = '<script type="module" src="/landing-variants.bundle.js"></script>';
+let indexHtml = fs.readFileSync(indexPath, "utf8");
+
+if (!indexHtml.includes(landingScriptTag)) {
+  if (!indexHtml.includes("</body>")) {
+    throw new Error("Could not inject landing variant bundle: </body> is missing from index.html");
+  }
+  indexHtml = indexHtml.replace("</body>", `  ${landingScriptTag}\n  </body>`);
+  fs.writeFileSync(indexPath, indexHtml);
+}

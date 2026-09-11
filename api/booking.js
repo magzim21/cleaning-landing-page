@@ -59,6 +59,9 @@ async function sendSlackBookingNotification({
   requestId,
   webhookUrl,
   bookingSource,
+  landingId,
+  landingVariant,
+  landingPath,
   clientName,
   clientEmail,
   clientMobile,
@@ -79,6 +82,9 @@ async function sendSlackBookingNotification({
   const slackText = [
     ":rotating_light: *New booking request*",
     `*Source:* ${bookingSource}`,
+    `*Landing ID:* ${landingId || "Not provided"}`,
+    `*Landing variant:* ${landingVariant || "Not provided"}`,
+    `*Landing path:* ${landingPath || "Not provided"}`,
     `*Name:* ${clientName}`,
     `*Email:* ${clientEmail}`,
     `*Phone:* ${clientMobile}`,
@@ -172,6 +178,9 @@ export default async function handler(request) {
   }
 
   const bookingSource = str(formData.get("booking_source")) || "Website";
+  const landingId = str(formData.get("landing_id"));
+  const landingVariant = str(formData.get("landing_variant"));
+  const landingPath = str(formData.get("landing_path"));
   const clientName = readFirst(formData, [
     "client_name",
     "contact_name",
@@ -255,6 +264,9 @@ export default async function handler(request) {
 
   const emailBody = [
     `Booking source: ${bookingSource}`,
+    `Landing ID: ${landingId || "Not provided"}`,
+    `Landing variant: ${landingVariant || "Not provided"}`,
+    `Landing path: ${landingPath || "Not provided"}`,
     `Name: ${clientName}`,
     `Email: ${clientEmail}`,
     `Mobile number: ${clientMobile}`,
@@ -280,6 +292,9 @@ export default async function handler(request) {
 
   console.log(`[${requestId}] Sending booking email`, {
     bookingSource,
+    landingId,
+    landingVariant,
+    landingPath,
     packageType,
     attachments: attachments.length,
     totalPhotoBytes,
@@ -347,6 +362,9 @@ export default async function handler(request) {
       requestId,
       webhookUrl: slackWebhookUrl,
       bookingSource,
+      landingId,
+      landingVariant,
+      landingPath,
       clientName,
       clientEmail,
       clientMobile,
